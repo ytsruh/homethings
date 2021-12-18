@@ -1,0 +1,17 @@
+{
+  "name": "homeflix-api",
+  "version": "1.0.0",
+  "description": "Azure functions for Homeflix",
+  "scripts": {
+    "start": "func start",
+    "seed": "node ./db/seed",
+    "seed-undo": "node ./db/seed-undo"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "convert-excel-to-json": "^1.7.0",
+    "dotenv": "^10.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.12"
+  }
+}
