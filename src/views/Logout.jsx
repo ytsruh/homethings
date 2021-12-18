@@ -1,5 +1,7 @@
 import React from "react";
+import { Navigate } from "react-router-dom";
 
 export default function Logout() {
-  return <h1>Logout</h1>;
+  sessionStorage.clear();
+  return <Navigate replace to="/login" />;
 }

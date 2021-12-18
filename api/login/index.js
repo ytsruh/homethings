@@ -1,6 +1,6 @@
 require("dotenv").config();
 const db = require("../db");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 module.exports = async function (context, req) {
@@ -10,19 +10,20 @@ module.exports = async function (context, req) {
     const match = await bcrypt.compare(req.body.password, user.password);
     //Send response based on result
     if (match) {
+      const expiry = Math.floor(Date.now() / 1000) + 60 * 60 * 24; //Expires in 24 hours
       const token = jwt.sign(
         {
           data: {
             id: user.id,
             username: user.username,
           },
-          exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24, //Expires in 24 hours
+          exp: expiry,
         },
         process.env.JWTSECRET
       );
       context.res = {
         status: 200,
-        body: token,
+        body: JSON.stringify({ token, expiry }),
         headers: {
           "Content-Type": "application/json",
         },

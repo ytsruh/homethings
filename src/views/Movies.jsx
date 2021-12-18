@@ -34,7 +34,7 @@ export default function Movies() {
   }
 
   return (
-    <div>
+    <div className="mb-3">
       <PageTitle title="Movies" description={desc} image={image} alt="Movies Hero" />
       <MoviesList data={movies} />
     </div>

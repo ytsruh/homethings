@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import PageTitle from "../components/PageTitle";
 import image from "../assets/img/showshero1.jpeg";
+import ShowsList from "../components/ShowsList";
 
 export default function Shows() {
   const [shows, setShows] = useState([]);
@@ -33,8 +34,9 @@ export default function Shows() {
   }
 
   return (
-    <div>
+    <div className="mb-3">
       <PageTitle title="TV Shows" description={desc} image={image} alt="Shows Hero" />
+      <ShowsList data={shows} />
     </div>
   );
 }

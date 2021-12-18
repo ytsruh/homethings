@@ -8,7 +8,9 @@ import Login from "./views/Login";
 import Logout from "./views/Logout";
 import Movies from "./views/Movies";
 import Shows from "./views/Shows";
-import Player from "./views/Player";
+import Show from "./views/Show";
+import MoviePlayer from "./views/MoviePlayer";
+import ShowPlayer from "./views/ShowPlayer";
 
 export default function App() {
   return (
@@ -20,8 +22,10 @@ export default function App() {
         <Route path="/" element={<Protected />}>
           <Route path="/" element={<Navigate replace to="/movies" />} />
           <Route path="movies" element={<Movies />} />
-          <Route path="/movies/:id" element={<Player />} />
+          <Route path="/movies/:id" element={<MoviePlayer />} />
           <Route path="shows" element={<Shows />} />
+          <Route path="/shows/:id" element={<Show />} />
+          <Route path="/shows/:id/episode/:episode" element={<ShowPlayer />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
