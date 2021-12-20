@@ -8,6 +8,7 @@ The Homeflix API & App
 
 - Added Authentication to API
 - Updated app to send token with fetch requests
+- Updated 404 & 500 Pages
 
 ### 0.1
 
