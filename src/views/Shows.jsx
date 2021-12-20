@@ -10,10 +10,17 @@ export default function Shows() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_HOST}/shows`);
+        const response = await fetch(`${process.env.REACT_APP_HOST}/shows`, {
+          headers: { token: user.token },
+        });
+        if (!response.ok) {
+          setError(true);
+        }
         const data = await response.json();
         setShows(data);
         setLoading(false);
@@ -23,7 +30,7 @@ export default function Shows() {
       }
     };
     getData();
-  }, []);
+  }, [user.token]);
 
   if (error) {
     return <Navigate replace to="/500" />;

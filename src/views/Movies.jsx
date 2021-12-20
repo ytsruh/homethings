@@ -10,10 +10,17 @@ export default function Movies() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  const user = JSON.parse(sessionStorage.getItem("user"));
+
   useEffect(() => {
     const getData = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_HOST}/movies`);
+        const response = await fetch(`${process.env.REACT_APP_HOST}/movies`, {
+          headers: { token: user.token },
+        });
+        if (!response.ok) {
+          setError(true);
+        }
         const data = await response.json();
         setMovies(data);
         setLoading(false);
@@ -23,7 +30,7 @@ export default function Movies() {
       }
     };
     getData();
-  }, []);
+  }, [user.token]);
 
   if (error) {
     return <Navigate replace to="/500" />;

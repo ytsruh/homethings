@@ -3,7 +3,7 @@ import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 
 export default function Navigation() {
   return (
-    <Navbar bg="dark" variant="primary">
+    <Navbar bg="dark" variant="primary" sticky="top">
       <Container className="d-flex justify-content-between">
         <Navbar.Brand href="/">Homeflix</Navbar.Brand>
         <Nav className="flex-row">
