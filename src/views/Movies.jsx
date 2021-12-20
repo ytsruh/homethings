@@ -30,7 +30,7 @@ export default function Movies() {
       }
     };
     getData();
-  }, [user]);
+  }, [user.token]);
 
   if (error) {
     return <Navigate replace to="/500" />;

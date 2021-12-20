@@ -29,7 +29,7 @@ export default function Show(props) {
       }
     };
     getData();
-  }, [params.id, user]);
+  }, [params.id, user.token]);
 
   if (error) {
     return <Navigate replace to="/500" />;
