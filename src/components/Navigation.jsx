@@ -16,6 +16,7 @@ export default function Navigation() {
         </Nav>
         <Nav>
           <NavDropdown title="Account">
+            <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
             <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
           </NavDropdown>
         </Nav>

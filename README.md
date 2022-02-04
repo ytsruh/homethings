@@ -4,6 +4,10 @@ The Homeflix API & App
 
 ## Versions
 
+### 0.3
+
+- Added Profile page
+
 ### 0.2
 
 - Added Authentication to API

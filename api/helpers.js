@@ -22,4 +22,8 @@ module.exports = {
       return false;
     }
   },
+  decode: async (token) => {
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    return decoded.data.id;
+  },
 };
