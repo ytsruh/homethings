@@ -2,20 +2,7 @@
 
 The Homeflix API & App
 
-## Environment Variables
-
-### React
-
-- REACT_APP_HOST =
-- REACT_APP_VERSION =
-
-### API
-
-- MONGO_URL =
-- JWTSECRET =
-- USER_NAME =
-- USER_EMAIL =
-- USER_PASSWORD =
+---
 
 ## Versions
 
