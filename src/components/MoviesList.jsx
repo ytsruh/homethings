@@ -3,11 +3,11 @@ import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 export default function MoviesList(props) {
-  const rows = props.data.data.map((x, i) => {
+  const rows = props.data.map((x, i) => {
     return <Movie key={i} data={x} />;
   });
   return (
-    <Container className="">
+    <Container>
       <Row>{rows}</Row>
     </Container>
   );
