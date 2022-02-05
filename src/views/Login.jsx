@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { Navigate } from "react-router-dom";
 import Loading from "../components/Loading";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [redirect, setRedirect] = useState(false);
 
@@ -31,11 +32,11 @@ export default function Login() {
       }
       // Set to json, put token in storage & redirect
       const data = await response.json();
-      console.log(data);
       await sessionStorage.setItem("user", JSON.stringify(data));
       setRedirect(true);
     } catch (err) {
       setSubmitting(false);
+      setError("There has been an error. Please try to enter you email & password again.");
       console.log(err);
     }
   };
@@ -52,6 +53,10 @@ export default function Login() {
     <Container fluid>
       <Row className="justify-content-md-center">
         <Col sm="10" md="6" lg="4" className="mt-5">
+          <div className="text-primary text-center py-5">
+            <h1>Welcome to Homeflix</h1>
+            <h6 className="text-white">Please login to view awesome Movies & TV shows</h6>
+          </div>
           <Form onSubmit={submitForm}>
             <Form.Group className="mb-3">
               <Form.Label className="text-primary">Email address</Form.Label>
@@ -80,8 +85,18 @@ export default function Login() {
               Submit
             </Button>
           </Form>
+          {error ? <Error text={error} close={setError} /> : ""}
         </Col>
       </Row>
     </Container>
   );
 }
+
+const Error = (props) => {
+  return (
+    <Alert variant="primary" onClose={() => props.close(false)} dismissible className="my-5">
+      <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+      <p>{props.text}</p>
+    </Alert>
+  );
+};
