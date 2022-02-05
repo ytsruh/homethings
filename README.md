@@ -2,8 +2,6 @@
 
 The Homeflix API & App
 
----
-
 ## Versions
 
 ### 0.3
