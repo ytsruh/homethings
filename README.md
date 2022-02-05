@@ -7,6 +7,7 @@ The Homeflix API & App
 ### 0.3
 
 - Added Profile page
+- Added Personalised Icon setting
 
 ### 0.2
 

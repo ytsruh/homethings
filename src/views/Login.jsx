@@ -11,7 +11,7 @@ export default function Login() {
 
   const submitForm = async (e) => {
     e.preventDefault();
-    const url = "https://homeflix-api.azurewebsites.net/login";
+    const url = `${process.env.REACT_APP_HOST}/login`;
     try {
       setSubmitting(true);
       const response = await fetch(url, {
@@ -31,6 +31,7 @@ export default function Login() {
       }
       // Set to json, put token in storage & redirect
       const data = await response.json();
+      console.log(data);
       await sessionStorage.setItem("user", JSON.stringify(data));
       setRedirect(true);
     } catch (err) {

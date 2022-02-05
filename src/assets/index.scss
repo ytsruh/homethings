@@ -9,6 +9,11 @@ $web-font: "https://fonts.googleapis.com/css2?family=Ubuntu&display=swap";
   font-family: "Ubuntu", sans-serif !important;
 }
 
+//Remove dropdown arrow from navigation
+.dropdown-toggle::after {
+  display: none;
+}
+
 .movieImageContainer {
   width: 100%;
   overflow: hidden;

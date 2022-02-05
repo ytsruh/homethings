@@ -18,6 +18,14 @@ const UserSchema = new mongoose.Schema(
       required: true,
       min: 6,
     },
+    icon: {
+      type: String,
+      default: "BsFillEmojiSmileUpsideDownFill",
+    },
+    darkMode: {
+      type: String,
+      default: "system",
+    },
   },
   { timestamps: true }
 );
