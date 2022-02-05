@@ -22,4 +22,16 @@ module.exports = {
       return false;
     }
   },
+  decode: async (token) => {
+    const decoded = jwt.verify(token, process.env.JWTSECRET);
+    return decoded.data.id;
+  },
+  filterUserData: async (data) => {
+    return {
+      name: data.name,
+      email: data.email,
+      darkMode: data.darkMode,
+      icon: data.icon,
+    };
+  },
 };

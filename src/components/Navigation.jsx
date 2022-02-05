@@ -1,7 +1,10 @@
 import React from "react";
 import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
+import Icon from "./Icon";
 
 export default function Navigation() {
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  const iconType = user.userData.icon;
   return (
     <Navbar bg="dark" variant="primary" sticky="top">
       <Container className="d-flex justify-content-between">
@@ -15,7 +18,11 @@ export default function Navigation() {
           </Nav.Link>
         </Nav>
         <Nav>
-          <NavDropdown title="Account">
+          <NavDropdown
+            title={<Icon icon={iconType} color="primary" styles={iconStyles} />}
+            menuVariant="dark"
+          >
+            <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
             <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
           </NavDropdown>
         </Nav>
@@ -23,3 +30,7 @@ export default function Navigation() {
     </Navbar>
   );
 }
+
+const iconStyles = {
+  fontSize: "20px",
+};

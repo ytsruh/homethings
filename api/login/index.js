@@ -21,9 +21,14 @@ module.exports = async function (context, req) {
         },
         process.env.JWTSECRET
       );
+      const userData = {
+        name: user.name,
+        icon: user.icon,
+        darkMode: user.darkMode,
+      };
       context.res = {
         status: 200,
-        body: JSON.stringify({ token, expiry }),
+        body: JSON.stringify({ token, expiry, userData }),
         headers: {
           "Content-Type": "application/json",
         },

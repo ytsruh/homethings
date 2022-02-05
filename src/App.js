@@ -11,6 +11,7 @@ import Shows from "./views/Shows";
 import Show from "./views/Show";
 import MoviePlayer from "./views/MoviePlayer";
 import ShowPlayer from "./views/ShowPlayer";
+import Profile from "./views/Profile";
 
 export default function App() {
   return (
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="shows" element={<Shows />} />
           <Route path="/shows/:id" element={<Show />} />
           <Route path="/shows/:id/episode/:episode" element={<ShowPlayer />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
