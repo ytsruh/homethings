@@ -1,7 +1,8 @@
+import type { NextApiRequest, NextApiResponse } from "next";
 import * as helpers from "@/lib/helpers";
 import * as db from "@/lib/db";
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     await controller.post(req, res);
   } else {

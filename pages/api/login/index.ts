@@ -1,8 +1,9 @@
+import type { NextApiRequest, NextApiResponse } from "next";
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 import * as db from "@/lib/db";
 
-export default async function handler(req, res) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
       //find user & validate password
