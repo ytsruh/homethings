@@ -1,33 +1,36 @@
 import React from "react";
-import { Navbar, Container, Nav, NavDropdown } from "react-bootstrap";
 import Icon from "./Icon";
+import Dropdown from "@/lib/ui/Dropdown";
+import ThemePicker from "@/components/ThemePicker";
 
 export default function Navigation(props) {
   return (
-    <Navbar bg="dark" variant="primary" sticky="top">
-      <Container className="d-flex justify-content-between">
-        <Navbar.Brand href="/">Homeflix</Navbar.Brand>
-        <Nav className="flex-row">
-          <Nav.Link className="px-2" href="/movies">
-            Movies
-          </Nav.Link>
-          <Nav.Link className="px-2" href="/shows">
-            Shows
-          </Nav.Link>
-        </Nav>
-        <Nav>
-          <NavDropdown
-            title={<Icon icon={props.icon} color="primary" styles={iconStyles} />}
-            menuVariant="dark"
-          >
-            <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
-            <NavDropdown.Item href="/logout">Logout</NavDropdown.Item>
-          </NavDropdown>
-        </Nav>
-      </Container>
-    </Navbar>
+    <div
+      className="flex items-center justify-between px-5 md:px-10 lg:px-20 py-4 bg-salt dark:bg-coal text-primary sticky top-0 z-50 
+    border-bottom border-black"
+    >
+      <a href="/" className="text-2xl">
+        Homeflix
+      </a>
+      <div className="flex items-center space-x-2 md:space-x-10">
+        <a href="/movies">Movies</a>
+        <a href="/shows">Shows</a>
+      </div>
+      <div className="flex space-x-5">
+        <ThemePicker />
+        <Dropdown
+          menuItem={<Icon icon={props.icon} color="primary" styles={iconStyles} />}
+          menuItems={items}
+        />
+      </div>
+    </div>
   );
 }
+
+const items = [
+  { link: "/profile", text: "Profile" },
+  { link: "/logout", text: "Logout" },
+];
 
 const iconStyles = {
   fontSize: "20px",

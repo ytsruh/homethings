@@ -4,6 +4,10 @@ The Homeflix App & API using NextJS
 
 ## Versions
 
+### 0.5
+
+-
+
 ### 0.4
 
 - Refactored to use NextJS

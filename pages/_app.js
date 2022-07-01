@@ -1,6 +1,6 @@
 import React from "react";
 import Head from "next/head";
-import "@/lib/styles/index.scss";
+import "@/lib/styles/index.css";
 
 function App({ Component, pageProps: { session, ...pageProps } }) {
   return (

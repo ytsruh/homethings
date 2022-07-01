@@ -7,9 +7,9 @@ export default function MoviesList(props) {
     return <Movie key={i} data={x} />;
   });
   return (
-    <Container>
-      <Row>{rows}</Row>
-    </Container>
+    <div className="container mx-auto px-5 md:px-0">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{rows}</div>
+    </div>
   );
 }
 
@@ -19,10 +19,10 @@ const Movie = (props) => {
   const handleShow = () => setShow(true);
   const imageUrl = `https://homeflix-media.azureedge.net/images/movies/${props.data.imageName}`;
   return (
-    <Col lg={3} md={4} sm={6} className="my-3">
-      <button onClick={handleShow} className="modalButton movieImageContainer">
-        <img className="movieImageThumbnail img-fluid" src={imageUrl} alt={props.data.title} />
-      </button>
+    <div className="my-3">
+      <div onClick={handleShow} className="cursor-pointer">
+        <img className="h-120 w-full" src={imageUrl} alt={props.data.title} />
+      </div>
       <Modal show={show} onHide={handleClose} centered size="lg" className="border border-dark">
         <Modal.Header className="bg-dark border border-dark">
           <Modal.Title className="text-primary">{props.data.title}</Modal.Title>
@@ -51,7 +51,7 @@ const Movie = (props) => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </Col>
+    </div>
   );
 };
 
