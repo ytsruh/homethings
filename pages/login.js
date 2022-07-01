@@ -37,7 +37,6 @@ export default function Login() {
     } catch (err) {
       setSubmitting(false);
       setError("There has been an error. Please try to enter you email & password again.");
-      console.log(err);
     }
   };
 
