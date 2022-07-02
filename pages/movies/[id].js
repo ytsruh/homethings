@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "react-bootstrap";
 import { useRouter } from "next/router";
 import {
   Player as VideoPlayer,
@@ -15,6 +14,7 @@ import {
 import "video-react/dist/video-react.css";
 import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
+import Button from "@/lib/ui/Button";
 
 export default function SingleMovie() {
   const router = useRouter();
@@ -27,7 +27,6 @@ export default function SingleMovie() {
     if (!router.isReady) return;
     const getData = async () => {
       try {
-        console.log(id);
         const user = JSON.parse(sessionStorage.getItem("user"));
         const response = await fetch(`/api/movies/${id}`, {
           headers: { token: user.token },
@@ -58,32 +57,37 @@ export default function SingleMovie() {
 
   return (
     <Protected>
-      <Card bg="dark" className="border border-dark m-3">
-        <Card.Body>
-          <Card.Title className="my-3 text-primary">
-            <h1>{data.title}</h1>
-          </Card.Title>
-          <Card.Subtitle className="my-3 text-white">Duration: {data.duration}</Card.Subtitle>
-          <Card.Text className="my-3 text-muted">
-            <VideoPlayer
-              src={`https://homeflix-media.azureedge.net/movies/${data.fileName}`}
-              aspectRatio="16:9"
-              fluid={true}
-              autoPlay={true}
-            >
-              <LoadingSpinner />
-              <BigPlayButton position="center" />
-              <ControlBar>
-                <ReplayControl seconds={10} order={1.1} />
-                <ForwardControl seconds={30} order={1.2} />
-                <CurrentTimeDisplay order={4.1} />
-                <TimeDivider order={4.2} />
-                <VolumeMenuButton />
-              </ControlBar>
-            </VideoPlayer>
-          </Card.Text>
-        </Card.Body>
-      </Card>
+      <div className="container mx-auto flex flex-col w-full py-10">
+        <div className="flex justify-between items-center my-2">
+          <div className="space-y-2">
+            <h1 className="text-primary text-3xl">{data.title}</h1>
+            <p className="text-coal dark:text-salt">Duration: {data.duration}</p>
+          </div>
+          <a href="/movies">
+            <Button color="bg-coal dark:bg-salt" text="text-salt dark:text-coal">
+              Back
+            </Button>
+          </a>
+        </div>
+        <div>
+          <VideoPlayer
+            src={`https://homeflix-media.azureedge.net/movies/${data.fileName}`}
+            aspectRatio="16:9"
+            fluid={true}
+            autoPlay={true}
+          >
+            <LoadingSpinner />
+            <BigPlayButton position="center" />
+            <ControlBar>
+              <ReplayControl seconds={10} order={1.1} />
+              <ForwardControl seconds={30} order={1.2} />
+              <CurrentTimeDisplay order={4.1} />
+              <TimeDivider order={4.2} />
+              <VolumeMenuButton />
+            </ControlBar>
+          </VideoPlayer>
+        </div>
+      </div>
     </Protected>
   );
 }

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import Icon from "@/components/Icon";
+import Button from "@/lib/ui/Button";
 
 export default function Profile() {
   const router = useRouter();
@@ -83,29 +83,28 @@ export default function Profile() {
 
   return (
     <Protected>
-      <div className="mb-3">
+      <div className="py-3">
         <PageTitle title="Profile" description={desc} image="img/settings.jpeg" alt="Settings" />
-        <Container className="bg-dark my-5">
-          <Form>
-            <Row className="p-5">
-              <Col sm={12} md={6}>
-                <h2 className="text-white pb-3 text-center">Account Settings</h2>
-                <Form.Group className="mt-3">
-                  <Form.Label className="text-white">Name</Form.Label>
-                  <Form.Control
-                    className="text-white"
-                    type="email"
-                    value={profile.name}
-                    placeholder="name"
-                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                  />
-                </Form.Group>
-                <Form.Group className="mt-3">
-                  <Form.Label className="text-white">Dark Mode</Form.Label>
-                  <div onChange={(e) => setProfile({ ...profile, darkMode: e.target.value })}>
-                    {["dark", "light", "system"].map((type, i) => (
-                      <Form.Check
-                        inline
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 py-5 px-5 md:px-10 lg:px-16">
+          <div>
+            <h2 className="text-primary text-2xl pb-3 text-center">Account Settings</h2>
+            <div className="px-5">
+              <div className="py-3">
+                <div className="px-3 py-1 mb-2">Name</div>
+                <input
+                  className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
+                  type="text"
+                  value={profile.name}
+                  placeholder="Name"
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                />
+              </div>
+              <div className="py-3">
+                <div className="px-3 py-1 mb-2">Dark Mode</div>
+                <div className="flex justify-around px-5 py-2">
+                  {["light", "dark", "system"].map((type, i) => (
+                    <div key={i}>
+                      <input
                         value={type}
                         label={type}
                         name="darkMode"
@@ -114,45 +113,45 @@ export default function Profile() {
                         key={i}
                         className="text-white text-capitalize"
                       />
-                    ))}
-                  </div>
-                  <Form.Text muted>Note: This feature does not work at the moment :)</Form.Text>
-                </Form.Group>
-              </Col>
-              <Col sm={12} md={6} className="mt-5 mt-md-0">
-                <h2 className="text-white pb-3 text-center">Profile Icon</h2>
-                <Row onChange={(e) => setProfile({ ...profile, icon: e.target.value })}>
-                  {[
-                    "BsFillEmojiSmileUpsideDownFill",
-                    "BsTrophyFill",
-                    "BsFillCameraReelsFill",
-                    "BsHeartFill",
-                  ].map((type, i) => (
-                    <Col key={i} className="" xs={6} sm={6} md={3}>
-                      <Form.Check
-                        inline
-                        value={type}
-                        label={<Icon icon={type} styles={iconStyles} />}
-                        name="icon"
-                        type="radio"
-                        defaultChecked={profile.icon === type}
-                        id={i}
-                      />
-                    </Col>
+                      <label className="capitalize px-3">{type}</label>
+                    </div>
                   ))}
-                </Row>
-              </Col>
-            </Row>
-            <Row className="p-5">
-              <Button variant="primary" onClick={() => submitData()}>
-                Submit
-              </Button>
-            </Row>
-          </Form>
-        </Container>
-        <Container className="bg-dark my-5 py-3 text-white">
+                </div>
+                <div className="text-sm text-zinc-400 px-3 py-1 mb-2">
+                  Please note: This feature does not currently work
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h2 className="text-primary text-2xl pb-3 text-center">Profile Icon</h2>
+            <div className="flex justify-around px-5">
+              {["BsFillEmojiSmileUpsideDownFill", "BsTrophyFill", "BsFillCameraReelsFill", "BsHeartFill"].map(
+                (type, i) => (
+                  <div key={i}>
+                    <input
+                      value={type}
+                      name="icon"
+                      type="radio"
+                      defaultChecked={profile.icon === type}
+                      id={i}
+                      onChange={(e) => setProfile({ ...profile, icon: e.target.value })}
+                    />
+                    <label>
+                      <Icon icon={type} styles={iconStyles} color="text-coal dark:text-salt" />
+                    </label>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex justify-center py-5" onClick={() => submitData()}>
+          <Button>Submit</Button>
+        </div>
+        <div className="py-10">
           <h5 className="text-center">App version: {process.env.NEXT_PUBLIC_VERSION}</h5>
-        </Container>
+        </div>
       </div>
     </Protected>
   );
@@ -160,5 +159,4 @@ export default function Profile() {
 
 const iconStyles = {
   fontSize: "50px",
-  margin: "0,0,0,50",
 };

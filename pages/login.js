@@ -56,13 +56,13 @@ export default function Login() {
           <form id="login-form" onSubmit={submitForm} className="py-5 space-y-5 text-coal dark:text-salt">
             <input
               type="email"
-              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-white border"
+              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
               placeholder="Email"
               onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"
-              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-white border"
+              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
               placeholder="Password"
               onChange={(e) => setPassword(e.target.value)}
             />
