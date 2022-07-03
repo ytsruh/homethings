@@ -6,7 +6,9 @@ The Homeflix App & API using NextJS
 
 ### 0.5
 
--
+- Switched from Bootstrap to Tailwind
+- Added dark mode toggle
+- Added new section to view users & create new user
 
 ### 0.4
 
