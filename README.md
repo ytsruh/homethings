@@ -1,8 +1,18 @@
 # Homeflix
 
-The Homeflix API & App
+The Homeflix App & API using NextJS
 
 ## Versions
+
+### 0.5
+
+-
+
+### 0.4
+
+- Refactored to use NextJS
+- Added new endpoint to retrieve Episode
+- Switched from 'node-sass' to 'sass' library
 
 ### 0.3
 
