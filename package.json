@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "dayjs": "^1.11.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.12",
     "next": "^12.2.0",

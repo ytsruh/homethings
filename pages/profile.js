@@ -149,9 +149,6 @@ export default function Profile() {
         <div className="flex justify-center py-5" onClick={() => submitData()}>
           <Button>Submit</Button>
         </div>
-        <div className="py-10">
-          <h5 className="text-center">App version: {process.env.NEXT_PUBLIC_VERSION}</h5>
-        </div>
       </div>
     </Protected>
   );
