@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Table, Button } from "react-bootstrap";
 import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import { useRouter } from "next/router";
+import Button from "@/lib/ui/Button";
 
 export default function Show() {
   const router = useRouter();
@@ -48,70 +48,48 @@ export default function Show() {
 
   return (
     <Protected>
-      <Container fluid>
-        <div className="bg-dark my-3">
-          <Row>
-            <Col className="mx-5">
-              <Row>
-                <div className="my-3">
-                  <h1 className="text-primary">{show.name}</h1>
-                </div>
-              </Row>
-              <Row>
-                <Col md="5" sm="6">
-                  <div className="my-3">
-                    <img
-                      src={`https://homeflix-media.azureedge.net/images/shows/${show.imageName}`}
-                      alt={show.name}
-                      className="showImageThumbnail"
-                    />
-                  </div>
-                </Col>
-                <Col md="7" sm="6">
-                  <h1 className="text-primary py-3">{show.title}</h1>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col>
-                  <Table variant="dark" size="sm" responsive className="my-3 text-center">
-                    <thead>
-                      <tr className="font-weight-bold text-uppercase">
-                        <th className="w-10">Season</th>
-                        <th className="w-10">Episode</th>
-                        <th className="w-30">Title</th>
-                        <th className="w-40">Description</th>
-                        <th className="w-10" />
-                      </tr>
-                    </thead>
-                    <tbody>{episodes}</tbody>
-                  </Table>
-                </Col>
-              </Row>
-            </Col>
-          </Row>
+      <div className="container mx-auto flex flex-col px-5 md:px-10">
+        <div className="flex justify-between">
+          <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col items-center justify-center">
+            <h1 className="text-primary text-5xl">{show.title}</h1>
+            <h3 className="text-xl my-10">Episodes: {show.episodes.length}</h3>
+          </div>
+          <div className="w-0 md:w-2/3 lg:w-1/2">
+            <img
+              src={`https://homeflix-media.azureedge.net/images/shows/${show.imageName}`}
+              alt={show.name}
+              className="w-full h-80 object-cover"
+            />
+          </div>
         </div>
-      </Container>
+        <table className="min-w-full table-auto text-center my-5">
+          <thead>
+            <tr className="font-bold border-b-4 border-salt">
+              <th>Season</th>
+              <th>Episode</th>
+              <th>Title</th>
+              <th className="hidden sm:block">Description</th>
+              <th />
+            </tr>
+          </thead>
+          <tbody className="">{episodes}</tbody>
+        </table>
+      </div>
     </Protected>
   );
 }
 
 const EpisodeRow = (props) => {
   return (
-    <tr className="font-weight-bold">
+    <tr className="">
       <td>{props.episode.seasonNumber}</td>
       <td>{props.episode.episodeNumber}</td>
       <td>{props.episode.title}</td>
-      <td>{props.episode.description}</td>
+      <td className="hidden sm:inline">{props.episode.description}</td>
       <td>
-        <Button
-          color="primary"
-          size="lg"
-          className="mx-5 my-3"
-          href={`/shows/${props.show._id}/episode/${props.episode._id}`}
-        >
-          Play
-        </Button>
+        <a href={`/shows/${props.show._id}/episode/${props.episode._id}`}>
+          <Button>Play</Button>
+        </a>
       </td>
     </tr>
   );

@@ -42,7 +42,7 @@ export default function Shows() {
 
   return (
     <Protected>
-      <div className="mb-3">
+      <div className="py-3">
         <PageTitle title="TV Shows" description={desc} image="img/showshero1.jpeg" alt="Shows Hero" />
         <ShowsList data={shows} />
       </div>

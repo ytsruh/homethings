@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Card } from "react-bootstrap";
 import { useRouter } from "next/router";
 import {
   Player as VideoPlayer,
@@ -15,6 +14,7 @@ import {
 import "video-react/dist/video-react.css";
 import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
+import Button from "@/lib/ui/Button";
 
 export default function Episode() {
   const router = useRouter();
@@ -27,7 +27,6 @@ export default function Episode() {
     if (!router.isReady) return;
     const getData = async () => {
       try {
-        console.log(episode);
         const user = JSON.parse(sessionStorage.getItem("user"));
         const response = await fetch(`/api/episode/${episode}`, {
           headers: { token: user.token },
@@ -58,36 +57,40 @@ export default function Episode() {
 
   return (
     <Protected>
-      <Card bg="dark" className="border border-dark m-3">
-        <Card.Body>
-          <Card.Title className="my-3 text-primary">
-            <h1>{data.show.title}</h1>
-          </Card.Title>
-          <Card.Subtitle className="my-3 text-white">{data.title}</Card.Subtitle>
-          <Card.Subtitle className="my-3 text-white">
-            Season: {data.seasonNumber} | Episode: {data.episodeNumber}
-          </Card.Subtitle>
-
-          <Card.Text className="my-3 text-muted">
-            <VideoPlayer
-              src={`https://homeflix-media.azureedge.net/shows/${data.show.title}/Season ${data.seasonNumber}/${data.fileName}`}
-              aspectRatio="16:9"
-              fluid={true}
-              autoPlay={true}
-            >
-              <LoadingSpinner />
-              <BigPlayButton position="center" />
-              <ControlBar>
-                <ReplayControl seconds={10} order={1.1} />
-                <ForwardControl seconds={30} order={1.2} />
-                <CurrentTimeDisplay order={4.1} />
-                <TimeDivider order={4.2} />
-                <VolumeMenuButton />
-              </ControlBar>
-            </VideoPlayer>
-          </Card.Text>
-        </Card.Body>
-      </Card>
+      <div className="container mx-auto flex flex-col w-full py-10">
+        <div className="flex justify-between my-2 items-center">
+          <div className="space-y-2">
+            <h1 className="text-primary text-3xl">{data.show.title}</h1>
+            <h2 className="text-xl">{data.title}</h2>
+            <p className="text-coal dark:text-salt">
+              Season: {data.seasonNumber} | Episode: {data.episodeNumber}
+            </p>
+          </div>
+          <a href={`/shows/${data.show._id}`}>
+            <Button color="bg-coal dark:bg-salt" text="text-salt dark:text-coal">
+              Back
+            </Button>
+          </a>
+        </div>
+        <div>
+          <VideoPlayer
+            src={`https://homeflix-media.azureedge.net/shows/${data.show.title}/Season ${data.seasonNumber}/${data.fileName}`}
+            aspectRatio="16:9"
+            fluid={true}
+            autoPlay={true}
+          >
+            <LoadingSpinner />
+            <BigPlayButton position="center" />
+            <ControlBar>
+              <ReplayControl seconds={10} order={1.1} />
+              <ForwardControl seconds={30} order={1.2} />
+              <CurrentTimeDisplay order={4.1} />
+              <TimeDivider order={4.2} />
+              <VolumeMenuButton />
+            </ControlBar>
+          </VideoPlayer>
+        </div>
+      </div>
     </Protected>
   );
 }

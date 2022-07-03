@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
 import { useRouter } from "next/router";
+import Button from "@/lib/ui/Button";
+import Alert from "@/lib/ui/Alert";
 import Loading from "@/components/Loading";
 
 export default function Login() {
@@ -45,53 +46,37 @@ export default function Login() {
   }
 
   return (
-    <Container fluid>
-      <Row className="justify-content-md-center">
-        <Col sm="10" md="6" lg="4" className="mt-5">
-          <div className="text-primary text-center py-5">
-            <h1>Welcome to Homeflix</h1>
-            <h6 className="text-white">Please login to view awesome Movies & TV shows</h6>
+    <div className="flex items-center justify-center h-screen bg-salt dark:bg-coal text-coal dark:text-salt">
+      <div className="relative flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0">
+        <div className="p-6 md:p-20">
+          <div className="text-center py-5">
+            <h1 className="text-primary text-5xl py-2">Welcome to Homeflix</h1>
+            <h6 className="text-xl py-2">Login to view awesome Movies & TV shows</h6>
           </div>
-          <Form onSubmit={submitForm}>
-            <Form.Group className="mb-3">
-              <Form.Label className="text-primary">Email address</Form.Label>
-              <Form.Control
-                required
-                type="email"
-                name="email"
-                className="bg-dark border border-primary text-white"
-                placeholder="Email"
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Group>
+          <form id="login-form" onSubmit={submitForm} className="py-5 space-y-5 text-coal dark:text-salt">
+            <input
+              type="email"
+              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
+              placeholder="Email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <input
+              type="password"
+              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
+              placeholder="Password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <div className="flex flex-col items-center justify-between mt-6 space-y-6 md:flex-row md:space-y-0">
+              <Button form="login-form" type="submit">
+                Login
+              </Button>
+            </div>
+          </form>
+          {error ? <Alert text={error} close={setError} /> : ""}
+        </div>
 
-            <Form.Group className="mb-3">
-              <Form.Label className="text-primary">Password</Form.Label>
-              <Form.Control
-                required
-                type="password"
-                name="password"
-                className="bg-dark border border-primary text-white"
-                placeholder="Password"
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
-          </Form>
-          {error ? <Error text={error} close={setError} /> : ""}
-        </Col>
-      </Row>
-    </Container>
+        <img src="img/login.jpg" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
+      </div>
+    </div>
   );
 }
-
-const Error = (props) => {
-  return (
-    <Alert variant="primary" onClose={() => props.close(false)} dismissible className="my-5">
-      <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-      <p>{props.text}</p>
-    </Alert>
-  );
-};

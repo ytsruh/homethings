@@ -1,6 +1,7 @@
 # dependencies
 node_modules
 .next
+.swc
 
 # production
 /build
