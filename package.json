@@ -22,6 +22,7 @@
     "video-react": "^0.14.1"
   },
   "devDependencies": {
+    "@types/node": "^18.11.17",
     "@types/react": "^18.0.14",
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
