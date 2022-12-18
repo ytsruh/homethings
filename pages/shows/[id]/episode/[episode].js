@@ -74,7 +74,7 @@ export default function Episode() {
         </div>
         <div>
           <VideoPlayer
-            src={`https://homeflix-media.azureedge.net/shows/${data.show.title}/Season ${data.seasonNumber}/${data.fileName}`}
+            src={`${process.env.NEXT_PUBLIC_CDN_BASEURL}/shows/${data.show.title}/Season ${data.seasonNumber}/${data.fileName}`}
             aspectRatio="16:9"
             fluid={true}
             autoPlay={true}

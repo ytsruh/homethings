@@ -1,13 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-import * as db from "@/lib/db";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
+const db = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
     try {
       //find user & validate password
-      const user = await db.User.findOne({ email: req.body.email });
+      const user = await db.user.findUnique({
+        where: {
+          email: req.body.email,
+        },
+      });
       const match = await bcrypt.compare(req.body.password, user.password);
       //Send response based on result
       if (match) {

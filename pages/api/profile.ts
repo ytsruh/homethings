@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as helpers from "@/lib/helpers";
-import * as db from "@/lib/db";
+import { PrismaClient } from "@prisma/client";
+const db = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -16,7 +17,7 @@ const controller = {
       const auth = await helpers.checkAuth(req);
       const id = await helpers.decode(req.headers.token);
       if (auth) {
-        const data = await db.User.findById(id);
+        const data = await db.user.findUnique({ where: { id: id } });
         const filtered = await helpers.filterUserData(data);
         res.status(200).json(filtered);
       } else {
@@ -35,8 +36,11 @@ const controller = {
         const options = {
           returnDocument: "after",
         };
-        const data = await db.User.findOneAndUpdate({ _id: id }, req.body.profile, {
-          new: true,
+        const data = await db.user.update({
+          where: {
+            id: id,
+          },
+          data: req.body.profile,
         });
         res.status(200).json(data);
       } else {

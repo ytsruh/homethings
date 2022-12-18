@@ -4,6 +4,11 @@ The Homeflix App & API using NextJS
 
 ## Versions
 
+### 0.6
+
+- Switched to MySQL & Prisma
+- Upgraded to Next 13
+
 ### 0.5
 
 - Switched from Bootstrap to Tailwind
