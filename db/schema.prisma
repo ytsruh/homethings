@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())   
+  name          String?
+  email         String    @unique
+  password      String 
+  icon          String    @default("BsFillEmojiSmileUpsideDownFill")   
+  darkMode      String    @default("system")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Movie {
+  id            String    @id @default(cuid())   
+  title         String
+  description   String
+  duration      String
+  fileName      String
+  imageName     String
+  releaseYear   String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Show {
+  id            String     @id @default(cuid()) 
+  title         String
+  imageName     String
+  episodes      Episode[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Episode {
+  id            String     @id @default(cuid()) 
+  show          Show       @relation(fields: [showId], references: [id])
+  showId        String     // relation scalar field  (used in the `@relation` attribute above) 
+  title         String
+  description   String?
+  fileName      String
+  seasonNumber  Int
+  episodeNumber Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}

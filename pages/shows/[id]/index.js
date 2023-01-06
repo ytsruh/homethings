@@ -56,7 +56,7 @@ export default function Show() {
           </div>
           <div className="w-0 md:w-2/3 lg:w-1/2">
             <img
-              src={`https://homeflix-media.azureedge.net/images/shows/${show.imageName}`}
+              src={`${process.env.NEXT_PUBLIC_CDN_BASEURL}/images/shows/${show.imageName}`}
               alt={show.name}
               className="w-full h-80 object-cover"
             />
@@ -87,7 +87,7 @@ const EpisodeRow = (props) => {
       <td>{props.episode.title}</td>
       <td className="hidden sm:inline">{props.episode.description}</td>
       <td>
-        <a href={`/shows/${props.show._id}/episode/${props.episode._id}`}>
+        <a href={`/shows/${props.show.id}/episode/${props.episode.id}`}>
           <Button>Play</Button>
         </a>
       </td>

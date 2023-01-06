@@ -1,15 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as helpers from "@/lib/helpers";
-import * as db from "@/lib/db";
+import { PrismaClient } from "@prisma/client";
+const db = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
     const auth = await helpers.checkAuth(req);
     if (auth) {
-      const show = await db.Show.findById(req.query.id);
-      const episodes = await show.getEpisodes();
-      const data = show.toObject();
-      data.episodes = episodes;
+      const data = await db.show.findUnique({
+        where: { id: req.query.id },
+        include: {
+          episodes: true,
+        },
+      });
       res.status(200).json(data);
     } else {
       res.status(401).json({ error: "Unauthorised" });

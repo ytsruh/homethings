@@ -71,7 +71,7 @@ export default function SingleMovie() {
         </div>
         <div>
           <VideoPlayer
-            src={`https://homeflix-media.azureedge.net/movies/${data.fileName}`}
+            src={`${process.env.NEXT_PUBLIC_CDN_BASEURL}/movies/${data.fileName}`}
             aspectRatio="16:9"
             fluid={true}
             autoPlay={true}
