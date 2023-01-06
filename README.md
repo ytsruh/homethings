@@ -6,7 +6,7 @@ The Homeflix App & API using NextJS
 
 ### 0.6
 
-- Switched to MySQL & Prisma
+- Switched to Postgres & Prisma
 - Upgraded to Next 13
 
 ### 0.5
