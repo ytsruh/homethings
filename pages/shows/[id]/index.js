@@ -56,7 +56,7 @@ export default function Show() {
           </div>
           <div className="w-0 md:w-2/3 lg:w-1/2">
             <img
-              src={`${process.env.NEXT_PUBLIC_CDN_BASEURL}/images/shows/${show.imageName}`}
+              src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/images/shows/${show.imageName}`}
               alt={show.name}
               className="w-full h-80 object-cover"
             />

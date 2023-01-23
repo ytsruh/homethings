@@ -28,10 +28,9 @@ export default function Episode() {
     const getData = async () => {
       try {
         const user = JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(`/api/episode/${episode}`, {
+        const response = await fetch(`/api/episodes/${episode}`, {
           headers: { token: user.token },
         });
-
         if (!response.ok) {
           setError(true);
         }
@@ -60,13 +59,12 @@ export default function Episode() {
       <div className="container mx-auto flex flex-col w-full py-10">
         <div className="flex justify-between my-2 items-center">
           <div className="space-y-2">
-            <h1 className="text-primary text-3xl">{data.show.title}</h1>
-            <h2 className="text-xl">{data.title}</h2>
+            <h1 className="text-primary text-3xl">{data.title}</h1>
             <p className="text-coal dark:text-salt">
               Season: {data.seasonNumber} | Episode: {data.episodeNumber}
             </p>
           </div>
-          <a href={`/shows/${data.show._id}`}>
+          <a href={`/shows/${data.showId}`}>
             <Button color="bg-coal dark:bg-salt" text="text-salt dark:text-coal">
               Back
             </Button>
@@ -74,7 +72,7 @@ export default function Episode() {
         </div>
         <div>
           <VideoPlayer
-            src={`${process.env.NEXT_PUBLIC_CDN_BASEURL}/shows/${data.show.title}/Season ${data.seasonNumber}/${data.fileName}`}
+            src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/shows/${data.show.title}/Season ${data.seasonNumber}/${data.fileName}`}
             aspectRatio="16:9"
             fluid={true}
             autoPlay={true}
