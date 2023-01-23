@@ -54,7 +54,7 @@ export default function SingleMovie() {
   if (loading) {
     return <Loading />;
   }
-
+  console.log(data);
   return (
     <Protected>
       <div className="container mx-auto flex flex-col w-full py-10">
@@ -71,7 +71,7 @@ export default function SingleMovie() {
         </div>
         <div>
           <VideoPlayer
-            src={`${process.env.NEXT_PUBLIC_CDN_BASEURL}/movies/${data.fileName}`}
+            src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/movies/${data.fileName}`}
             aspectRatio="16:9"
             fluid={true}
             autoPlay={true}

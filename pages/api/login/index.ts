@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           {
             data: {
               id: user.id,
-              username: user.username,
+              username: user.email,
             },
             exp: expiry,
           },

@@ -8,7 +8,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const auth = await helpers.checkAuth(req);
     if (auth) {
       const data = await db.show.findUnique({
-        where: { id: req.query.id },
+        where: { id: req.query.id.toString() },
         include: {
           episodes: true,
         },

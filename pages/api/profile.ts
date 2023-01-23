@@ -33,9 +33,6 @@ const controller = {
       const auth = await helpers.checkAuth(req);
       const id = await helpers.decode(req.headers.token);
       if (auth) {
-        const options = {
-          returnDocument: "after",
-        };
         const data = await db.user.update({
           where: {
             id: id,
