@@ -1,6 +1,5 @@
-// @ts-nocheck
-const jwt = require("jsonwebtoken");
 import { PrismaClient } from "@prisma/client";
+import { getToken } from "next-auth/jwt";
 
 // Fix for having too many DB connections in development.
 // https://github.com/prisma/prisma/issues/5007#issuecomment-618433162
@@ -18,26 +17,20 @@ if (process.env.NODE_ENV === "production") {
 
 export const checkAuth = async (req) => {
   try {
-    const token = req.headers.token;
-    if (!token) {
-      return false;
-    }
-    //Check token is a valid user
-    const decoded = jwt.verify(token, process.env.NEXT_PUBLIC_JWTSECRET);
-    if (decoded) {
+    const token = await getToken({ req });
+    if (token) {
       return true;
     } else {
       return false;
     }
   } catch (err) {
-    console.log(err);
     return false;
   }
 };
 
-export const decode = async (token) => {
-  const decoded = jwt.verify(token, process.env.NEXT_PUBLIC_JWTSECRET);
-  return decoded.data.id;
+export const decode = async (req) => {
+  const token = await getToken({ req });
+  return token.sub;
 };
 
 export const filterUserData = async (data) => {

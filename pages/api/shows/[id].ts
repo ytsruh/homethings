@@ -1,11 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import * as helpers from "@/lib/helpers";
-import { PrismaClient } from "@prisma/client";
-const db = new PrismaClient();
+import { db, checkAuth } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const auth = await helpers.checkAuth(req);
+    const auth = await checkAuth(req);
     if (auth) {
       const data = await db.show.findUnique({
         where: { id: req.query.id.toString() },

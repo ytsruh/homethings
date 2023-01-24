@@ -19,22 +19,24 @@ export default function Movies() {
     router.push("/500");
   }
 
-  const filterMovies = (data) => {
-    return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
-  };
-
-  return (
-    <Protected>
-      <div className="py-3">
-        <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
-        <FilterBar function={setSearchText} />
-        <MoviesList data={filterMovies(apiData)} />
-      </div>
-    </Protected>
-  );
+  if (apiData) {
+    return (
+      <Protected>
+        <div className="py-3">
+          <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
+          <FilterBar function={setSearchText} />
+          <MoviesList data={filterMovies(apiData, searchText)} />
+        </div>
+      </Protected>
+    );
+  }
 }
 
 const desc = "Find the best & most popular movies now available on Homeflix";
+
+const filterMovies = (data, searchText) => {
+  return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
+};
 
 const FilterBar = (props) => {
   return (

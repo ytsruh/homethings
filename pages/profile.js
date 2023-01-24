@@ -16,15 +16,12 @@ export default function Profile() {
   const desc = "Your profile & account settings";
 
   const submitData = async () => {
-    const url = `/api/profile`;
-    const user = JSON.parse(sessionStorage.getItem("user"));
     try {
       setSubmitting(true);
-      const response = await fetch(url, {
+      const response = await fetch(`/api/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: user.token,
         },
         body: JSON.stringify({
           profile,
@@ -35,11 +32,6 @@ export default function Profile() {
         //Throw error if not ok
         throw Error(response.statusText);
       }
-      // Set to json, put token in storage & redirect
-      const localStorage = JSON.parse(await sessionStorage.getItem("user"));
-      localStorage.userData.darkMode = profile.darkMode;
-      localStorage.userData.icon = profile.icon;
-      await sessionStorage.setItem("user", JSON.stringify(localStorage));
       setSubmitting(false);
       setRedirect(true);
     } catch (err) {
@@ -124,6 +116,9 @@ export default function Profile() {
                   </div>
                 )
               )}
+            </div>
+            <div className="text-sm text-zinc-400 p-3">
+              Please note: This will only update the next time you log in.
             </div>
           </div>
         </div>

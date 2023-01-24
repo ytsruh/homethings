@@ -9,10 +9,7 @@ const useFetchData = (url: URL) => {
     setIsLoading(true);
     const fetchData = async () => {
       try {
-        const user = await JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(url, {
-          headers: { token: user.token },
-        });
+        const response = await fetch(url);
         if (!response.ok) {
           setServerError(true);
         }

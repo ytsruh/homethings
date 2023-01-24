@@ -67,5 +67,7 @@ export default function Episode() {
         </div>
       </Protected>
     );
+  } else {
+    return null;
   }
 }

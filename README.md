@@ -8,6 +8,7 @@ The Homeflix App & API using NextJS
 
 - Fixed Typescript errors
 - Moved data fetching into a hook
+- Replaced custom auth with NextAuth
 
 ### 0.6
 

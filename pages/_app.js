@@ -1,10 +1,11 @@
 import React from "react";
 import Head from "next/head";
+import { SessionProvider } from "next-auth/react";
 import "@/lib/styles/index.css";
 
 function App({ Component, pageProps: { session, ...pageProps } }) {
   return (
-    <>
+    <SessionProvider session={session}>
       <Head>
         <meta charSet="utf-8" />
         <meta name="theme-color" content="#d9230f" />
@@ -15,7 +16,7 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
         <title>Homeflix | Like Netflix, but crappier</title>
       </Head>
       <Component {...pageProps} />
-    </>
+    </SessionProvider>
   );
 }
 

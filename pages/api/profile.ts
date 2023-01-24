@@ -13,7 +13,7 @@ const controller = {
   get: async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const auth = await checkAuth(req);
-      const id = await decode(req.headers.token);
+      const id = await decode(req);
       if (auth) {
         const data = await db.user.findUnique({ where: { id: id } });
         const filtered = await filterUserData(data);
@@ -29,7 +29,7 @@ const controller = {
   post: async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       const auth = await checkAuth(req);
-      const id = await decode(req.headers.token);
+      const id = await decode(req);
       if (auth) {
         const data = await db.user.update({
           where: {

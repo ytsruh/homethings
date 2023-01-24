@@ -17,7 +17,7 @@ export default function Show() {
     router.push("/500");
   }
 
-  if (apiData && apiData.episodes) {
+  if (apiData?.episodes) {
     const episodes = apiData.episodes.map((episode, i) => {
       return <EpisodeRow key={i} episode={episode} show={apiData} />;
     });
