@@ -4,6 +4,11 @@ The Homeflix App & API using NextJS
 
 ## Versions
 
+### 0.7
+
+- Fixed Typescript errors
+- Moved data fetching into a hook
+
 ### 0.6
 
 - Switched to Postgres & Prisma

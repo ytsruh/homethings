@@ -4,42 +4,19 @@ import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import MoviesList from "@/components/MoviesList";
+import useFetchData from "@/lib/hooks/useFetchData";
 
 export default function Movies() {
   const router = useRouter();
-  const [movies, setMovies] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(`/api/movies`, {
-          headers: { token: user.token },
-        });
-        if (!response.ok) {
-          setError(true);
-        }
-        const data = await response.json();
-        setMovies(data);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-        setError(true);
-        setLoading(false);
-      }
-    };
-    getData();
-  }, []);
+  const { isLoading, serverError, apiData } = useFetchData("/api/movies");
 
-  if (error) {
-    router.push("/500");
-  }
-
-  if (loading) {
+  if (isLoading) {
     return <Loading />;
+  }
+  if (serverError) {
+    router.push("/500");
   }
 
   const filterMovies = (data) => {
@@ -51,7 +28,7 @@ export default function Movies() {
       <div className="py-3">
         <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
         <FilterBar function={setSearchText} />
-        <MoviesList data={filterMovies(movies)} />
+        <MoviesList data={filterMovies(apiData)} />
       </div>
     </Protected>
   );
