@@ -1,6 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
-export default function Dropdown(props) {
+type Props = {
+  menuItem: JSX.Element;
+  menuItems: Link[];
+};
+
+type Link = {
+  link?: string;
+  text: string;
+  onClick?: any;
+};
+
+export default function Dropdown(props: Props) {
   const [show, setShow] = useState(false);
   return (
     <div className="relative cursor-pointer">
@@ -14,8 +25,8 @@ Dropdown.defaultProps = {
   menuItem: "Menu",
 };
 
-const List = (props) => {
-  const links = props.links?.map((link, i) => {
+const List = (props: any) => {
+  const links = props.links?.map((link: Link, i: number) => {
     return (
       <li key={i} className="my-1 py-1">
         {link.link ? (

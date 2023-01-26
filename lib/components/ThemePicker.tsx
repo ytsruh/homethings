@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import Icon from "./Icon";
 
 export default function ThemePicker() {
-  const [theme, setTheme] = useState();
-  const changeTheme = (newTheme) => {
+  const [theme, setTheme] = useState<string>();
+  const changeTheme = (newTheme: string) => {
     setTheme(newTheme);
     if (theme === "light") {
       localStorage.setItem("theme", "dark");

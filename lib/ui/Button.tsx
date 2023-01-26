@@ -1,7 +1,11 @@
-import React from "react";
-import * as Icons from "react-icons/bs";
+type Props = {
+  color: string;
+  text: string;
+  children: JSX.Element | string;
+  onClick?: () => void;
+};
 
-export default function Button(props) {
+export default function Button(props: Props) {
   return <button className={`${props.color} ${props.text} px-6 py-3 rounded-md`}>{props.children}</button>;
 }
 

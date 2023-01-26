@@ -3,7 +3,11 @@ import { useSession } from "next-auth/react";
 import Navigation from "@/components/Navigation";
 import Loading from "@/components/Loading";
 
-export default function Protected(props) {
+type Props = {
+  children: JSX.Element;
+};
+
+export default function Protected(props: Props) {
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -13,7 +17,7 @@ export default function Protected(props) {
   if (status === "authenticated") {
     return (
       <>
-        <Navigation icon={session.user.icon} />
+        <Navigation icon={session.user?.icon} />
         <div className="min-h-screen bg-salt dark:bg-coal text-coal dark:text-salt">{props.children}</div>
       </>
     );

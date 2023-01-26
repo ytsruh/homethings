@@ -6,7 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const auth = await checkAuth(req);
     if (auth) {
       const data = await db.episode.findUnique({
-        where: { id: req.query.id.toString() },
+        where: { id: req?.query?.id?.toString() },
         include: { show: true },
       });
       res.status(200).json(data);

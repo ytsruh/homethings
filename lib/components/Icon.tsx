@@ -1,7 +1,13 @@
-import React from "react";
+// @ts-nocheck
 import * as Icons from "react-icons/bs";
 
-export default function Profile(props) {
+type Props = {
+  icon: any;
+  color: string;
+  styles: any;
+};
+
+export default function Profile(props: Props) {
   const icon = Icons[props.icon]();
   const color = props.color || "text-white";
   return (

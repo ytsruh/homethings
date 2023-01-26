@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const useFetchData = (url: URL) => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiData, setApiData] = useState([]);
-  const [serverError, setServerError] = useState(null);
+  const [serverError, setServerError]: any = useState(null);
 
   useEffect(() => {
     setIsLoading(true);
