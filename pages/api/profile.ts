@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db, checkAuth, filterUserData, decode } from "@/lib/helpers";
+import { UserSchema } from "@/lib/schema";
+import type { User } from "@/lib/schema";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -31,11 +33,12 @@ const controller = {
       const auth = await checkAuth(req);
       const id = await decode(req);
       if (auth) {
+        const userdata: User = UserSchema.parse(req.body.profile);
         const data = await db.user.update({
           where: {
             id: id,
           },
-          data: req.body.profile,
+          data: userdata,
         });
         res.status(200).json(data);
       } else {

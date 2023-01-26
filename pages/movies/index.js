@@ -35,7 +35,10 @@ export default function Movies() {
 const desc = "Find the best & most popular movies now available on Homeflix";
 
 const filterMovies = (data, searchText) => {
-  return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
+  if (data.length > 0) {
+    return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
+  }
+  return [];
 };
 
 const FilterBar = (props) => {
