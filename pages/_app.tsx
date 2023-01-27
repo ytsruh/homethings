@@ -1,9 +1,11 @@
-import React from "react";
+import type { AppType } from "next/app";
+import { trpc } from "@/lib/trpc";
 import Head from "next/head";
+import { Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import "@/lib/styles/index.css";
 
-function App({ Component, pageProps: { session, ...pageProps } }) {
+const App: AppType<{ session: Session }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
     <SessionProvider session={session}>
       <Head>
@@ -18,6 +20,6 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
       <Component {...pageProps} />
     </SessionProvider>
   );
-}
+};
 
-export default App;
+export default trpc.withTRPC(App);
