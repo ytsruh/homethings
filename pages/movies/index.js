@@ -4,60 +4,42 @@ import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import MoviesList from "@/components/MoviesList";
+import useFetchData from "@/lib/hooks/useFetchData";
 
 export default function Movies() {
   const router = useRouter();
-  const [movies, setMovies] = useState([]);
   const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(`/api/movies`, {
-          headers: { token: user.token },
-        });
-        if (!response.ok) {
-          setError(true);
-        }
-        const data = await response.json();
-        setMovies(data);
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
-        setError(true);
-        setLoading(false);
-      }
-    };
-    getData();
-  }, []);
+  const { isLoading, serverError, apiData } = useFetchData("/api/movies");
 
-  if (error) {
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (serverError) {
     router.push("/500");
   }
 
-  if (loading) {
-    return <Loading />;
+  if (apiData) {
+    return (
+      <Protected>
+        <div className="py-3">
+          <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
+          <FilterBar function={setSearchText} />
+          <MoviesList data={filterMovies(apiData, searchText)} />
+        </div>
+      </Protected>
+    );
   }
-
-  const filterMovies = (data) => {
-    return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
-  };
-
-  return (
-    <Protected>
-      <div className="py-3">
-        <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
-        <FilterBar function={setSearchText} />
-        <MoviesList data={filterMovies(movies)} />
-      </div>
-    </Protected>
-  );
 }
 
 const desc = "Find the best & most popular movies now available on Homeflix";
+
+const filterMovies = (data, searchText) => {
+  if (data.length > 0) {
+    return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
+  }
+  return [];
+};
 
 const FilterBar = (props) => {
   return (

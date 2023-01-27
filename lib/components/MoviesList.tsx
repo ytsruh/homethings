@@ -3,18 +3,29 @@ import { useRouter } from "next/router";
 import Button from "@/lib/ui/Button";
 import { BsX } from "react-icons/bs";
 
-export default function MoviesList(props) {
-  const rows = props.data.map((x, i) => {
+type Props = {
+  data: Movie[];
+};
+
+type Movie = {
+  close: any;
+  text: string;
+};
+
+export default function MoviesList(props: Props) {
+  const rows = props.data.map((x: Movie, i: number) => {
     return <Movie key={i} data={x} />;
   });
   return (
     <div className="container mx-auto px-5 md:px-0">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">{rows}</div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <>{rows}</>
+      </div>
     </div>
   );
 }
 
-const Movie = (props) => {
+const Movie = (props: any) => {
   const [show, setShow] = useState(false);
   const imageUrl = `${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/images/movies/${props.data.imageName}`;
   return (

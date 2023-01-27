@@ -4,50 +4,29 @@ import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import ShowsList from "@/components/ShowsList";
+import useFetchData from "@/lib/hooks/useFetchData";
 
 export default function Shows() {
   const router = useRouter();
-  const [shows, setShows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const { isLoading, serverError, apiData } = useFetchData(`/api/shows`);
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(`/api/shows`, {
-          headers: { token: user.token },
-        });
-        if (!response.ok) {
-          setError(true);
-        }
-        const data = await response.json();
-        setShows(data);
-        setLoading(false);
-      } catch (err) {
-        setError(true);
-        setLoading(false);
-      }
-    };
-    getData();
-  }, []);
-
-  if (error) {
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (serverError) {
     router.push("/500");
   }
 
-  if (loading) {
-    return <Loading />;
+  if (apiData) {
+    return (
+      <Protected>
+        <div className="py-3">
+          <PageTitle title="TV Shows" description={desc} image="img/showshero1.jpeg" alt="Shows Hero" />
+          <ShowsList data={apiData} />
+        </div>
+      </Protected>
+    );
   }
-
-  return (
-    <Protected>
-      <div className="py-3">
-        <PageTitle title="TV Shows" description={desc} image="img/showshero1.jpeg" alt="Shows Hero" />
-        <ShowsList data={shows} />
-      </div>
-    </Protected>
-  );
 }
 
 const desc = "Action, comedy & fantasy TV shows from 24 to Game of Thrones. Sit back & binge.";
