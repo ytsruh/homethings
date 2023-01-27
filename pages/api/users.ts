@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import * as helpers from "@/lib/helpers";
-import { PrismaClient } from "@prisma/client";
-const db = new PrismaClient();
+import { db, checkAuth, filterOutPassword } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "POST") {
@@ -12,12 +10,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 const controller = {
-  get: async (req, res) => {
+  get: async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const auth = await helpers.checkAuth(req);
+      const auth = await checkAuth(req);
       if (auth) {
         const data = await db.user.findMany();
-        const filtered = helpers.filterOutPassword(data);
+        const filtered = filterOutPassword(data);
         res.status(200).json(filtered);
       } else {
         res.status(401).json({ error: "Unauthorised" });
@@ -27,9 +25,9 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req, res) => {
+  post: async (req: NextApiRequest, res: NextApiResponse) => {
     try {
-      const auth = await helpers.checkAuth(req);
+      const auth = await checkAuth(req);
       if (auth) {
         const data = await db.user.create({ data: req.body });
         res.status(200).json(data);

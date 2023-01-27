@@ -1,7 +1,19 @@
-import React from "react";
+type Props = {
+  data: Show[];
+};
 
-export default function ShowsList(props) {
-  const rows = props.data.map((x, i) => {
+type Show = {
+  data: ShowData;
+};
+
+type ShowData = {
+  imageName: string;
+  id: string;
+  title: string;
+};
+
+export default function ShowsList(props: Props) {
+  const rows = props.data.map((x: Show, i: number) => {
     return <Show key={i} data={x} />;
   });
   return (
@@ -11,7 +23,7 @@ export default function ShowsList(props) {
   );
 }
 
-const Show = (props) => {
+const Show: any = (props: Show) => {
   const imageUrl = `${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/images/shows/${props.data.imageName}`;
   return (
     <div className="my-3">

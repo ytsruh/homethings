@@ -1,6 +1,11 @@
-import React from "react";
+type Props = {
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+};
 
-export default function PageTitle(props) {
+export default function PageTitle(props: Props) {
   return (
     <div className="container mx-auto px-10 py-5 md:py-0">
       <div className="flex flex-col md:flex-row items-center justify-center">

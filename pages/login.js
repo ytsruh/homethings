@@ -1,43 +1,37 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import { signIn } from "next-auth/react";
 import Button from "@/lib/ui/Button";
 import Alert from "@/lib/ui/Alert";
 import Loading from "@/components/Loading";
 
 export default function Login() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const submitForm = async (e) => {
-    e.preventDefault();
-    const url = `/api/login`;
     try {
+      e.preventDefault();
       setSubmitting(true);
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
+      const email = e.target[0].value;
+      const password = e.target[1].value;
+      // Pass credentials to NextAuth & login
+      const result = await signIn("credentials", {
+        email: email,
+        password: password,
+        redirect: false,
       });
-      //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (result?.ok) {
+        router.push("/");
+      } else {
+        setError("There has been an error. Please try to enter you email & password again.");
+        setSubmitting(false);
       }
-      // Set to json, put token in storage & redirect
-      const data = await response.json();
-      await sessionStorage.setItem("user", JSON.stringify(data));
-      router.push("/movies");
-    } catch (err) {
+    } catch (error) {
+      console.log(error);
+      setError("There has been an error. Something went wrong so please try again.");
       setSubmitting(false);
-      setError("There has been an error. Please try to enter you email & password again.");
     }
   };
 
@@ -58,13 +52,11 @@ export default function Login() {
               type="email"
               className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
               placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"
               className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
               placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
             />
             <div className="flex flex-col items-center justify-between mt-6 space-y-6 md:flex-row md:space-y-0">
               <Button form="login-form" type="submit">

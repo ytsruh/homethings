@@ -5,50 +5,25 @@ import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import Button from "@/lib/ui/Button";
+import useFetchData from "@/lib/hooks/useFetchData";
 
 export default function Profile() {
   const router = useRouter();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [redirect, setRedirect] = useState(false);
   const desc = "Admin section to add, update or remove users";
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(`/api/users`, {
-          headers: { token: user.token },
-        });
-        if (!response.ok) {
-          setError(true);
-        }
-        const data = await response.json();
-        setUsers(data);
-        setLoading(false);
-      } catch (err) {
-        setError(true);
-        setLoading(false);
-      }
-    };
-    getData();
-  }, []);
+  const { isLoading, serverError, apiData } = useFetchData(`/api/users`);
 
-  if (error) {
+  if (isLoading) {
+    return <Loading />;
+  }
+  if (serverError) {
     router.push("/500");
   }
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  if (redirect) {
-    router.push("/");
-  }
-  const rows = users.map((user, i) => {
+  const rows = apiData.map((user, i) => {
     return <EpisodeRow data={user} key={i} />;
   });
+
   return (
     <Protected>
       <div className="py-3">

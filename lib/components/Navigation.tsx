@@ -1,9 +1,13 @@
-import React from "react";
+import { signOut } from "next-auth/react";
 import Icon from "./Icon";
 import Dropdown from "@/lib/ui/Dropdown";
 import ThemePicker from "@/components/ThemePicker";
 
-export default function Navigation(props) {
+type Props = {
+  icon: string;
+};
+
+export default function Navigation(props: Props) {
   return (
     <div
       className="flex items-center justify-between px-5 md:px-10 lg:px-20 py-4 bg-salt dark:bg-coal text-primary 
@@ -30,7 +34,7 @@ export default function Navigation(props) {
 const items = [
   { link: "/profile", text: "Profile" },
   { link: "/users", text: "Users" },
-  { link: "/logout", text: "Logout" },
+  { text: "Logout", onClick: () => signOut({ callbackUrl: "/login" }) },
 ];
 
 const iconStyles = {

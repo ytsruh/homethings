@@ -5,26 +5,23 @@ import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import Icon from "@/components/Icon";
 import Button from "@/lib/ui/Button";
+import useFetchData from "@/lib/hooks/useFetchData";
 
 export default function Profile() {
   const router = useRouter();
-  const [profile, setProfile] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const desc = "Your profile & account settings";
 
   const submitData = async () => {
-    const url = `/api/profile`;
-    const user = JSON.parse(sessionStorage.getItem("user"));
     try {
       setSubmitting(true);
-      const response = await fetch(url, {
+      const response = await fetch(`/api/profile`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: user.token,
         },
         body: JSON.stringify({
           profile,
@@ -35,11 +32,6 @@ export default function Profile() {
         //Throw error if not ok
         throw Error(response.statusText);
       }
-      // Set to json, put token in storage & redirect
-      const localStorage = JSON.parse(await sessionStorage.getItem("user"));
-      localStorage.userData.darkMode = profile.darkMode;
-      localStorage.userData.icon = profile.icon;
-      await sessionStorage.setItem("user", JSON.stringify(localStorage));
       setSubmitting(false);
       setRedirect(true);
     } catch (err) {
@@ -48,32 +40,13 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    const getData = async () => {
-      try {
-        const user = JSON.parse(sessionStorage.getItem("user"));
-        const response = await fetch(`/api/profile`, {
-          headers: { token: user.token },
-        });
-        if (!response.ok) {
-          setError(true);
-        }
-        const data = await response.json();
-        setProfile(data);
-        setLoading(false);
-      } catch (err) {
-        setError(true);
-        setLoading(false);
-      }
-    };
-    getData();
-  }, []);
+  const { isLoading, serverError, apiData } = useFetchData(`/api/profile`);
 
-  if (error) {
+  if (error || serverError) {
     router.push("/500");
   }
 
-  if (loading || submitting) {
+  if (isLoading || submitting) {
     return <Loading />;
   }
 
@@ -94,9 +67,9 @@ export default function Profile() {
                 <input
                   className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
                   type="text"
-                  value={profile.name}
+                  defaultValue={apiData.name}
                   placeholder="Name"
-                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                  onChange={(e) => setProfile({ ...apiData, name: e.target.value })}
                 />
               </div>
               <div className="py-3">
@@ -105,11 +78,11 @@ export default function Profile() {
                   {["light", "dark", "system"].map((type, i) => (
                     <div key={i}>
                       <input
-                        value={type}
+                        defaultValue={type}
                         label={type}
                         name="darkMode"
                         type="radio"
-                        defaultChecked={profile.darkMode === type}
+                        defaultChecked={apiData.darkMode === type}
                         key={i}
                         className="text-white text-capitalize"
                       />
@@ -130,12 +103,12 @@ export default function Profile() {
                 (type, i) => (
                   <div key={i}>
                     <input
-                      value={type}
+                      defaultValue={type}
                       name="icon"
                       type="radio"
-                      defaultChecked={profile.icon === type}
+                      defaultChecked={apiData.icon === type}
                       id={i}
-                      onChange={(e) => setProfile({ ...profile, icon: e.target.value })}
+                      onChange={(e) => setProfile({ ...apiData, icon: e.target.value })}
                     />
                     <label>
                       <Icon icon={type} styles={iconStyles} color="text-coal dark:text-salt" />
@@ -143,6 +116,9 @@ export default function Profile() {
                   </div>
                 )
               )}
+            </div>
+            <div className="text-sm text-zinc-400 p-3">
+              Please note: This will only update the next time you log in.
             </div>
           </div>
         </div>

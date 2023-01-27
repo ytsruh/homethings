@@ -1,7 +1,11 @@
-import React from "react";
 import { BsX } from "react-icons/bs";
 
-export default function Alert(props) {
+type Props = {
+  close: any;
+  text: string;
+};
+
+export default function Alert(props: Props) {
   return (
     <div className="bg-warning text-salt rounded-lg px-5 py-3">
       <div className="flex justify-between">
