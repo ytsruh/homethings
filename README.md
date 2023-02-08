@@ -4,6 +4,10 @@ The Homeflix App & API using NextJS
 
 ## Versions
 
+### 0.8
+
+- Added User favourites
+
 ### 0.7
 
 - Fixed Typescript errors

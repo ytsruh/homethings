@@ -1,0 +1,47 @@
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import Icon from "@/lib/components/Icon";
+import useFavourite from "../hooks/useFavourite";
+
+type Props = {
+  id: string;
+  type: string;
+  favourite: boolean;
+};
+
+function FavouriteButton(props: Props) {
+  const router = useRouter();
+  const [favourite, setFavourite] = useState(props.favourite);
+  const [update, setUpdate] = useState(false);
+  const { success, error } = useFavourite({ favourite, update, props });
+
+  function toggle() {
+    setFavourite(!favourite);
+    setUpdate(true);
+  }
+
+  if (error) {
+    router.push("/500");
+  }
+
+  if (success) {
+    router.push("/");
+  }
+
+  return (
+    <button onClick={() => toggle()} className={`bg-salt text-coal px-6 py-3 rounded-md`}>
+      <div className="flex content-center">
+        <p className="px-1">Favourite</p>
+        <Icon
+          icon={favourite ? "BsHeartFill" : "BsHeart"}
+          color="bg-salt"
+          styles={{
+            fontSize: "22px",
+          }}
+        />
+      </div>
+    </button>
+  );
+}
+
+export default FavouriteButton;

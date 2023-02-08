@@ -6,7 +6,11 @@ type Props = {
 };
 
 export default function Button(props: Props) {
-  return <button className={`${props.color} ${props.text} px-6 py-3 rounded-md`}>{props.children}</button>;
+  return (
+    <button onClick={props.onClick} className={`${props.color} ${props.text} px-6 py-3 rounded-md`}>
+      {props.children}
+    </button>
+  );
 }
 
 Button.defaultProps = {
