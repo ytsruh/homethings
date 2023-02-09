@@ -1,14 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import { useRouter } from "next/router";
 import Button from "@/lib/ui/Button";
 import useFetchData from "@/lib/hooks/useFetchData";
+import FavouriteButton from "@/components/FavouriteButton";
+import { GetServerSideProps } from "next";
+import { getFavourites } from "../../api/favourite";
 
-export default function Show() {
+type Show = {
+  favourites: any;
+};
+
+type Episode = {
+  episode: any;
+  show: any;
+};
+
+export default function Show(props: Show) {
   const router = useRouter();
   const { id } = router.query;
-  const { isLoading, serverError, apiData } = useFetchData(`/api/shows/${id}`);
+  const { isLoading, serverError, apiData }: any = useFetchData(`/api/shows/${id}` as unknown as any);
 
   if (isLoading) {
     return <Loading />;
@@ -18,7 +30,7 @@ export default function Show() {
   }
 
   if (apiData?.episodes) {
-    const episodes = apiData.episodes.map((episode, i) => {
+    const episodes = apiData.episodes.map((episode: any, i: any) => {
       return <EpisodeRow key={i} episode={episode} show={apiData} />;
     });
 
@@ -29,6 +41,11 @@ export default function Show() {
             <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col items-center justify-center">
               <h1 className="text-primary text-5xl">{apiData.title}</h1>
               <h3 className="text-xl my-10">Episodes: {apiData.episodes.length}</h3>
+              <FavouriteButton
+                id={apiData.id}
+                type="show"
+                favourite={props.favourites.shows.find((f: any) => f.id === apiData.id)}
+              />
             </div>
             <div className="w-0 md:w-2/3 lg:w-1/2">
               <img
@@ -56,9 +73,9 @@ export default function Show() {
   }
 }
 
-const EpisodeRow = (props) => {
+const EpisodeRow = (props: Episode) => {
   return (
-    <tr className="">
+    <tr>
       <td>{props.episode.seasonNumber}</td>
       <td>{props.episode.episodeNumber}</td>
       <td>{props.episode.title}</td>
@@ -75,4 +92,14 @@ const EpisodeRow = (props) => {
 const styles = {
   textDecoration: "none",
   color: "white",
+};
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const favourites = await getFavourites(context.req);
+  // Have to stringify then parse otherwise date objects cannot be passed to page
+  const stringify = JSON.stringify(favourites);
+  const parsed = JSON.parse(stringify);
+  return {
+    props: { favourites: parsed }, // will be passed to the page component as props
+  };
 };

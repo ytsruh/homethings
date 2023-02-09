@@ -40,10 +40,8 @@ const useFavourite = (data: any) => {
       if (data.update === true) {
         // Check if favouriting or unfavouriting
         if (data.favourite) {
-          console.log("Favourited");
           createFavourite(data.props);
         } else {
-          console.log("Unfavourited");
           deleteFavourite(data.props.id);
         }
       }

@@ -17,27 +17,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-export const getFavourites = async (context: any) => {
-  const user = await decode(context.req);
-  const data = await db.favourite.findMany({
+export const getFavourites = async (req: any) => {
+  const user = await decode(req);
+  const favourites = await db.favourite.findMany({
     where: {
       userId: user,
     },
   });
-  return data;
+  const items = favourites.map((f) => f.favourite);
+  const favouriteMovies = await db.movie.findMany({
+    where: {
+      id: { in: items },
+    },
+  });
+  const favouriteShows = await db.show.findMany({
+    where: {
+      id: { in: items },
+    },
+  });
+  return { movies: favouriteMovies, shows: favouriteShows };
 };
 
 const controller = {
   get: async (req: NextApiRequest, res: NextApiResponse) => {
     const auth = await checkAuth(req);
     if (auth) {
-      const user = await decode(req);
-      const data = await db.favourite.findMany({
-        where: {
-          userId: user,
-        },
-      });
-      res.status(200).json(data);
+      const favourites = await getFavourites(req);
+      res.status(200).json(favourites);
     } else {
       res.status(401).json({ error: "Unauthorised" });
     }
@@ -64,7 +70,7 @@ const controller = {
       const user = await decode(req);
       const favourite = await db.favourite.deleteMany({
         where: {
-          favourite: req.body.id,
+          favourite: req.body,
           userId: user,
         },
       });

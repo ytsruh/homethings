@@ -1,21 +1,50 @@
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import Protected from "@/components/Protected";
 import { getFavourites } from "./api/favourite";
+import Button from "@/lib/ui/Button";
 
 export default function Home(props: any) {
-  console.log(props);
+  const { favourites } = props;
+  const favemovies = favourites.movies.map((movie: any, i: number) => {
+    return <Favourite key={i} data={movie} types="movies" />;
+  });
+  const faveShows = favourites.shows.map((show: any, i: number) => {
+    return <Favourite key={i} data={show} types="shows" />;
+  });
   return (
     <Protected>
-      <div>
-        <h1>Dashboard</h1>
+      <div className="flex flex-col">
+        <h1 className="text-5xl text-coal dark:text-white py-10 text-center">Welcome to Homeflix</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 w-100 px-5 lg:px-10">
+          <div className="m-5 w-100">
+            <h2 className="text-center text-2xl underline">Favourite Movies</h2>
+            {favemovies}
+          </div>
+          <div className="m-5 w-100">
+            <h2 className="text-center text-2xl underline">Favourite Shows</h2>
+            {faveShows}
+          </div>
+        </div>
       </div>
     </Protected>
   );
 }
 
+const Favourite = (props: any) => {
+  const router = useRouter();
+  return (
+    <div className="flex justify-between py-2 w-100">
+      <div className="flex place-items-center justify-start md:justify-center px-10 w-full">
+        <h6 className="text-lg">{props.data.title}</h6>
+      </div>
+      <Button onClick={() => router.push(`/${props.types}/${props.data.id}`)}>Play</Button>
+    </div>
+  );
+};
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  console.log(context);
-  const favourites = await getFavourites(context);
+  const favourites = await getFavourites(context.req);
   // Have to stringify then parse otherwise date objects cannot be passed to page
   const stringify = JSON.stringify(favourites);
   const parsed = JSON.parse(stringify);

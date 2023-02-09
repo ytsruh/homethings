@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import { useRouter } from "next/router";
+import { useState, useContext } from "react";
 import Button from "@/lib/ui/Button";
 import FavouriteButton from "./FavouriteButton";
 import { BsX } from "react-icons/bs";
+import { FavouriteContext } from "@/lib/hooks/FavouriteContext";
 
 type Props = {
   data: Movie[];
@@ -14,9 +14,11 @@ type Movie = {
 };
 
 export default function MoviesList(props: Props) {
+  const favourites = useContext(FavouriteContext) as any;
   const rows = props.data.map((x: Movie, i: number) => {
-    return <Movie key={i} data={x} />;
+    return <Movie key={i} data={x} fav={favourites.movies} />;
   });
+
   return (
     <div className="container mx-auto px-5 md:px-0">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -64,7 +66,11 @@ const Movie = (props: any) => {
                   <a href={`/movies/${props.data.id}`}>
                     <Button>Play</Button>
                   </a>
-                  <FavouriteButton id={props.data.id} type="movie" favourite={false} />
+                  <FavouriteButton
+                    id={props.data.id}
+                    type="movie"
+                    favourite={props.fav.find((f: any) => f.id === props.data.id)}
+                  />
                 </div>
                 <Button
                   color="bg-coal dark:bg-salt"

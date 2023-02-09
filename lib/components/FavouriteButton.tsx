@@ -29,7 +29,7 @@ function FavouriteButton(props: Props) {
   }
 
   return (
-    <button onClick={() => toggle()} className={`bg-salt text-coal px-6 py-3 rounded-md`}>
+    <button onClick={() => toggle()} className={`bg-salt text-coal border border-coal px-6 py-3 rounded-md`}>
       <div className="flex content-center">
         <p className="px-1">Favourite</p>
         <Icon

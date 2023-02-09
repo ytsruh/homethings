@@ -47,7 +47,7 @@ const FilterBar = (props) => {
       <input
         type="search"
         name="filter"
-        className="w-11/12 lg:w-8/12 dark:bg-coal border dark:text-salt border-primary focus:outline-none p-2 m-1 rounded-md"
+        className="w-11/12 lg:w-8/12 dark:bg-coal border-2 dark:text-salt border-primary focus:outline-none p-2 m-1 rounded-md"
         placeholder="Search or filter movies"
         onChange={(e) => props.function(e.target.value)}
       />
