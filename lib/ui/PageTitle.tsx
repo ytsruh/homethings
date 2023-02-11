@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 type Props = {
   title: string;
   description?: string;
@@ -29,4 +31,11 @@ export default function PageTitle(props: Props) {
 
 const styles = {
   maxHeight: "400px",
+};
+
+PageTitle.propTypes = {
+  title: PropTypes.string,
+  description: PropTypes.string,
+  image: PropTypes.string,
+  alt: PropTypes.string,
 };

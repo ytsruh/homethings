@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 type Props = {
   color: string;
   text: string;
@@ -18,5 +20,10 @@ export default function Button(props: Props) {
 
 Button.defaultProps = {
   color: "bg-primary",
-  text: "text-salt",
+  text: "text-white",
+};
+
+Button.propTypes = {
+  color: PropTypes.string,
+  text: PropTypes.string,
 };

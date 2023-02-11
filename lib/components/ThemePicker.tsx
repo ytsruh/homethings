@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Icon from "../ui/Icon";
 
 export default function ThemePicker() {

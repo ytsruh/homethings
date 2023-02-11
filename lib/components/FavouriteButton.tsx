@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import Icon from "@/lib/ui/Icon";
 import useFavourite from "../hooks/useFavourite";
+import PropTypes from "prop-types";
 
 type Props = {
   id: string;
@@ -9,7 +10,7 @@ type Props = {
   favourite: boolean;
 };
 
-function FavouriteButton(props: Props) {
+export default function FavouriteButton(props: Props) {
   const router = useRouter();
   const [favourite, setFavourite] = useState(props.favourite);
   const [update, setUpdate] = useState(false);
@@ -44,4 +45,8 @@ function FavouriteButton(props: Props) {
   );
 }
 
-export default FavouriteButton;
+FavouriteButton.propTypes = {
+  id: PropTypes.string,
+  type: PropTypes.string,
+  favourite: PropTypes.object,
+};

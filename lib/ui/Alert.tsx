@@ -1,7 +1,8 @@
 import { BsX } from "react-icons/bs";
+import PropTypes from "prop-types";
 
 type Props = {
-  close: any;
+  close: (close: boolean) => void;
   text: string;
 };
 
@@ -18,3 +19,8 @@ export default function Alert(props: Props) {
     </div>
   );
 }
+
+Alert.propTypes = {
+  close: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+};
