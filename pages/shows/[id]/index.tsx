@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
-import Loading from "@/components/Loading";
+import { useEffect } from "react";
 import Protected from "@/components/Protected";
 import { useRouter } from "next/router";
 import Button from "@/lib/ui/Button";
-import useFetchData from "@/lib/hooks/useFetchData";
 import FavouriteButton from "@/components/FavouriteButton";
 import { GetServerSideProps } from "next";
 import { getFavourites } from "../../api/favourite";
+import { getShow } from "../../api/shows/[id]";
 
-type Show = {
+type Data = {
   favourites: any;
+  show: any;
 };
 
 type Episode = {
@@ -17,21 +17,19 @@ type Episode = {
   show: any;
 };
 
-export default function Show(props: Show) {
+export default function Show(props: Data) {
   const router = useRouter();
-  const { id } = router.query;
-  const { isLoading, serverError, apiData }: any = useFetchData(`/api/shows/${id}` as unknown as any);
+  const { show, favourites } = props;
 
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (serverError) {
-    router.push("/500");
-  }
+  useEffect(() => {
+    if (router.isReady && !show) {
+      router.push("/404");
+    }
+  }, [router, show]);
 
-  if (apiData?.episodes) {
-    const episodes = apiData.episodes.map((episode: any, i: any) => {
-      return <EpisodeRow key={i} episode={episode} show={apiData} />;
+  if (show?.episodes) {
+    const episodes = show.episodes.map((episode: any, i: any) => {
+      return <EpisodeRow key={i} episode={episode} show={show} />;
     });
 
     return (
@@ -39,18 +37,18 @@ export default function Show(props: Show) {
         <div className="container mx-auto flex flex-col px-5 md:px-10">
           <div className="flex justify-between">
             <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col items-center justify-center">
-              <h1 className="text-primary text-5xl">{apiData.title}</h1>
-              <h3 className="text-xl my-10">Episodes: {apiData.episodes.length}</h3>
+              <h1 className="text-primary text-5xl">{show.title}</h1>
+              <h3 className="text-xl my-10">Episodes: {show.episodes.length}</h3>
               <FavouriteButton
-                id={apiData.id}
+                id={show.id}
                 type="show"
-                favourite={props.favourites.shows.find((f: any) => f.id === apiData.id)}
+                favourite={favourites.shows.find((f: any) => f.id === show.id)}
               />
             </div>
             <div className="w-0 md:w-2/3 lg:w-1/2">
               <img
-                src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/images/shows/${apiData.imageName}`}
-                alt={apiData.name}
+                src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/images/shows/${show.imageName}`}
+                alt={show.name}
                 className="w-full h-80 object-cover"
               />
             </div>
@@ -89,17 +87,14 @@ const EpisodeRow = (props: Episode) => {
   );
 };
 
-const styles = {
-  textDecoration: "none",
-  color: "white",
-};
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.query;
   const favourites = await getFavourites(context.req);
+  const show = await getShow(id);
   // Have to stringify then parse otherwise date objects cannot be passed to page
-  const stringify = JSON.stringify(favourites);
+  const stringify = JSON.stringify({ favourites, show });
   const parsed = JSON.parse(stringify);
   return {
-    props: { favourites: parsed }, // will be passed to the page component as props
+    props: parsed, // will be passed to the page component as props
   };
 };

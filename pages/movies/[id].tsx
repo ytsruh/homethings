@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import {
   Player as VideoPlayer,
@@ -12,32 +12,29 @@ import {
   VolumeMenuButton,
 } from "video-react";
 import "video-react/dist/video-react.css";
-import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import Button from "@/lib/ui/Button";
-import useFetchData from "@/lib/hooks/useFetchData";
+import { getMovie } from "../api/movies/[id]";
+import { GetServerSideProps } from "next";
 
-export default function SingleMovie() {
+export default function SingleMovie(props: any) {
   const router = useRouter();
-  const { id } = router.query;
+  const { movie } = props;
 
-  const { isLoading, serverError, apiData } = useFetchData(`/api/movies/${id}`);
+  useEffect(() => {
+    if (router.isReady && !movie) {
+      router.push("/404");
+    }
+  }, [router, movie]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (serverError) {
-    router.push("/500");
-  }
-
-  if (apiData) {
+  if (movie) {
     return (
       <Protected>
         <div className="container mx-auto flex flex-col w-full py-10">
           <div className="flex justify-between items-center my-2">
             <div className="space-y-2">
-              <h1 className="text-primary text-3xl">{apiData.title}</h1>
-              <p className="text-coal dark:text-salt">Duration: {apiData.duration}</p>
+              <h1 className="text-primary text-3xl">{movie.title}</h1>
+              <p className="text-coal dark:text-salt">Duration: {movie.duration}</p>
             </div>
             <a href="/movies">
               <Button color="bg-coal dark:bg-salt" text="text-salt dark:text-coal">
@@ -47,7 +44,7 @@ export default function SingleMovie() {
           </div>
           <div>
             <VideoPlayer
-              src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/movies/${apiData.fileName}`}
+              src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/movies/${movie.fileName}`}
               aspectRatio="16:9"
               fluid={true}
               autoPlay={true}
@@ -55,8 +52,8 @@ export default function SingleMovie() {
               <LoadingSpinner />
               <BigPlayButton position="center" />
               <ControlBar>
-                <ReplayControl seconds={10} order={1.1} />
-                <ForwardControl seconds={30} order={1.2} />
+                <ReplayControl seconds={10} />
+                <ForwardControl seconds={30} />
                 <CurrentTimeDisplay order={4.1} />
                 <TimeDivider order={4.2} />
                 <VolumeMenuButton />
@@ -68,3 +65,14 @@ export default function SingleMovie() {
     );
   }
 }
+
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
+  const { id } = context.query;
+  const movie = await getMovie(id);
+  // Have to stringify then parse otherwise date objects cannot be passed to page
+  const stringify = JSON.stringify(movie);
+  const parsed = JSON.parse(stringify);
+  return {
+    props: { movie: parsed }, // will be passed to the page component as props
+  };
+};

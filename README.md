@@ -7,6 +7,9 @@ The Homeflix App & API using NextJS
 ### 0.8
 
 - Added User favourites
+- Upgraded all files to TypeScript
+- Added getServerSideProps to all pages
+- Added prop-types to components
 
 ### 0.7
 

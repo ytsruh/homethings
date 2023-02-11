@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
-import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import Button from "@/lib/ui/Button";
-import useFetchData from "@/lib/hooks/useFetchData";
+import { getUsers } from "../api/users";
+import { GetServerSideProps } from "next";
 
-export default function Profile() {
+export default function Profile(props: any) {
   const router = useRouter();
+  const { users } = props;
   const desc = "Admin section to add, update or remove users";
 
-  const { isLoading, serverError, apiData } = useFetchData(`/api/users`);
+  useEffect(() => {
+    if (router.isReady && !users) {
+      router.push("/404");
+    }
+  }, [router, users]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (serverError) {
-    router.push("/500");
-  }
-
-  const rows = apiData.map((user, i) => {
+  const rows = users.map((user: any, i: number) => {
     return <EpisodeRow data={user} key={i} />;
   });
 
@@ -58,7 +56,7 @@ export default function Profile() {
   );
 }
 
-const EpisodeRow = (props) => {
+const EpisodeRow = (props: any) => {
   return (
     <tr className="">
       <td>{props.data.name}</td>
@@ -69,4 +67,14 @@ const EpisodeRow = (props) => {
       <td>{dayjs(props.data.updatedAt).format("DD/MM/YYYY")}</td>
     </tr>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const users = await getUsers();
+  // Have to stringify then parse otherwise date objects cannot be passed to page
+  const stringify = JSON.stringify(users);
+  const parsed = JSON.parse(stringify);
+  return {
+    props: { users: parsed }, // will be passed to the page component as props
+  };
 };

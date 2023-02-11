@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/components/PageTitle";
 import MoviesList from "@/components/MoviesList";
-import useFetchData from "@/lib/hooks/useFetchData";
+import { getMovies } from "../api/movies";
+import { GetServerSideProps } from "next";
 
-export default function Movies() {
+export default function Movies(props: any) {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
+  const { movies } = props;
 
-  const { isLoading, serverError, apiData } = useFetchData("/api/movies");
+  useEffect(() => {
+    if (router.isReady && !movies) {
+      router.push("/404");
+    }
+  }, [router, movies]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (serverError) {
-    router.push("/500");
-  }
-
-  if (apiData) {
+  if (movies) {
     return (
       <Protected>
         <div className="py-3">
           <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
           <FilterBar function={setSearchText} />
-          <MoviesList data={filterMovies(apiData, searchText)} />
+          <MoviesList data={filterMovies(movies, searchText)} />
         </div>
       </Protected>
     );
@@ -34,14 +32,14 @@ export default function Movies() {
 
 const desc = "Find the best & most popular movies now available on Homeflix";
 
-const filterMovies = (data, searchText) => {
+const filterMovies = (data: any, searchText: string) => {
   if (data.length > 0) {
-    return data.filter((movie) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
+    return data.filter((movie: any) => movie.title.toLowerCase().includes(searchText.toLowerCase()));
   }
   return [];
 };
 
-const FilterBar = (props) => {
+const FilterBar = (props: any) => {
   return (
     <div className="container mx-auto my-5 flex justify-center">
       <input
@@ -53,4 +51,14 @@ const FilterBar = (props) => {
       />
     </div>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const movies = await getMovies();
+  // Have to stringify then parse otherwise date objects cannot be passed to page
+  const stringify = JSON.stringify(movies);
+  const parsed = JSON.parse(stringify);
+  return {
+    props: { movies: parsed }, // will be passed to the page component as props
+  };
 };
