@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import Icon from "./Icon";
+import { useState, useEffect } from "react";
+import Icon from "../ui/Icon";
 
 export default function ThemePicker() {
   const [theme, setTheme] = useState<string>();

@@ -40,3 +40,13 @@ const controller = {
     }
   },
 };
+
+export const getUsers = async () => {
+  try {
+    const data = await db.user.findMany();
+    const filtered = filterOutPassword(data);
+    return filtered;
+  } catch (err) {
+    throw err;
+  }
+};

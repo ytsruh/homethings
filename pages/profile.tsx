@@ -1,19 +1,27 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Loading from "@/components/Loading";
+import Loading from "@/lib/ui/Loading";
 import Protected from "@/components/Protected";
-import PageTitle from "@/components/PageTitle";
-import Icon from "@/components/Icon";
+import PageTitle from "@/lib/ui/PageTitle";
+import Icon from "@/lib/ui/Icon";
 import Button from "@/lib/ui/Button";
-import useFetchData from "@/lib/hooks/useFetchData";
+import { getProfile } from "./api/profile";
+import { GetServerSideProps } from "next";
 
-export default function Profile() {
+export default function Profile(props: any) {
   const router = useRouter();
+  const { profileData } = props;
   const [profile, setProfile] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const desc = "Your profile & account settings";
+
+  useEffect(() => {
+    if (router.isReady && !profileData) {
+      router.push("/404");
+    }
+  }, [router, profileData]);
 
   const submitData = async () => {
     try {
@@ -40,13 +48,11 @@ export default function Profile() {
     }
   };
 
-  const { isLoading, serverError, apiData } = useFetchData(`/api/profile`);
-
-  if (error || serverError) {
+  if (error) {
     router.push("/500");
   }
 
-  if (isLoading || submitting) {
+  if (submitting) {
     return <Loading />;
   }
 
@@ -67,9 +73,9 @@ export default function Profile() {
                 <input
                   className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
                   type="text"
-                  defaultValue={apiData.name}
+                  defaultValue={profileData.name}
                   placeholder="Name"
-                  onChange={(e) => setProfile({ ...apiData, name: e.target.value })}
+                  onChange={(e) => setProfile({ ...profileData, name: e.target.value })}
                 />
               </div>
               <div className="py-3">
@@ -79,10 +85,9 @@ export default function Profile() {
                     <div key={i}>
                       <input
                         defaultValue={type}
-                        label={type}
                         name="darkMode"
                         type="radio"
-                        defaultChecked={apiData.darkMode === type}
+                        defaultChecked={profileData.darkMode === type}
                         key={i}
                         className="text-white text-capitalize"
                       />
@@ -106,9 +111,9 @@ export default function Profile() {
                       defaultValue={type}
                       name="icon"
                       type="radio"
-                      defaultChecked={apiData.icon === type}
-                      id={i}
-                      onChange={(e) => setProfile({ ...apiData, icon: e.target.value })}
+                      defaultChecked={profileData.icon === type}
+                      id={i.toString()}
+                      onChange={(e) => setProfile({ ...profileData, icon: e.target.value })}
                     />
                     <label>
                       <Icon icon={type} styles={iconStyles} color="text-coal dark:text-salt" />
@@ -132,4 +137,14 @@ export default function Profile() {
 
 const iconStyles = {
   fontSize: "50px",
+};
+
+export const getServerSideProps: GetServerSideProps = async (context: any) => {
+  const profile = await getProfile(context.req);
+  // Have to stringify then parse otherwise date objects cannot be passed to page
+  const stringify = JSON.stringify(profile);
+  const parsed = JSON.parse(stringify);
+  return {
+    props: { profileData: parsed }, // will be passed to the page component as props
+  };
 };

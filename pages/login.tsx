@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import Button from "@/lib/ui/Button";
 import Alert from "@/lib/ui/Alert";
-import Loading from "@/components/Loading";
+import Loading from "@/lib/ui/Loading";
 
 export default function Login() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const submitForm = async (e) => {
+  const submitForm = async (e: any) => {
     try {
       e.preventDefault();
       setSubmitting(true);

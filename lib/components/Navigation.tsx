@@ -1,5 +1,5 @@
 import { signOut } from "next-auth/react";
-import Icon from "./Icon";
+import Icon from "../ui/Icon";
 import Dropdown from "@/lib/ui/Dropdown";
 import ThemePicker from "@/components/ThemePicker";
 

@@ -15,3 +15,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: "An error has occured" });
   }
 }
+
+export const getShows = async () => {
+  try {
+    const data = await db.show.findMany();
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};

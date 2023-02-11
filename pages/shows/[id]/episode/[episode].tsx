@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useEffect } from "react";
 import {
   Player as VideoPlayer,
   BigPlayButton,
@@ -12,35 +11,34 @@ import {
   VolumeMenuButton,
 } from "video-react";
 import "video-react/dist/video-react.css";
-import Loading from "@/components/Loading";
 import Protected from "@/components/Protected";
 import Button from "@/lib/ui/Button";
-import useFetchData from "@/lib/hooks/useFetchData";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
+import { getEpisode } from "../../../api/episodes/[id]";
 
-export default function Episode() {
+export default function Episode(props: any) {
   const router = useRouter();
-  const { episode } = router.query;
-  const { isLoading, serverError, apiData } = useFetchData(`/api/episodes/${episode}`);
+  const { episode } = props;
 
-  if (isLoading) {
-    return <Loading />;
-  }
-  if (serverError) {
-    router.push("/500");
-  }
+  useEffect(() => {
+    if (router.isReady && !episode) {
+      router.push("/404");
+    }
+  }, [router, episode]);
 
-  if (apiData && apiData.show) {
+  if (episode) {
     return (
       <Protected>
         <div className="container mx-auto flex flex-col w-full py-10">
           <div className="flex justify-between my-2 items-center">
             <div className="space-y-2">
-              <h1 className="text-primary text-3xl">{apiData.title}</h1>
+              <h1 className="text-primary text-3xl">{episode.title}</h1>
               <p className="text-coal dark:text-salt">
-                Season: {apiData.seasonNumber} | Episode: {apiData.episodeNumber}
+                Season: {episode.seasonNumber} | Episode: {episode.episodeNumber}
               </p>
             </div>
-            <a href={`/shows/${apiData.showId}`}>
+            <a href={`/shows/${episode.showId}`}>
               <Button color="bg-coal dark:bg-salt" text="text-salt dark:text-coal">
                 Back
               </Button>
@@ -48,7 +46,7 @@ export default function Episode() {
           </div>
           <div>
             <VideoPlayer
-              src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/shows/${apiData.show.title}/Season ${apiData.seasonNumber}/${apiData.fileName}`}
+              src={`${process.env.NEXT_PUBLIC_IMAGES_ENDPOINT}/shows/${episode.show.title}/Season ${episode.seasonNumber}/${episode.fileName}`}
               aspectRatio="16:9"
               fluid={true}
               autoPlay={true}
@@ -56,8 +54,8 @@ export default function Episode() {
               <LoadingSpinner />
               <BigPlayButton position="center" />
               <ControlBar>
-                <ReplayControl seconds={10} order={1.1} />
-                <ForwardControl seconds={30} order={1.2} />
+                <ReplayControl seconds={10} />
+                <ForwardControl seconds={30} />
                 <CurrentTimeDisplay order={4.1} />
                 <TimeDivider order={4.2} />
                 <VolumeMenuButton />
@@ -67,7 +65,16 @@ export default function Episode() {
         </div>
       </Protected>
     );
-  } else {
-    return null;
   }
 }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { episode } = context.query;
+  const episodeData = await getEpisode(episode as string);
+  // Have to stringify then parse otherwise date objects cannot be passed to page
+  const stringify = JSON.stringify(episodeData);
+  const parsed = JSON.parse(stringify);
+  return {
+    props: { episode: parsed }, // will be passed to the page component as props
+  };
+};

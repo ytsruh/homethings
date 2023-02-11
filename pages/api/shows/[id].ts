@@ -20,3 +20,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: "An error has occured" });
   }
 }
+
+export const getShow = async (id: any) => {
+  try {
+    const data = await db.show.findUnique({
+      where: { id: id },
+      include: {
+        episodes: true,
+      },
+    });
+    return data;
+  } catch (err) {
+    throw err;
+  }
+};

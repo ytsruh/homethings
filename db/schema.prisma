@@ -17,6 +17,7 @@ model User {
   password      String 
   icon          String    @default("BsFillEmojiSmileUpsideDownFill")   
   darkMode      String    @default("system")
+  favourites    Favourite[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -51,6 +52,16 @@ model Episode {
   fileName      String
   seasonNumber  Int
   episodeNumber Int
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Favourite {
+  id            String     @id @default(cuid()) 
+  favourite     String
+  type          String
+  user          User       @relation(fields: [userId], references: [id])
+  userId        String     // relation scalar field  (used in the `@relation` attribute above) 
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
