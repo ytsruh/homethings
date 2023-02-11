@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import Protected from "@/components/Protected";
-import PageTitle from "@/components/PageTitle";
+import PageTitle from "@/lib/ui/PageTitle";
 import Button from "@/lib/ui/Button";
 import { getUsers } from "../api/users";
 import { GetServerSideProps } from "next";

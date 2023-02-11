@@ -1,6 +1,7 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import Protected from "@/components/Protected";
+import PageTitle from "@/lib/ui/PageTitle";
 import { getFavourites } from "./api/favourite";
 import Button from "@/lib/ui/Button";
 
@@ -15,15 +16,15 @@ export default function Home(props: any) {
   return (
     <Protected>
       <div className="flex flex-col">
-        <h1 className="text-5xl text-coal dark:text-white py-10 text-center">Welcome to Homeflix</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 w-100 px-5 lg:px-10">
+        <PageTitle title="Welcome to Homeflix" image={"img/home.jpg"} alt="Homepage Hero" />
+        <div className="grid grid-cols-1 md:grid-cols-2 w-100 p-5 lg:px-10">
           <div className="m-5 w-100">
             <h2 className="text-center text-2xl underline">Favourite Movies</h2>
-            {favemovies}
+            {favemovies.length > 0 ? favemovies : <NoFavourites />}
           </div>
           <div className="m-5 w-100">
             <h2 className="text-center text-2xl underline">Favourite Shows</h2>
-            {faveShows}
+            {faveShows.length > 0 ? faveShows : <NoFavourites />}
           </div>
         </div>
       </div>
@@ -39,6 +40,14 @@ const Favourite = (props: any) => {
         <h6 className="text-lg">{props.data.title}</h6>
       </div>
       <Button onClick={() => router.push(`/${props.types}/${props.data.id}`)}>Play</Button>
+    </div>
+  );
+};
+
+const NoFavourites = () => {
+  return (
+    <div className="flex justify-center py-5 w-100">
+      <h6 className="text-lg">You have not created any favourites yet</h6>
     </div>
   );
 };

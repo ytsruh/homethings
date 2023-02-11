@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Navigation from "@/components/Navigation";
-import Loading from "@/components/Loading";
+import Loading from "@/lib/ui/Loading";
 import useFetchData from "@/lib/hooks/useFetchData";
 import { FavouriteContext } from "@/lib/hooks/FavouriteContext";
 

@@ -3,6 +3,9 @@ type Props = {
   text: string;
   children: JSX.Element | string;
   onClick?: () => void;
+  form?: string;
+  disabled?: boolean;
+  type?: any;
 };
 
 export default function Button(props: Props) {

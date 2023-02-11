@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Loading from "@/components/Loading";
+import Loading from "@/lib/ui/Loading";
 import Protected from "@/components/Protected";
-import PageTitle from "@/components/PageTitle";
-import Icon from "@/components/Icon";
+import PageTitle from "@/lib/ui/PageTitle";
+import Icon from "@/lib/ui/Icon";
 import Button from "@/lib/ui/Button";
 import { getProfile } from "./api/profile";
 import { GetServerSideProps } from "next";

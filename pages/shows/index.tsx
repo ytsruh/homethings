@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import Protected from "@/components/Protected";
-import PageTitle from "@/components/PageTitle";
+import PageTitle from "@/lib/ui/PageTitle";
 import ShowsList from "@/components/ShowsList";
 import { getShows } from "../api/shows";
 import { GetServerSideProps } from "next";

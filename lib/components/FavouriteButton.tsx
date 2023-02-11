@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Icon from "@/lib/components/Icon";
+import Icon from "@/lib/ui/Icon";
 import useFavourite from "../hooks/useFavourite";
 
 type Props = {
