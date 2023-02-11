@@ -15,3 +15,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(500).json({ error: "An error has occured" });
   }
 }
+
+export const getMovie = async (id: string) => {
+  try {
+    const data = await db.movie.findUnique({ where: { id: id } });
+    return data;
+  } catch (error) {
+    return error;
+  }
+};

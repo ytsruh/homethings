@@ -1,5 +1,6 @@
 // @ts-nocheck
 import * as Icons from "react-icons/bs";
+import PropTypes from "prop-types";
 
 type Props = {
   icon: any;
@@ -7,7 +8,7 @@ type Props = {
   styles: any;
 };
 
-export default function Profile(props: Props) {
+export default function Icon(props: Props) {
   const icon = Icons[props.icon]();
   const color = props.color || "text-white";
   return (
@@ -16,3 +17,9 @@ export default function Profile(props: Props) {
     </div>
   );
 }
+
+Icon.propTypes = {
+  icon: PropTypes.any,
+  color: PropTypes.string,
+  styles: PropTypes.object,
+};

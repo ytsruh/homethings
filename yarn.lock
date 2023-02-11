@@ -114,7 +114,7 @@
   "resolved" "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.5.tgz"
   "version" "15.7.5"
 
-"@types/react@^18.0.14":
+"@types/react@*", "@types/react@^18.0.14":
   "integrity" "sha512-x4gGuASSiWmo0xjDLpm5mPb52syZHJx02VKbqUKdLmKtAwIh63XClGsiTI1K6DO5q7ox4xAsQrU+Gl3+gGXF9Q=="
   "resolved" "https://registry.npmjs.org/@types/react/-/react-18.0.14.tgz"
   "version" "18.0.14"
@@ -127,6 +127,13 @@
   "integrity" "sha512-hppQEBDmlwhFAXKJX2KnWLYu5yMfi91yazPb2l+lbJiwW+wdo1gNeRA+3RgNSO39WYX2euey41KEwnqesU2Jew=="
   "resolved" "https://registry.npmjs.org/@types/scheduler/-/scheduler-0.16.2.tgz"
   "version" "0.16.2"
+
+"@types/video-react@^0.15.1":
+  "integrity" "sha512-OFndW9sVCX7yTHnt6cGWE88IAVMm6RcS4YN15N+i0o5yYDFQhPc3ChmiyNkQXk6HuBBLQDu6Fyy5FH3Dv/F5IA=="
+  "resolved" "https://registry.npmjs.org/@types/video-react/-/video-react-0.15.1.tgz"
+  "version" "0.15.1"
+  dependencies:
+    "@types/react" "*"
 
 "acorn-node@^1.8.2":
   "integrity" "sha512-8mt+fslDufLYntIoPAaIMUe/lrbrehIiwmR3t2k9LljIzoigEPF27eLk2hy8zSGzmR/ogr7zbRKINMo1u0yh5A=="
@@ -634,7 +641,7 @@
   dependencies:
     "@prisma/engines" "4.7.1"
 
-"prop-types@^15.7.2":
+"prop-types@^15.7.2", "prop-types@^15.8.1":
   "integrity" "sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg=="
   "resolved" "https://registry.npmjs.org/prop-types/-/prop-types-15.8.1.tgz"
   "version" "15.8.1"

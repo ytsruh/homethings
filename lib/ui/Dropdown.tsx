@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 type Props = {
   menuItem: JSX.Element;
@@ -20,9 +21,8 @@ export default function Dropdown(props: Props) {
     </div>
   );
 }
-
-Dropdown.defaultProps = {
-  menuItem: "Menu",
+Dropdown.propTypes = {
+  menuItem: PropTypes.element,
 };
 
 const List = (props: any) => {

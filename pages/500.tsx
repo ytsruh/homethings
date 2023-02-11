@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function Custom500() {
   return (
     <div className="flex items-center justify-center h-screen bg-salt dark:bg-coal text-coal dark:text-salt">

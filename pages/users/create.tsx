@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
-import Loading from "@/components/Loading";
+import Loading from "@/lib/ui/Loading";
 import Protected from "@/components/Protected";
-import PageTitle from "@/components/PageTitle";
+import PageTitle from "@/lib/ui/PageTitle";
 import Alert from "@/lib/ui/Alert";
 import Button from "@/lib/ui/Button";
+
+type Error = string | Boolean | string;
 
 export default function Profile() {
   const router = useRouter();
@@ -13,8 +15,8 @@ export default function Profile() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
-  const [alert, setAlert] = useState(false);
-  const [error, setError] = useState(false);
+  const [alert, setAlert] = useState("");
+  const [error, setError] = useState<Error>(false);
   const [submitting, setSubmitting] = useState(false);
   const desc = "Create a new user";
 
@@ -29,7 +31,7 @@ export default function Profile() {
       return;
     }
     const url = `/api/users`;
-    const user = JSON.parse(sessionStorage.getItem("user"));
+    const user = JSON.parse(sessionStorage.getItem("user") || "{}");
     try {
       setSubmitting(true);
       const response = await fetch(url, {

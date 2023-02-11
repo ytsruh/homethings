@@ -50,3 +50,14 @@ const controller = {
     }
   },
 };
+
+export const getProfile = async (req: any) => {
+  const id = await decode(req);
+  try {
+    const data = await db.user.findUnique({ where: { id: id } });
+    const filtered = await filterUserData(data);
+    return filtered;
+  } catch (err) {
+    throw err;
+  }
+};
