@@ -2,7 +2,7 @@ import { BsX } from "react-icons/bs";
 import PropTypes from "prop-types";
 
 type Props = {
-  close: (close: boolean) => void;
+  close: any;
   text: string;
 };
 
