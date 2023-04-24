@@ -4,6 +4,12 @@ The Homeflix App & API using NextJS
 
 ## Versions
 
+### 0.9
+
+- Adding support for books & reviews
+- Updated Next 13
+- Removed TRPC
+
 ### 0.8
 
 - Added User favourites
