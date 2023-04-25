@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import type { NextApiRequest } from "next";
-import { User } from "./schema";
+import jsonwebtoken from "jsonwebtoken";
 
 // Fix for having too many DB connections in development.
 // https://github.com/prisma/prisma/issues/5007#issuecomment-618433162
@@ -37,6 +37,22 @@ export const checkAuth = async (req: NextApiRequest) => {
 export const decode = async (req: NextApiRequest) => {
   const token = await getToken({ req });
   return token?.sub;
+};
+
+export const decodeToken = async (req: NextApiRequest) => {
+  if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error("JWT_KEY must be defined");
+  }
+  try {
+    if (!req.headers.token) {
+      throw new Error("Unauthorised: Token not found");
+    }
+    const decoded = await jsonwebtoken.verify(req.headers.token?.toString(), process.env.NEXTAUTH_SECRET);
+    return decoded;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
 };
 
 export const filterUserData = async (data: any) => {

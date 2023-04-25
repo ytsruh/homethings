@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
@@ -18,6 +19,7 @@ model User {
   icon          String    @default("BsFillEmojiSmileUpsideDownFill")   
   darkMode      String    @default("system")
   favourites    Favourite[]
+  books         Book[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -60,6 +62,22 @@ model Favourite {
   id            String     @id @default(cuid()) 
   favourite     String
   type          String
+  user          User       @relation(fields: [userId], references: [id])
+  userId        String     // relation scalar field  (used in the `@relation` attribute above) 
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Book {
+  id            String     @id @default(cuid()) 
+  name          String
+  isbn          String
+  author        String?
+  genre         String?
+  rating        Int?      
+  review        String?
+  image         String?
+  read          Boolean    @default(false)
   user          User       @relation(fields: [userId], references: [id])
   userId        String     // relation scalar field  (used in the `@relation` attribute above) 
   createdAt     DateTime   @default(now())

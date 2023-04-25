@@ -9,6 +9,7 @@ The Homeflix App & API using NextJS
 - Adding support for books & reviews
 - Updated Next 13
 - Removed TRPC
+- Added Prisma JSON feature flag
 
 ### 0.8
 
