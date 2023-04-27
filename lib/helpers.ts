@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
-import type { NextApiRequest } from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import jsonwebtoken from "jsonwebtoken";
 
 // Fix for having too many DB connections in development.
@@ -39,7 +39,7 @@ export const decode = async (req: NextApiRequest) => {
   return token?.sub;
 };
 
-export const decodeToken = async (req: NextApiRequest) => {
+export const decodeToken = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!process.env.NEXTAUTH_SECRET) {
     throw new Error("JWT_KEY must be defined");
   }
@@ -51,7 +51,7 @@ export const decodeToken = async (req: NextApiRequest) => {
     return decoded;
   } catch (error) {
     console.log(error);
-    return error;
+    res.status(401).json({ error: "unauthorised" });
   }
 };
 

@@ -7,11 +7,32 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return;
   }
   switch (req.method) {
-    case "POST":
+    case "GET":
+      try {
+        const token: any = await decodeToken(req, res);
+        const books = await db.book.findMany({
+          where: {
+            id: req.query.id?.toString(),
+            userId: token.data.id,
+          },
+        });
+        res.status(200).json({ data: books });
+      } catch (error) {
+        // For errors, log to console and send a 500 response back
+        console.log(error);
+        res.status(500).json({ error: "Something went wrong" });
+      }
+      break;
+
+    case "PATCH":
       try {
         const token: any = await decodeToken(req, res);
         const { body } = req;
-        const book = await db.book.create({
+        const book = await db.book.updateMany({
+          where: {
+            id: req.query.id?.toString(),
+            userId: token.data.id,
+          },
           data: {
             name: body.name,
             isbn: body.isbn,
@@ -20,7 +41,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             rating: body.rating,
             review: body.review,
             image: body.image,
-            userId: token.data.id,
           },
         });
         res.status(200).json({ message: "success", data: book });
@@ -31,15 +51,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       break;
 
-    case "GET":
+    case "DELETE":
       try {
         const token: any = await decodeToken(req, res);
-        const books = await db.book.findMany({
+        await db.book.deleteMany({
           where: {
+            id: req.query.id?.toString(),
             userId: token.data.id,
           },
         });
-        res.status(200).json({ count: books.length, data: books });
+        res.status(200).json({ deleted: "success" });
       } catch (error) {
         // For errors, log to console and send a 500 response back
         console.log(error);
