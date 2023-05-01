@@ -74,9 +74,9 @@ model Book {
   isbn          String
   author        String?
   genre         String?
-  rating        Int?      
-  review        String?
+  rating        Int?     
   image         String?
+  wishlist      Boolean    @default(false)
   read          Boolean    @default(false)
   user          User       @relation(fields: [userId], references: [id])
   userId        String     // relation scalar field  (used in the `@relation` attribute above) 

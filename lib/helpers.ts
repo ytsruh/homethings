@@ -21,6 +21,8 @@ if (process.env.NODE_ENV === "production") {
   db = globalWithPrisma.prisma;
 }
 
+/* THIS CODE CAN BE DELETED?
+
 export const checkAuth = async (req: NextApiRequest) => {
   try {
     const token = await getToken({ req });
@@ -52,6 +54,44 @@ export const decodeToken = async (req: NextApiRequest, res: NextApiResponse) => 
   } catch (error) {
     console.log(error);
     res.status(401).json({ error: "unauthorised" });
+  }
+};
+
+THIS CODE CAN BE DELETED? */
+
+export const combinedDecodeToken = async (req: NextApiRequest) => {
+  // Check if Secret is set in ENV variables
+  if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error("JWT_KEY must be defined");
+  }
+  try {
+    // First try to get token in cookie from Next Auth
+    const token = await getToken({ req });
+    if (token) {
+      // If token is found then return the user id
+      return token.sub;
+    } else {
+      // If token is not found then check if a token from custom auth can be found in the headers
+      if (!req.headers.token) {
+        throw new Error("Unauthorised: Token not found");
+      }
+      // If token is found then verify it using custom auth
+      const decoded: any = await jsonwebtoken.verify(
+        req.headers.token?.toString(),
+        process.env.NEXTAUTH_SECRET
+      );
+      if (decoded) {
+        // If token is verified then return it
+        return decoded.data.id;
+      } else {
+        // If logic gets to this stage we must assume that the token is invalid so throw error
+        throw new Error("Unauthorised: Token not found");
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    // Token cannot be found or validated to return unauthorised
+    return false;
   }
 };
 

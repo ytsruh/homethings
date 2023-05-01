@@ -31,9 +31,7 @@ export default function Profile(props: any) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          profile,
-        }),
+        body: JSON.stringify(profile),
       });
       //Check for ok response
       if (!response.ok) {

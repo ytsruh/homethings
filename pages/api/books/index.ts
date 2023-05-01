@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db, decodeToken } from "@/lib/helpers";
+import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!req.headers.token) {
@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (req.method) {
     case "POST":
       try {
-        const token: any = await decodeToken(req, res);
+        const token: string = await combinedDecodeToken(req);
         const { body } = req;
         const book = await db.book.create({
           data: {
@@ -17,10 +17,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             isbn: body.isbn,
             author: body.author,
             genre: body.genre,
+            wishlist: body.wishlist,
+            read: body.read,
             rating: body.rating,
-            review: body.review,
             image: body.image,
-            userId: token.data.id,
+            userId: token,
           },
         });
         res.status(200).json({ message: "success", data: book });
@@ -33,10 +34,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case "GET":
       try {
-        const token: any = await decodeToken(req, res);
+        const token: string = await combinedDecodeToken(req);
         const books = await db.book.findMany({
           where: {
-            userId: token.data.id,
+            userId: token,
           },
         });
         res.status(200).json({ count: books.length, data: books });

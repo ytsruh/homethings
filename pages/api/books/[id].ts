@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db, decodeToken } from "@/lib/helpers";
+import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!req.headers.token) {
@@ -9,11 +9,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (req.method) {
     case "GET":
       try {
-        const token: any = await decodeToken(req, res);
+        const token: string = await combinedDecodeToken(req);
         const books = await db.book.findMany({
           where: {
             id: req.query.id?.toString(),
-            userId: token.data.id,
+            userId: token,
           },
         });
         res.status(200).json({ data: books });
@@ -26,20 +26,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case "PATCH":
       try {
-        const token: any = await decodeToken(req, res);
+        const token: string = await combinedDecodeToken(req);
         const { body } = req;
         const book = await db.book.updateMany({
           where: {
             id: req.query.id?.toString(),
-            userId: token.data.id,
+            userId: token,
           },
           data: {
             name: body.name,
             isbn: body.isbn,
             author: body.author,
             genre: body.genre,
+            wishlist: body.wishlist,
+            read: body.read,
             rating: body.rating,
-            review: body.review,
             image: body.image,
           },
         });
@@ -53,11 +54,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case "DELETE":
       try {
-        const token: any = await decodeToken(req, res);
+        const token: string = await combinedDecodeToken(req);
         await db.book.deleteMany({
           where: {
             id: req.query.id?.toString(),
-            userId: token.data.id,
+            userId: token,
           },
         });
         res.status(200).json({ deleted: "success" });
