@@ -6,10 +6,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(401).json({ error: "Unauthorised" });
     return;
   }
+  const token: string = await combinedDecodeToken(req);
   switch (req.method) {
     case "GET":
       try {
-        const token: string = await combinedDecodeToken(req);
         const books = await db.book.findMany({
           where: {
             userId: token,

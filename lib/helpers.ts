@@ -21,44 +21,6 @@ if (process.env.NODE_ENV === "production") {
   db = globalWithPrisma.prisma;
 }
 
-/* THIS CODE CAN BE DELETED?
-
-export const checkAuth = async (req: NextApiRequest) => {
-  try {
-    const token = await getToken({ req });
-    if (token) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (err) {
-    return false;
-  }
-};
-
-export const decode = async (req: NextApiRequest) => {
-  const token = await getToken({ req });
-  return token?.sub;
-};
-
-export const decodeToken = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (!process.env.NEXTAUTH_SECRET) {
-    throw new Error("JWT_KEY must be defined");
-  }
-  try {
-    if (!req.headers.token) {
-      throw new Error("Unauthorised: Token not found");
-    }
-    const decoded = await jsonwebtoken.verify(req.headers.token?.toString(), process.env.NEXTAUTH_SECRET);
-    return decoded;
-  } catch (error) {
-    console.log(error);
-    res.status(401).json({ error: "unauthorised" });
-  }
-};
-
-THIS CODE CAN BE DELETED? */
-
 export const combinedDecodeToken = async (req: NextApiRequest) => {
   // Check if Secret is set in ENV variables
   if (!process.env.NEXTAUTH_SECRET) {

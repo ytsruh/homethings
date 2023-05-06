@@ -2,17 +2,18 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const token = await combinedDecodeToken(req);
   switch (req.method) {
     case "POST":
-      await controller.post(req, res);
+      await controller.post(req, res, token);
       break;
 
     case "DELETE":
-      await controller.delete(req, res);
+      await controller.delete(req, res, token);
       break;
 
     default:
-      await controller.get(req, res);
+      await controller.get(req, res, token);
       break;
   }
 }
@@ -40,8 +41,7 @@ export const getFavourites = async (ctx: any) => {
 };
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse) => {
-    const token = await combinedDecodeToken(req);
+  get: async (req: NextApiRequest, res: NextApiResponse, token: string) => {
     if (token) {
       const favourites = await getFavourites(req);
       res.status(200).json(favourites);
@@ -49,8 +49,7 @@ const controller = {
       res.status(401).json({ error: "Unauthorised" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse) => {
-    const token = await combinedDecodeToken(req);
+  post: async (req: NextApiRequest, res: NextApiResponse, token: string) => {
     if (token) {
       console.log(req.body);
 
@@ -66,8 +65,7 @@ const controller = {
       res.status(401).json({ error: "Unauthorised" });
     }
   },
-  delete: async (req: NextApiRequest, res: NextApiResponse) => {
-    const token = await combinedDecodeToken(req);
+  delete: async (req: NextApiRequest, res: NextApiResponse, token: string) => {
     if (token) {
       const favourite = await db.favourite.deleteMany({
         where: {

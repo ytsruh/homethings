@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const books = await db.book.findMany({
           where: {
             userId: token,
-            wishlist: true,
+            read: false,
           },
         });
         res.status(200).json({ count: books.length, data: books });

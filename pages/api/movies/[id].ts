@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const token = await combinedDecodeToken(req);
   try {
-    const token = await combinedDecodeToken(req);
     if (token) {
       const data = await db.movie.findUnique({ where: { id: req?.query?.id?.toString() } });
       res.status(200).json(data);

@@ -6,10 +6,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(401).json({ error: "Unauthorised" });
     return;
   }
+  await combinedDecodeToken(req);
   switch (req.method) {
     case "GET":
       try {
-        await combinedDecodeToken(req);
         const feedback = await db.feedback.findMany();
         res.status(200).json({ count: feedback.length, data: feedback });
       } catch (error) {
