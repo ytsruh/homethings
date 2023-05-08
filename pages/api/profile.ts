@@ -1,22 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db, checkAuth, filterUserData, decode } from "@/lib/helpers";
+import { db, filterUserData, combinedDecodeToken } from "@/lib/helpers";
 import { UserSchema } from "@/lib/schema";
 import type { User } from "@/lib/schema";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const token = await combinedDecodeToken(req);
   if (req.method === "POST") {
-    await controller.post(req, res);
+    await controller.post(req, res, token);
   } else {
-    await controller.get(req, res);
+    await controller.get(req, res, token);
   }
 }
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse) => {
+  get: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
     try {
-      const auth = await checkAuth(req);
-      const id = await decode(req);
-      if (auth) {
+      if (id) {
         const data = await db.user.findUnique({ where: { id: id } });
         const filtered = await filterUserData(data);
         res.status(200).json(filtered);
@@ -28,12 +27,10 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse) => {
+  post: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
     try {
-      const auth = await checkAuth(req);
-      const id = await decode(req);
-      if (auth) {
-        const userdata: User = UserSchema.parse(req.body.profile);
+      if (id) {
+        const userdata: User = UserSchema.parse(req.body);
         const data = await db.user.update({
           where: {
             id: id,
@@ -52,7 +49,7 @@ const controller = {
 };
 
 export const getProfile = async (req: any) => {
-  const id = await decode(req);
+  const id = await combinedDecodeToken(req);
   try {
     const data = await db.user.findUnique({ where: { id: id } });
     const filtered = await filterUserData(data);

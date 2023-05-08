@@ -1,8 +1,19 @@
-# Homeflix
+# Homethings
 
-The Homeflix App & API using NextJS
+The Homethings App & API using NextJS
 
 ## Versions
+
+### 0.9
+
+- Adding support for books
+- Updated Next 13
+- Removed TRPC
+- Added Prisma JSON feature flag
+- Added dual auth so both Next Auth & Custom JWT can be used with API
+- Added Feedback functionality
+- Fixed bug where favourites could not be deleted
+- Added Zod to DB models & ENV variables
 
 ### 0.8
 

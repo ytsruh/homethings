@@ -16,7 +16,7 @@ export default function Home(props: any) {
   return (
     <Protected>
       <div className="flex flex-col">
-        <PageTitle title="Welcome to Homeflix" image={"img/home.jpg"} alt="Homepage Hero" />
+        <PageTitle title="Welcome to Homethings" image={"img/home.jpg"} alt="Homepage Hero" />
         <div className="grid grid-cols-1 md:grid-cols-2 w-100 p-5 lg:px-10">
           <div className="m-5 w-100">
             <h2 className="text-center text-2xl underline">Favourite Movies</h2>

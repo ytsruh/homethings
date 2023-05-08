@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
-import type { NextApiRequest } from "next";
-import { User } from "./schema";
+import type { NextApiRequest, NextApiResponse } from "next";
+import jsonwebtoken from "jsonwebtoken";
 
 // Fix for having too many DB connections in development.
 // https://github.com/prisma/prisma/issues/5007#issuecomment-618433162
@@ -21,22 +21,40 @@ if (process.env.NODE_ENV === "production") {
   db = globalWithPrisma.prisma;
 }
 
-export const checkAuth = async (req: NextApiRequest) => {
+export const combinedDecodeToken = async (req: NextApiRequest) => {
+  // Check if Secret is set in ENV variables
+  if (!process.env.NEXTAUTH_SECRET) {
+    throw new Error("JWT_KEY must be defined");
+  }
   try {
+    // First try to get token in cookie from Next Auth
     const token = await getToken({ req });
     if (token) {
-      return true;
+      // If token is found then return the user id
+      return token.sub;
     } else {
-      return false;
+      // If token is not found then check if a token from custom auth can be found in the headers
+      if (!req.headers.token) {
+        throw new Error("Unauthorised: Token not found");
+      }
+      // If token is found then verify it using custom auth
+      const decoded: any = await jsonwebtoken.verify(
+        req.headers.token?.toString(),
+        process.env.NEXTAUTH_SECRET
+      );
+      if (decoded) {
+        // If token is verified then return it
+        return decoded.data.id;
+      } else {
+        // If logic gets to this stage we must assume that the token is invalid so throw error
+        throw new Error("Unauthorised: Token not found");
+      }
     }
-  } catch (err) {
+  } catch (error) {
+    console.log(error);
+    // Token cannot be found or validated to return unauthorised
     return false;
   }
-};
-
-export const decode = async (req: NextApiRequest) => {
-  const token = await getToken({ req });
-  return token?.sub;
 };
 
 export const filterUserData = async (data: any) => {

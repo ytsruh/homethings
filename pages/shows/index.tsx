@@ -22,7 +22,7 @@ export default function Shows(props: any) {
     return (
       <Protected>
         <div className="py-3">
-          <PageTitle title="TV Shows" description={desc} image="img/showshero1.jpeg" alt="Shows Hero" />
+          <PageTitle title="TV Shows" description={desc} image="img/showshero.jpg" alt="Shows Hero" />
           <ShowsList data={shows} />
         </div>
       </Protected>

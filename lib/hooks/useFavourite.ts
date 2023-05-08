@@ -19,14 +19,14 @@ const useFavourite = (data: any) => {
     }
   };
 
-  const deleteFavourite = async (input: any) => {
+  const deleteFavourite = async (id: any) => {
     try {
       fetch("/api/favourite", {
-        method: "DELETE",
+        method: "PATCH", // Have to use PATCH as DELETE request cannot include a body
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(input),
+        body: JSON.stringify({ id: id }),
       });
       setSuccess(true);
     } catch (error) {

@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db, checkAuth } from "@/lib/helpers";
+import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const token = await combinedDecodeToken(req);
   try {
-    const auth = await checkAuth(req);
-    if (auth) {
+    if (token) {
       const data = await db.show.findUnique({
         where: { id: req?.query?.id?.toString() },
         include: {

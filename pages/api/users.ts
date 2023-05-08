@@ -1,19 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db, checkAuth, filterOutPassword } from "@/lib/helpers";
+import { db, combinedDecodeToken, filterOutPassword } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const id = await combinedDecodeToken(req);
   if (req.method === "POST") {
-    await controller.post(req, res);
+    await controller.post(req, res, id);
   } else {
-    await controller.get(req, res);
+    await controller.get(req, res, id);
   }
 }
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse) => {
+  get: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
     try {
-      const auth = await checkAuth(req);
-      if (auth) {
+      if (id) {
         const data = await db.user.findMany();
         const filtered = filterOutPassword(data);
         res.status(200).json(filtered);
@@ -25,10 +25,9 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse) => {
+  post: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
     try {
-      const auth = await checkAuth(req);
-      if (auth) {
+      if (id) {
         const data = await db.user.create({ data: req.body });
         res.status(200).json(data);
       } else {

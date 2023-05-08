@@ -14,7 +14,7 @@ export default function Navigation(props: Props) {
       sticky top-0 z-50 border-b border-coal dark:border-none"
     >
       <a href="/" className="text-2xl">
-        Homeflix
+        Homethings
       </a>
       <div className="flex items-center space-x-2 md:space-x-10">
         <a href="/movies">Movies</a>

@@ -1,11 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { db, checkAuth } from "@/lib/helpers";
+import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const token = await combinedDecodeToken(req);
   try {
-    const auth = await checkAuth(req);
-    if (auth) {
+    if (token) {
       const data = await db.movie.findMany();
+      res.setHeader("Cache-Control", "s-maxage=604800, stale-while-revalidate");
       res.status(200).json(data);
     } else {
       res.status(401).json({ error: "Unauthorised" });
