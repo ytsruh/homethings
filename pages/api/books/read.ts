@@ -15,6 +15,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             userId: token,
             read: true,
           },
+          orderBy: [
+            {
+              name: "asc",
+            },
+          ],
         });
         res.status(200).json({ count: books.length, data: books });
       } catch (error) {

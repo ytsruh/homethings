@@ -8,8 +8,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       await controller.post(req, res, token);
       break;
 
-    case "DELETE":
-      await controller.delete(req, res, token);
+    case "PATCH":
+      await controller.patch(req, res, token);
       break;
 
     default:
@@ -65,7 +65,7 @@ const controller = {
       res.status(401).json({ error: "Unauthorised" });
     }
   },
-  delete: async (req: NextApiRequest, res: NextApiResponse, token: string) => {
+  patch: async (req: NextApiRequest, res: NextApiResponse, token: string) => {
     if (token) {
       const favourite = await db.favourite.deleteMany({
         where: {

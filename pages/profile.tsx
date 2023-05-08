@@ -61,7 +61,7 @@ export default function Profile(props: any) {
   return (
     <Protected>
       <div className="py-3">
-        <PageTitle title="Profile" description={desc} image="img/settings.jpeg" alt="Settings" />
+        <PageTitle title="Profile" description={desc} image="img/settings.jpg" alt="Settings" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 py-5 px-5 md:px-10 lg:px-16">
           <div>
             <h2 className="text-primary text-2xl pb-3 text-center">Account Settings</h2>

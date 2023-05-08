@@ -12,9 +12,9 @@ const App: AppType<{ session: Session }> = ({ Component, pageProps: { session, .
         <meta name="theme-color" content="#d9230f" />
         <meta
           name="description"
-          content="Watch Homeflix films &amp; TV programmes online or stream right to your smart TV, game console, PC, Mac, mobile, tablet and more."
+          content="Watch films, TV shows or look at your book collection. More things will probably come in the future. Don't get too excited."
         />
-        <title>Homeflix | Like Netflix, but crappier</title>
+        <title>Homethings | The crappy home app</title>
       </Head>
       <Component {...pageProps} />
     </SessionProvider>

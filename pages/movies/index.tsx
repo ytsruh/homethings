@@ -21,7 +21,7 @@ export default function Movies(props: any) {
     return (
       <Protected>
         <div className="py-3">
-          <PageTitle title="Movies" description={desc} image={"img/movieshero1.jpeg"} alt="Movies Hero" />
+          <PageTitle title="Movies" description={desc} image={"img/movieshero.jpg"} alt="Movies Hero" />
           <FilterBar function={setSearchText} />
           <MoviesList data={filterMovies(movies, searchText)} />
         </div>

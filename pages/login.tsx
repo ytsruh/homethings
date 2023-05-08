@@ -44,8 +44,8 @@ export default function Login() {
       <div className="relative flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0">
         <div className="p-6 md:p-20">
           <div className="text-center py-5">
-            <h1 className="text-primary text-5xl py-2">Welcome to Homeflix</h1>
-            <h6 className="text-xl py-2">Login to view awesome Movies & TV shows</h6>
+            <h1 className="text-primary text-5xl py-2">Welcome to Homethings</h1>
+            <h6 className="text-xl py-2">Login to view awesome things</h6>
           </div>
           <form id="login-form" onSubmit={submitForm} className="py-5 space-y-5 text-coal dark:text-salt">
             <input

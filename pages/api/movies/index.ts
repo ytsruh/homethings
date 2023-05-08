@@ -6,6 +6,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     if (token) {
       const data = await db.movie.findMany();
+      res.setHeader("Cache-Control", "s-maxage=604800, stale-while-revalidate");
       res.status(200).json(data);
     } else {
       res.status(401).json({ error: "Unauthorised" });

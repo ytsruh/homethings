@@ -8,6 +8,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
   const token: string = await combinedDecodeToken(req);
   switch (req.method) {
+    case "GET":
+      try {
+        const books = await db.book.findMany({
+          where: {
+            userId: token,
+          },
+          orderBy: [
+            {
+              name: "asc",
+            },
+          ],
+        });
+        res.status(200).json({ count: books.length, data: books });
+      } catch (error) {
+        // For errors, log to console and send a 500 response back
+        console.log(error);
+        res.status(500).json({ error: "Something went wrong" });
+      }
+      break;
+
     case "POST":
       try {
         const { body } = req;
@@ -25,21 +45,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           },
         });
         res.status(200).json({ message: "success", data: book });
-      } catch (error) {
-        // For errors, log to console and send a 500 response back
-        console.log(error);
-        res.status(500).json({ error: "Something went wrong" });
-      }
-      break;
-
-    case "GET":
-      try {
-        const books = await db.book.findMany({
-          where: {
-            userId: token,
-          },
-        });
-        res.status(200).json({ count: books.length, data: books });
       } catch (error) {
         // For errors, log to console and send a 500 response back
         console.log(error);

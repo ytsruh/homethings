@@ -1,5 +1,5 @@
 {
-  "name": "homeflix",
+  "name": "homethings",
   "private": true,
   "scripts": {
     "dev": "next dev",
