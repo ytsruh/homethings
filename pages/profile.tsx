@@ -138,7 +138,7 @@ const iconStyles = {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context: any) => {
-  const profile = await getProfile(context.req);
+  const profile = await getProfile(context);
   // Have to stringify then parse otherwise date objects cannot be passed to page
   const stringify = JSON.stringify(profile);
   const parsed = JSON.parse(stringify);
