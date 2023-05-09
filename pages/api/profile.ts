@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db, filterUserData, combinedDecodeToken } from "@/lib/helpers";
 import { UserSchema } from "@/lib/schema";
 import type { User } from "@/lib/schema";
+import { getToken } from "next-auth/jwt";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = await combinedDecodeToken(req);
@@ -49,7 +50,8 @@ const controller = {
 };
 
 export const getProfile = async (req: any) => {
-  const id = await combinedDecodeToken(req);
+  const token = await getToken(req);
+  const id = token?.sub;
   try {
     const data = await db.user.findUnique({ where: { id: id } });
     const filtered = await filterUserData(data);

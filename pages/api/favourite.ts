@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { db, combinedDecodeToken } from "@/lib/helpers";
+import { getToken } from "next-auth/jwt";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = await combinedDecodeToken(req);
@@ -18,12 +19,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-export const getFavourites = async (ctx: any) => {
-  const token = await combinedDecodeToken(ctx);
+export const getFavourites = async (req: any) => {
+  const token = await getToken({ req });
+  const id = token?.sub;
 
   const favourites = await db.favourite.findMany({
     where: {
-      userId: token as string,
+      userId: id as string,
     },
   });
   const items = favourites.map((f) => f.favourite);
