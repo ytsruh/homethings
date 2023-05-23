@@ -7,6 +7,7 @@ The Homethings Apps & API
 ### 0.10
 
 - Merged in expo project for mobile app
+- Fixed bug when creating new users. Passwords were not encrypted.
 
 ### 0.9
 
