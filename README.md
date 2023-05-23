@@ -1,8 +1,12 @@
 # Homethings
 
-The Homethings App & API using NextJS
+The Homethings Apps & API
 
 ## Versions
+
+### 0.10
+
+- Merged in expo project for mobile app
 
 ### 0.9
 
