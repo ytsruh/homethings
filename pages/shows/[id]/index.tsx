@@ -2,13 +2,10 @@ import { useEffect } from "react";
 import Protected from "@/components/Protected";
 import { useRouter } from "next/router";
 import Button from "@/lib/ui/Button";
-import FavouriteButton from "@/components/FavouriteButton";
 import { GetServerSideProps } from "next";
-import { getFavourites } from "../../api/favourite";
 import { getShow } from "../../api/shows/[id]";
 
 type Data = {
-  favourites: any;
   show: any;
 };
 
@@ -19,7 +16,7 @@ type Episode = {
 
 export default function Show(props: Data) {
   const router = useRouter();
-  const { show, favourites } = props;
+  const { show } = props;
 
   useEffect(() => {
     if (router.isReady && !show) {
@@ -39,11 +36,6 @@ export default function Show(props: Data) {
             <div className="w-full md:w-1/3 lg:w-1/2 flex flex-col items-center justify-center">
               <h1 className="text-primary text-5xl">{show.title}</h1>
               <h3 className="text-xl my-10">Episodes: {show.episodes.length}</h3>
-              <FavouriteButton
-                id={show.id}
-                type="show"
-                favourite={favourites.shows.find((f: any) => f.id === show.id)}
-              />
             </div>
             <div className="w-0 md:w-2/3 lg:w-1/2">
               <img
@@ -89,10 +81,9 @@ const EpisodeRow = (props: Episode) => {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.query;
-  const favourites = await getFavourites(context.req);
   const show = await getShow(id);
   // Have to stringify then parse otherwise date objects cannot be passed to page
-  const stringify = JSON.stringify({ favourites, show });
+  const stringify = JSON.stringify({ show });
   const parsed = JSON.parse(stringify);
   return {
     props: parsed, // will be passed to the page component as props
