@@ -16,10 +16,6 @@ export default function Navigation(props: Props) {
       <a href="/" className="text-2xl">
         Homethings
       </a>
-      <div className="flex items-center space-x-2 md:space-x-10">
-        <a href="/movies">Movies</a>
-        <a href="/shows">Shows</a>
-      </div>
       <div className="flex space-x-5">
         <ThemePicker />
         <Dropdown

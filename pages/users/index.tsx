@@ -10,7 +10,7 @@ import { GetServerSideProps } from "next";
 export default function Profile(props: any) {
   const router = useRouter();
   const { users } = props;
-  const desc = "Admin section to add, update or remove users";
+  const desc = "Admin section to add & view users";
 
   useEffect(() => {
     if (router.isReady && !users) {
