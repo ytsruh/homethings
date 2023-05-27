@@ -7,7 +7,7 @@ import PageTitle from "@/lib/ui/PageTitle";
 import Alert from "@/lib/ui/Alert";
 import Button from "@/lib/ui/Button";
 
-type Error = string | Boolean | string;
+type Error = boolean | string;
 
 export default function Profile() {
   const router = useRouter();

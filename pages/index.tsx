@@ -1,7 +1,7 @@
 import Protected from "@/components/Protected";
 import PageTitle from "@/lib/ui/PageTitle";
 
-export default function Home(props: any) {
+export default function Home() {
   return (
     <Protected>
       <div className="flex flex-col">

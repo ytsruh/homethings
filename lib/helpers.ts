@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import type { NextApiRequest, NextApiResponse } from "next";
 import jsonwebtoken from "jsonwebtoken";
@@ -57,7 +57,7 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
   }
 };
 
-export const filterUserData = async (data: any) => {
+export const filterUserData = async (data: User) => {
   return {
     name: data.name,
     email: data.email,
@@ -66,10 +66,10 @@ export const filterUserData = async (data: any) => {
   };
 };
 
-export const filterOutPassword = (array: any) => {
-  const filtered = array.map((data: any) => {
+export const filterOutPassword = (array: Array<User>) => {
+  const filtered = array.map((data: User) => {
     return {
-      _id: data._id,
+      id: data.id,
       name: data.name,
       email: data.email,
       darkMode: data.darkMode,

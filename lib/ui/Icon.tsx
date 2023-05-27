@@ -3,9 +3,11 @@ import * as Icons from "react-icons/bs";
 import PropTypes from "prop-types";
 
 type Props = {
-  icon: any;
+  icon: string;
   color: string;
-  styles: any;
+  styles: {
+    fontSize: string;
+  };
 };
 
 export default function Icon(props: Props) {

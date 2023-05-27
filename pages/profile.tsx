@@ -6,7 +6,7 @@ import PageTitle from "@/lib/ui/PageTitle";
 import Icon from "@/lib/ui/Icon";
 import Button from "@/lib/ui/Button";
 import { getProfile } from "./api/profile";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
 export default function Profile(props: any) {
   const router = useRouter();
@@ -137,7 +137,7 @@ const iconStyles = {
   fontSize: "50px",
 };
 
-export const getServerSideProps: GetServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   const profile = await getProfile(context);
   // Have to stringify then parse otherwise date objects cannot be passed to page
   const stringify = JSON.stringify(profile);

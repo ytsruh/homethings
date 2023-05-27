@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import { db, filterUserData, combinedDecodeToken } from "@/lib/helpers";
 import { UserSchema } from "@/lib/schema";
 import type { User } from "@/lib/schema";
@@ -18,8 +18,10 @@ const controller = {
     try {
       if (id) {
         const data = await db.user.findUnique({ where: { id: id } });
-        const filtered = await filterUserData(data);
-        res.status(200).json(filtered);
+        if (data) {
+          const filtered = await filterUserData(data);
+          res.status(200).json(filtered);
+        }
       } else {
         res.status(401).json({ error: "Unauthorised" });
       }
@@ -49,13 +51,15 @@ const controller = {
   },
 };
 
-export const getProfile = async (req: any) => {
-  const token = await getToken(req);
+export const getProfile = async (ctx: GetServerSidePropsContext) => {
+  const token = await getToken({ req: ctx.req });
   const id = token?.sub;
   try {
     const data = await db.user.findUnique({ where: { id: id } });
-    const filtered = await filterUserData(data);
-    return filtered;
+    if (data) {
+      const filtered = await filterUserData(data);
+      return filtered;
+    }
   } catch (err) {
     throw err;
   }

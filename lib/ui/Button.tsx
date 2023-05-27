@@ -7,7 +7,7 @@ type Props = {
   onClick?: () => void;
   form?: string;
   disabled?: boolean;
-  type?: any;
+  type?: string;
 };
 
 export default function Button(props: Props) {
