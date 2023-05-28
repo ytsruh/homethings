@@ -17,8 +17,6 @@ type EpisodeRowProps = {
 };
 
 export default function Profile(props: ProfileProps) {
-  console.log(props);
-
   const router = useRouter();
   const desc = "Admin section to add & view users";
 

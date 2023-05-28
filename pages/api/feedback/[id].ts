@@ -6,14 +6,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(401).json({ error: "Unauthorised" });
     return;
   }
-  const token: string = await combinedDecodeToken(req);
+  const token: any = await combinedDecodeToken(req);
   switch (req.method) {
     case "GET":
       try {
         const feedback = await db.feedback.findMany({
           where: {
             id: req.query.id?.toString(),
-            userId: token,
+            userId: token.id,
           },
         });
         res.status(200).json({ data: feedback });
@@ -30,12 +30,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const feedback = await db.feedback.updateMany({
           where: {
             id: req.query.id?.toString(),
-            userId: token,
+            userId: token.id,
           },
           data: {
             title: body.title,
             body: body.body,
-            userId: token,
+            userId: token.id,
           },
         });
         res.status(200).json({ message: "success", data: feedback });
@@ -51,7 +51,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await db.feedback.deleteMany({
           where: {
             id: req.query.id?.toString(),
-            userId: token,
+            userId: token.id,
           },
         });
         res.status(200).json({ deleted: "success" });

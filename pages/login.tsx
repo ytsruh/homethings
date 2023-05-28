@@ -10,16 +10,11 @@ export default function Login() {
   const [error, setError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
-  const submitForm = async (e: SyntheticEvent) => {
+  const submitForm = async (e: any) => {
     try {
       e.preventDefault();
-      const target = e.target as typeof e.target & {
-        email: { value: string };
-        password: { value: string };
-      };
-      setSubmitting(true);
-      const email = target.email.value;
-      const password = target.password.value;
+      const email = e.target[0].value;
+      const password = e.target[1].value;
       // Pass credentials to NextAuth & login
       const result = await signIn("credentials", {
         email: email,

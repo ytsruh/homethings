@@ -14,10 +14,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  get: async (req: NextApiRequest, res: NextApiResponse, token: any) => {
     try {
-      if (id) {
-        const data = await db.user.findUnique({ where: { id: id } });
+      if (token) {
+        const data = await db.user.findUnique({ where: { id: token.id } });
         if (data) {
           const filtered = await filterUserData(data);
           res.status(200).json(filtered);
@@ -30,13 +30,13 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  post: async (req: NextApiRequest, res: NextApiResponse, token: any) => {
     try {
-      if (id) {
+      if (token) {
         const userdata: User = UserSchema.parse(req.body);
         const data = await db.user.update({
           where: {
-            id: id,
+            id: token.id,
           },
           data: userdata,
         });

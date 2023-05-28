@@ -31,7 +31,7 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
     const token = await getToken({ req });
     if (token) {
       // If token is found then return the user id
-      return token.sub;
+      return { id: token.sub, accountId: token.accountId };
     } else {
       // If token is not found then check if a token from custom auth can be found in the headers
       if (!req.headers.token) {
@@ -42,13 +42,15 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
         req.headers.token?.toString(),
         process.env.NEXTAUTH_SECRET
       );
+      console.log(decoded);
       if (decoded) {
+        console.log(decoded);
+
         // If token is verified then return it
-        return decoded.data.id;
-      } else {
-        // If logic gets to this stage we must assume that the token is invalid so throw error
-        throw new Error("Unauthorised: Token not found");
+        return { id: decoded.data.id, accountId: decoded.data.accountId };
       }
+      // If logic gets to this stage we must assume that the token is invalid so throw error
+      throw new Error("Unauthorised: Token not found");
     }
   } catch (error) {
     console.log(error);
@@ -63,6 +65,7 @@ export const filterUserData = async (data: User) => {
     email: data.email,
     darkMode: data.darkMode,
     icon: data.icon,
+    accountId: data.accountId,
   };
 };
 
@@ -74,6 +77,7 @@ export const filterOutPassword = (array: Array<User>) => {
       email: data.email,
       darkMode: data.darkMode,
       icon: data.icon,
+      accountId: data.accountId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };
