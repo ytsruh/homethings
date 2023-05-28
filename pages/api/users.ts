@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  get: async (req: NextApiRequest, res: NextApiResponse, id: any) => {
     try {
       if (id) {
         const data = await db.user.findMany();
@@ -26,7 +26,7 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  post: async (req: NextApiRequest, res: NextApiResponse, id: any) => {
     try {
       if (id) {
         const salt = bcrypt.genSaltSync(10);
