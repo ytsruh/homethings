@@ -34,5 +34,5 @@ const items = [
 ];
 
 const iconStyles = {
-  fontSize: "20px",
+  fontSize: "24px",
 };

@@ -1,5 +1,5 @@
 // @ts-nocheck
-import * as Icons from "react-icons/bs";
+import * as Icons from "react-icons/go";
 import PropTypes from "prop-types";
 
 type Props = {

@@ -24,7 +24,7 @@ model User {
   name          String?
   email         String    @unique
   password      String 
-  icon          String    @default("BsFillEmojiSmileUpsideDownFill")   
+  icon          String    @default("GoPerson")   
   darkMode      String    @default("system")
   account       Account   @relation(fields: [accountId], references: [id])
   accountId     String    // relation scalar field  (used in the `@relation` attribute above) 

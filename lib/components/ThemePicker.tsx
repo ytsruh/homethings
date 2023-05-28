@@ -43,11 +43,11 @@ export default function ThemePicker() {
     <div>
       {theme === "light" ? (
         <div onClick={() => changeTheme("dark")}>
-          <Icon icon="BsFillSunFill" color="primary" styles={iconStyles} />
+          <Icon icon="GoZap" color="primary" styles={iconStyles} />
         </div>
       ) : (
         <div onClick={() => changeTheme("light")}>
-          <Icon icon="BsFillMoonFill" color="primary" styles={iconStyles} />
+          <Icon icon="GoFlame" color="primary" styles={iconStyles} />
         </div>
       )}
     </div>
@@ -55,5 +55,5 @@ export default function ThemePicker() {
 }
 
 const iconStyles = {
-  fontSize: "20px",
+  fontSize: "24px",
 };
