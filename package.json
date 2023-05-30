@@ -12,6 +12,8 @@
     "schema": "db/schema.prisma"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.341.0",
+    "@aws-sdk/s3-request-presigner": "^3.341.0",
     "@prisma/client": "^4.14.1",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.3",
@@ -25,6 +27,7 @@
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "@aws-sdk/types": "^3.341.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^18.11.17",
