@@ -40,7 +40,7 @@ export default function ThemePicker() {
   }, []);
 
   return (
-    <div>
+    <div className="cursor-pointer">
       {theme === "light" ? (
         <div onClick={() => changeTheme("dark")}>
           <Icon icon="GoZap" color="primary" styles={iconStyles} />

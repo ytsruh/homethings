@@ -3,10 +3,7 @@ import { combinedDecodeToken } from "@/lib/helpers";
 import { createS3PutUrl, createS3GetUrl } from "@/lib/storage";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!req.headers.token) {
-    res.status(401).json({ error: "Unauthorised" });
-    return;
-  }
+  // Check auth
   await combinedDecodeToken(req);
   if (!req.query.fileName) {
     res.status(400).json({ error: "Error with request" });

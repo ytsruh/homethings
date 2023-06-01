@@ -4,8 +4,8 @@ import PropTypes from "prop-types";
 
 type Props = {
   icon: string;
-  color: string;
-  styles: {
+  color?: string;
+  styles?: {
     fontSize: string;
   };
 };

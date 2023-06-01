@@ -3,17 +3,17 @@ import { db, combinedDecodeToken } from "@/lib/helpers";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  // Check auth
   const token: any = await combinedDecodeToken(req);
   switch (req.method) {
     case "GET":
       try {
-        const documents = await db.document.findMany({
+        const doc = await db.document.findMany({
           where: {
+            id: req.query.id?.toString(),
             accountId: token.accountId,
           },
         });
-        res.status(200).json({ count: documents.length, data: documents });
+        res.status(200).json({ data: doc });
       } catch (error) {
         // For errors, log to console and send a 500 response back
         console.log(error);
@@ -21,18 +21,36 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       break;
 
-    case "POST":
+    case "PATCH":
       try {
         const { body } = req;
-        const document = await db.document.create({
+        const doc = await db.document.updateMany({
+          where: {
+            id: req.query.id?.toString(),
+            accountId: token.accountId,
+          },
           data: {
             title: body.title,
             description: body.description,
-            fileName: body.fileName,
+          },
+        });
+        res.status(200).json({ message: "success", data: doc });
+      } catch (error) {
+        // For errors, log to console and send a 500 response back
+        console.log(error);
+        res.status(500).json({ error: "Something went wrong" });
+      }
+      break;
+
+    case "DELETE":
+      try {
+        await db.document.deleteMany({
+          where: {
+            id: req.query.id?.toString(),
             accountId: token.accountId,
           },
         });
-        res.status(200).json({ message: "success", data: document });
+        res.status(200).json({ deleted: "success" });
       } catch (error) {
         // For errors, log to console and send a 500 response back
         console.log(error);
@@ -46,15 +64,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
-export const getDocs = async (ctx: GetServerSidePropsContext) => {
+export const getSingleDoc = async (ctx: GetServerSidePropsContext) => {
   const token = await getToken({ req: ctx.req });
   try {
-    const documents = await db.document.findMany({
+    const document = await db.document.findMany({
       where: {
+        id: ctx.query.id?.toString(),
         accountId: token?.accountId as string,
       },
     });
-    if (documents) return { count: documents.length, data: documents };
+    if (document) return { data: document };
   } catch (err) {
     throw err;
   }

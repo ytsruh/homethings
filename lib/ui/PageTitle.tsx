@@ -19,7 +19,7 @@ export default function PageTitle(props: Props) {
           <img
             src={props.image}
             style={styles}
-            className="img-fluid mx-auto d-block rounded-md object-cover w-full h-72 lg:h-96 my-2"
+            className="img-fluid mx-auto d-block rounded-md object-cover w-full h-48 my-2"
             alt={props.alt}
             loading="lazy"
           />
