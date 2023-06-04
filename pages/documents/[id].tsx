@@ -25,7 +25,7 @@ type Document = {
 export default function Document(props: DocProps) {
   const router = useRouter();
   const [title, setTitle] = useState(props.document.data[0].title);
-  const [description, setDescription] = useState(props.document.data[0].description);
+  const [description, setDescription] = useState(props.document.data[0].description || "");
   const [alert, setAlert] = useState("");
   const [error, setError] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState(false);
@@ -51,7 +51,6 @@ export default function Document(props: DocProps) {
         throw Error(response.statusText);
       }
       router.push("/documents");
-      setSubmitting(false);
     } catch (err) {
       setSubmitting(false);
       setError(true);
@@ -89,6 +88,7 @@ export default function Document(props: DocProps) {
               />
               <textarea
                 rows={5}
+                value={description}
                 className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
                 placeholder="Description"
                 onChange={(e) => setDescription(e.target.value)}

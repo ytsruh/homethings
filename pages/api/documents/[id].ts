@@ -46,14 +46,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case "DELETE":
       try {
         //Delete the file from the database
-        await db.document.deleteMany({
+        const deletedDoc = await db.document.delete({
           where: {
             id: req.query.id?.toString(),
-            accountId: token.accountId,
           },
         });
         // Delete the file from storage
-        const result = await deleteFile(req.query.id?.toString() as string);
+        const result = await deleteFile(deletedDoc.fileName);
         if (!result.success) {
           throw new Error(result.error as string);
         }
