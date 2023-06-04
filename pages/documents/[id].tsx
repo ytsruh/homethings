@@ -5,9 +5,7 @@ import Button from "@/lib/ui/Button";
 import Loading from "@/lib/ui/Loading";
 import { getSingleDoc } from "../api/documents/[id]";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { createId } from "@paralleldrive/cuid2";
 import { useRouter } from "next/router";
-import Icon from "@/lib/ui/Icon";
 import Alert from "@/lib/ui/Alert";
 
 type DocProps = {

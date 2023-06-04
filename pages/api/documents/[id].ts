@@ -1,6 +1,7 @@
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import { db, combinedDecodeToken } from "@/lib/helpers";
 import { getToken } from "next-auth/jwt";
+import { deleteFile } from "@/lib/storage";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token: any = await combinedDecodeToken(req);
@@ -44,12 +45,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case "DELETE":
       try {
+        //Delete the file from the database
         await db.document.deleteMany({
           where: {
             id: req.query.id?.toString(),
             accountId: token.accountId,
           },
         });
+        // Delete the file from storage
+        const result = await deleteFile(req.query.id?.toString() as string);
+        if (!result.success) {
+          throw new Error(result.error as string);
+        }
         res.status(200).json({ deleted: "success" });
       } catch (error) {
         // For errors, log to console and send a 500 response back
