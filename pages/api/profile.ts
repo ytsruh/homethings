@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
 import { db, filterUserData, combinedDecodeToken } from "@/lib/helpers";
 import { UserSchema } from "@/lib/schema";
 import type { User } from "@/lib/schema";
@@ -14,12 +14,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  get: async (req: NextApiRequest, res: NextApiResponse, token: any) => {
     try {
-      if (id) {
-        const data = await db.user.findUnique({ where: { id: id } });
-        const filtered = await filterUserData(data);
-        res.status(200).json(filtered);
+      if (token) {
+        const data = await db.user.findUnique({ where: { id: token.id } });
+        if (data) {
+          const filtered = await filterUserData(data);
+          res.status(200).json(filtered);
+        }
       } else {
         res.status(401).json({ error: "Unauthorised" });
       }
@@ -28,13 +30,13 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  post: async (req: NextApiRequest, res: NextApiResponse, token: any) => {
     try {
-      if (id) {
+      if (token) {
         const userdata: User = UserSchema.parse(req.body);
         const data = await db.user.update({
           where: {
-            id: id,
+            id: token.id,
           },
           data: userdata,
         });
@@ -49,13 +51,15 @@ const controller = {
   },
 };
 
-export const getProfile = async (req: any) => {
-  const token = await getToken(req);
+export const getProfile = async (ctx: GetServerSidePropsContext) => {
+  const token = await getToken({ req: ctx.req });
   const id = token?.sub;
   try {
     const data = await db.user.findUnique({ where: { id: id } });
-    const filtered = await filterUserData(data);
-    return filtered;
+    if (data) {
+      const filtered = await filterUserData(data);
+      return filtered;
+    }
   } catch (err) {
     throw err;
   }

@@ -9,7 +9,7 @@ type Props = {
 type Link = {
   link?: string;
   text: string;
-  onClick?: any;
+  onClick?: () => void;
 };
 
 export default function Dropdown(props: Props) {
@@ -35,7 +35,7 @@ const List = (props: any) => {
           </a>
         ) : (
           <a
-            onClick={() => link.onClick()}
+            onClick={() => link.onClick?.()}
             className="py-2 px-5 md:px-10 hover:bg-neutral-500 hover:text-salt rounded-md"
           >
             {link.text}

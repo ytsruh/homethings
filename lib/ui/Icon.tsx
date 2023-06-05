@@ -1,11 +1,13 @@
 // @ts-nocheck
-import * as Icons from "react-icons/bs";
+import * as Icons from "react-icons/go";
 import PropTypes from "prop-types";
 
 type Props = {
-  icon: any;
-  color: string;
-  styles: any;
+  icon: string;
+  color?: string;
+  styles?: {
+    fontSize: string;
+  };
 };
 
 export default function Icon(props: Props) {

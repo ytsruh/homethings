@@ -6,7 +6,7 @@ import PageTitle from "@/lib/ui/PageTitle";
 import Icon from "@/lib/ui/Icon";
 import Button from "@/lib/ui/Button";
 import { getProfile } from "./api/profile";
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
 export default function Profile(props: any) {
   const router = useRouter();
@@ -102,23 +102,21 @@ export default function Profile(props: any) {
           <div>
             <h2 className="text-primary text-2xl pb-3 text-center">Profile Icon</h2>
             <div className="flex justify-around px-5">
-              {["BsFillEmojiSmileUpsideDownFill", "BsTrophyFill", "BsFillCameraReelsFill", "BsHeartFill"].map(
-                (type, i) => (
-                  <div key={i}>
-                    <input
-                      defaultValue={type}
-                      name="icon"
-                      type="radio"
-                      defaultChecked={profileData.icon === type}
-                      id={i.toString()}
-                      onChange={(e) => setProfile({ ...profileData, icon: e.target.value })}
-                    />
-                    <label>
-                      <Icon icon={type} styles={iconStyles} color="text-coal dark:text-salt" />
-                    </label>
-                  </div>
-                )
-              )}
+              {["GoPerson", "GoRocket", "GoKey", "GoKebabVertical"].map((type, i) => (
+                <div key={i}>
+                  <input
+                    defaultValue={type}
+                    name="icon"
+                    type="radio"
+                    defaultChecked={profileData.icon === type}
+                    id={i.toString()}
+                    onChange={(e) => setProfile({ ...profileData, icon: e.target.value })}
+                  />
+                  <label>
+                    <Icon icon={type} styles={iconStyles} color="text-coal dark:text-salt" />
+                  </label>
+                </div>
+              ))}
             </div>
             <div className="text-sm text-zinc-400 p-3">
               Please note: This will only update the next time you log in.
@@ -134,10 +132,10 @@ export default function Profile(props: any) {
 }
 
 const iconStyles = {
-  fontSize: "50px",
+  fontSize: "40px",
 };
 
-export const getServerSideProps: GetServerSideProps = async (context: any) => {
+export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   const profile = await getProfile(context);
   // Have to stringify then parse otherwise date objects cannot be passed to page
   const stringify = JSON.stringify(profile);

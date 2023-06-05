@@ -3,11 +3,11 @@ import Icon from "../ui/Icon";
 import Dropdown from "@/lib/ui/Dropdown";
 import ThemePicker from "@/components/ThemePicker";
 
-type Props = {
+type NavProps = {
   icon: string;
 };
 
-export default function Navigation(props: Props) {
+export default function Navigation(props: NavProps) {
   return (
     <div
       className="flex items-center justify-between px-5 md:px-10 lg:px-20 py-4 bg-salt dark:bg-coal text-primary 
@@ -16,10 +16,6 @@ export default function Navigation(props: Props) {
       <a href="/" className="text-2xl">
         Homethings
       </a>
-      <div className="flex items-center space-x-2 md:space-x-10">
-        <a href="/movies">Movies</a>
-        <a href="/shows">Shows</a>
-      </div>
       <div className="flex space-x-5">
         <ThemePicker />
         <Dropdown
@@ -38,5 +34,5 @@ const items = [
 ];
 
 const iconStyles = {
-  fontSize: "20px",
+  fontSize: "24px",
 };

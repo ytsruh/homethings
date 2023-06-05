@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
-import dayjs from "dayjs";
 import Loading from "@/lib/ui/Loading";
 import Protected from "@/components/Protected";
 import PageTitle from "@/lib/ui/PageTitle";
 import Alert from "@/lib/ui/Alert";
 import Button from "@/lib/ui/Button";
 
-type Error = string | Boolean | string;
+type Error = boolean | string;
 
 export default function Profile() {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [accountId, setAccountId] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -44,6 +44,7 @@ export default function Profile() {
           name: name,
           email: email,
           password: password,
+          accountId: accountId,
         }),
       });
       //Check for ok response
@@ -86,6 +87,12 @@ export default function Profile() {
                 className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
                 placeholder="Name"
                 onChange={(e) => setName(e.target.value)}
+              />
+              <input
+                type="text"
+                className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
+                placeholder="Account Id"
+                onChange={(e) => setAccountId(e.target.value)}
               />
               <input
                 type="email"

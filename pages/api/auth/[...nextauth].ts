@@ -46,11 +46,13 @@ export const authOptions = {
     },
     async session({ session, user, token }) {
       session.user.icon = token.icon;
+      session.user.accountId = token.accountId;
       return session;
     },
     async jwt({ token, user, account, profile, isNewUser }) {
       if (user) {
         token.icon = user.icon;
+        token.accountId = user.accountId;
       }
       return token;
     },

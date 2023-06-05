@@ -14,6 +14,7 @@ const App: AppType<{ session: Session }> = ({ Component, pageProps: { session, .
           name="description"
           content="Watch films, TV shows or look at your book collection. More things will probably come in the future. Don't get too excited."
         />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
         <title>Homethings | The crappy home app</title>
       </Head>
       <Component {...pageProps} />

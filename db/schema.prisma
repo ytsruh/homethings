@@ -11,62 +11,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id            String    @id @default(cuid())   
+  name          String?
+  users         User[]
+  documents     Document[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
 model User {
   id            String    @id @default(cuid())   
   name          String?
   email         String    @unique
   password      String 
-  icon          String    @default("BsFillEmojiSmileUpsideDownFill")   
+  icon          String    @default("GoPerson")   
   darkMode      String    @default("system")
-  favourites    Favourite[]
+  account       Account   @relation(fields: [accountId], references: [id])
+  accountId     String    // relation scalar field  (used in the `@relation` attribute above) 
   books         Book[]
   feedback      Feedback[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-}
-
-model Movie {
-  id            String    @id @default(cuid())   
-  title         String
-  description   String
-  duration      String
-  fileName      String
-  imageName     String
-  releaseYear   String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Show {
-  id            String     @id @default(cuid()) 
-  title         String
-  imageName     String
-  episodes      Episode[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Episode {
-  id            String     @id @default(cuid()) 
-  show          Show       @relation(fields: [showId], references: [id])
-  showId        String     // relation scalar field  (used in the `@relation` attribute above) 
-  title         String
-  description   String?
-  fileName      String
-  seasonNumber  Int
-  episodeNumber Int
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Favourite {
-  id            String     @id @default(cuid()) 
-  favourite     String
-  type          String
-  user          User       @relation(fields: [userId], references: [id])
-  userId        String     // relation scalar field  (used in the `@relation` attribute above) 
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
 }
 
 model Book {
@@ -91,6 +57,17 @@ model Feedback {
   body         String?
   user         User       @relation(fields: [userId], references: [id])
   userId       String     // relation scalar field  (used in the `@relation` attribute above) 
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Document {
+  id           String     @id @default(cuid()) 
+  title        String
+  description  String?
+  fileName     String
+  account      Account    @relation(fields: [accountId], references: [id])
+  accountId    String     // relation scalar field  (used in the `@relation` attribute above) 
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }

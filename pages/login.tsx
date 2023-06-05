@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import Button from "@/lib/ui/Button";
@@ -7,13 +7,12 @@ import Loading from "@/lib/ui/Loading";
 
 export default function Login() {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
 
   const submitForm = async (e: any) => {
     try {
       e.preventDefault();
-      setSubmitting(true);
       const email = e.target[0].value;
       const password = e.target[1].value;
       // Pass credentials to NextAuth & login
