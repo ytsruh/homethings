@@ -1,6 +1,8 @@
-export default function Loading() {
+export default function Loading(props: any) {
   return (
-    <div className="flex items-center justify-center h-screen bg-salt dark:bg-coal">
+    <div
+      className={`flex items-center justify-center ${props.small ? null : "h-screen"} bg-salt dark:bg-coal`}
+    >
       <svg
         role="status"
         className="w-24 h-24 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-primary"

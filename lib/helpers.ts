@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
 import type { NextApiRequest, NextApiResponse } from "next";
 import jsonwebtoken from "jsonwebtoken";
@@ -31,7 +31,7 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
     const token = await getToken({ req });
     if (token) {
       // If token is found then return the user id
-      return token.sub;
+      return { id: token.sub, accountId: token.accountId };
     } else {
       // If token is not found then check if a token from custom auth can be found in the headers
       if (!req.headers.token) {
@@ -42,13 +42,15 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
         req.headers.token?.toString(),
         process.env.NEXTAUTH_SECRET
       );
+      console.log(decoded);
       if (decoded) {
+        console.log(decoded);
+
         // If token is verified then return it
-        return decoded.data.id;
-      } else {
-        // If logic gets to this stage we must assume that the token is invalid so throw error
-        throw new Error("Unauthorised: Token not found");
+        return { id: decoded.data.id, accountId: decoded.data.accountId };
       }
+      // If logic gets to this stage we must assume that the token is invalid so throw error
+      throw new Error("Unauthorised: Token not found");
     }
   } catch (error) {
     console.log(error);
@@ -57,23 +59,25 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
   }
 };
 
-export const filterUserData = async (data: any) => {
+export const filterUserData = async (data: User) => {
   return {
     name: data.name,
     email: data.email,
     darkMode: data.darkMode,
     icon: data.icon,
+    accountId: data.accountId,
   };
 };
 
-export const filterOutPassword = (array: any) => {
-  const filtered = array.map((data: any) => {
+export const filterOutPassword = (array: Array<User>) => {
+  const filtered = array.map((data: User) => {
     return {
-      _id: data._id,
+      id: data.id,
       name: data.name,
       email: data.email,
       darkMode: data.darkMode,
       icon: data.icon,
+      accountId: data.accountId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
     };

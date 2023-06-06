@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import bcrypt from "bcryptjs";
 import { db, combinedDecodeToken, filterOutPassword } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -11,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 const controller = {
-  get: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  get: async (req: NextApiRequest, res: NextApiResponse, id: any) => {
     try {
       if (id) {
         const data = await db.user.findMany();
@@ -25,9 +26,11 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse, id: string) => {
+  post: async (req: NextApiRequest, res: NextApiResponse, id: any) => {
     try {
       if (id) {
+        const salt = bcrypt.genSaltSync(10);
+        req.body.password = bcrypt.hashSync(req.body.password, salt);
         const data = await db.user.create({ data: req.body });
         res.status(200).json(data);
       } else {

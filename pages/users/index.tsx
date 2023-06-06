@@ -6,19 +6,27 @@ import PageTitle from "@/lib/ui/PageTitle";
 import Button from "@/lib/ui/Button";
 import { getUsers } from "../api/users";
 import { GetServerSideProps } from "next";
+import { User } from "@prisma/client";
 
-export default function Profile(props: any) {
+type ProfileProps = {
+  users: User[];
+};
+
+type EpisodeRowProps = {
+  data: User;
+};
+
+export default function Profile(props: ProfileProps) {
   const router = useRouter();
-  const { users } = props;
-  const desc = "Admin section to add, update or remove users";
+  const desc = "Admin section to add & view users";
 
   useEffect(() => {
-    if (router.isReady && !users) {
+    if (router.isReady && !props.users) {
       router.push("/404");
     }
-  }, [router, users]);
+  }, [router, props.users]);
 
-  const rows = users.map((user: any, i: number) => {
+  const rows = props.users.map((user: User, i: number) => {
     return <EpisodeRow data={user} key={i} />;
   });
 
@@ -56,9 +64,9 @@ export default function Profile(props: any) {
   );
 }
 
-const EpisodeRow = (props: any) => {
+const EpisodeRow = (props: EpisodeRowProps) => {
   return (
-    <tr className="">
+    <tr>
       <td>{props.data.name}</td>
       <td>{props.data.email}</td>
       <td className="hidden md:table-cell">{props.data.icon}</td>

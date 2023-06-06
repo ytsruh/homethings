@@ -1,0 +1,25 @@
+{
+  "cli": {
+    "version": ">= 3.12.0"
+  },
+  "build": {
+    "base": {
+      "autoIncrement": true, // Crucial to ensure EAS doesn't overwrite old builds that cannot be submitted
+    },
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "extends": "base",
+      "distribution": "internal"
+    },
+    "production": {
+      "extends": "base",
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

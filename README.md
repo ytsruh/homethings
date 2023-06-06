@@ -1,8 +1,15 @@
 # Homethings
 
-The Homethings App & API using NextJS
+The Homethings Apps & API
 
 ## Versions
+
+### 0.10
+
+- Merged in expo project for mobile app
+- Fixed bug when creating new users. Passwords were not encrypted.
+- Removed favourites
+- Added Documents model & ui
 
 ### 0.9
 

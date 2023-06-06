@@ -12,7 +12,11 @@
     "schema": "db/schema.prisma"
   },
   "dependencies": {
-    "@prisma/client": "^4.7.1",
+    "@aws-sdk/client-s3": "^3.341.0",
+    "@aws-sdk/s3-request-presigner": "^3.341.0",
+    "@headlessui/react": "^1.7.15",
+    "@paralleldrive/cuid2": "^2.2.0",
+    "@prisma/client": "^4.14.1",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.3",
     "jsonwebtoken": "^9.0.0",
@@ -22,18 +26,17 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.3.1",
-    "video-react": "^0.16.0",
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "@aws-sdk/types": "^3.341.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/jsonwebtoken": "^9.0.1",
     "@types/node": "^18.11.17",
     "@types/react": "^18.0.14",
-    "@types/video-react": "^0.15.1",
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
-    "prisma": "^4.7.1",
+    "prisma": "^4.14.1",
     "tailwindcss": "^3.3.1",
     "typescript": "^5.0.4"
   }
