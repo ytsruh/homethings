@@ -54,7 +54,7 @@ const UploadForm = () => {
         throw new Error("Failed to get S3 url");
       }
       const res = await response.json();
-      await fetch(res.url, {
+      const uploadRes = await fetch(res.url, {
         method: "PUT",
         headers: {
           ContentType: fileObject.type,
@@ -62,9 +62,13 @@ const UploadForm = () => {
         },
         body: fileObject,
       });
-      if (!response.ok) {
+      if (!uploadRes.ok) {
+        console.log(uploadRes);
+        console.log("failed");
+
         throw new Error("Failed to upload to S3");
       }
+
       const save = await fetch(`/api/documents`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
