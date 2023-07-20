@@ -1,5 +1,10 @@
 import React from "react";
+import PageFrame from "@/components/PageFrame";
 
 export default function Home() {
-  return <div>Home</div>;
+  return (
+    <PageFrame title="Dashboard">
+      <h1>Home</h1>
+    </PageFrame>
+  );
 }

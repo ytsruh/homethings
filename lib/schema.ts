@@ -44,3 +44,15 @@ export const FeedbackSchema = z.object({
 });
 
 export type Feedback = z.infer<typeof FeedbackSchema>;
+
+export const DocumentSchema = z.object({
+  id: z.string().optional(),
+  accountId: z.string().optional(),
+  createdAt: z.date().optional(),
+  updatedAt: z.date().optional(),
+  title: z.string().optional(),
+  description: z.string().optional(),
+  fileName: z.string().optional(),
+});
+
+export type Document = z.infer<typeof DocumentSchema>;
