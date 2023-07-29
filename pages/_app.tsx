@@ -10,8 +10,6 @@ import "@/lib/styles/index.css";
 
 const App: AppType<{ session: Session }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  console.log(`Loading state: ${loading}`);
-
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <SessionProvider session={session}>

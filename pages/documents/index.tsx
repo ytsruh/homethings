@@ -10,6 +10,7 @@ import { useRouter } from "next/router";
 import { createId } from "@paralleldrive/cuid2";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import { ResetIcon } from "@radix-ui/react-icons";
+import FormError from "@/components/FormError";
 
 type DocumentProps = {
   count: number;
@@ -86,17 +87,7 @@ const UploadForm = () => {
   }
 
   if (error) {
-    return (
-      <div className="w-full flex justify-around items-center gap-2">
-        <div>
-          <h6>An Error Occurred</h6>
-          <p>Please try again</p>
-        </div>
-        <Button onClick={() => setError(false)}>
-          <ResetIcon className="mr-2 h-4 w-4" /> Reset
-        </Button>
-      </div>
-    );
+    return <FormError reset={setError} />;
   }
 
   return (

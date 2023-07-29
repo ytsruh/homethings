@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
