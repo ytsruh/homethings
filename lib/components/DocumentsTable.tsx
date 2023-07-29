@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
 import {
   ColumnDef,
@@ -12,19 +12,30 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Document } from "../schema";
+import { useRouter } from "next/router";
+import { useLoadingContext } from "../LoadingContext";
 
 export const columns: ColumnDef<Document>[] = [
   {
@@ -83,17 +94,61 @@ export const columns: ColumnDef<Document>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem onClick={() => download(data.fileName as string)}>Download</DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <a href={`/documents/${data.id}`}>
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+            </a>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <DeleteModal id={data.id as string} />
           </DropdownMenuContent>
         </DropdownMenu>
       );
     },
   },
 ];
+
+function DeleteModal(props: { id: string }) {
+  const router = useRouter();
+  const { setLoading } = useLoadingContext();
+  async function deleteItem() {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/documents/" + props.id, {
+        method: "DELETE",
+      });
+      //Check for ok response
+      if (!response.ok) {
+        //Throw error if not ok
+        throw Error(response.statusText);
+      }
+      router.reload();
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
+    }
+  }
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild className="w-full">
+        <Button variant="destructive">Delete</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete this document and it cannot be
+            recovered.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction onClick={() => deleteItem()}>Confirm</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
 
 export function DocumentsTable(props: { data: Document[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -121,10 +176,10 @@ export function DocumentsTable(props: { data: Document[] }) {
   });
 
   return (
-    <div className="w-full lg:w-9/12">
+    <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter documents..."
+          placeholder="Filter documents by title..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
           className="max-w-sm"
