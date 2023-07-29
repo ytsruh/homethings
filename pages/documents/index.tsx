@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
 import { createId } from "@paralleldrive/cuid2";
 import { useLoadingContext } from "@/lib/LoadingContext";
-import { ResetIcon } from "@radix-ui/react-icons";
 import FormError from "@/components/FormError";
 
 type DocumentProps = {

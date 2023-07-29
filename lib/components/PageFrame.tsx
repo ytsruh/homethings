@@ -25,8 +25,8 @@ export default function PageFrame(props: { title: string; children: React.ReactN
             <div className="hidden lg:grid lg:col-span-2 p-2">
               <div className="flex flex-col mt-2 space-y-3">
                 <SideLink text="Home" link="/" />
-                <SideLink text="Books" link="/books" />
                 <SideLink text="Documents" link="/documents" />
+                <SideLink text="Books" link="/books" />
                 <SideLink text="Profile" link="/profile" />
               </div>
             </div>

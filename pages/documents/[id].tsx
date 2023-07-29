@@ -82,7 +82,7 @@ export default function SingleDocument(props: { document: Document }) {
               <Button asChild variant="secondary">
                 <Link href="/documents">Cancel</Link>
               </Button>
-              <Button type="submit">Upload</Button>
+              <Button type="submit">Update</Button>
             </div>
           </form>
         )}

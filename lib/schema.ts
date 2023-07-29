@@ -24,6 +24,7 @@ export const UserSchema = z.object({
 export type User = z.infer<typeof UserSchema>;
 
 export const BookSchema = z.object({
+  id: z.string().optional(),
   name: z.string().optional(),
   isbn: z.string().optional(),
   author: z.string().optional(),
