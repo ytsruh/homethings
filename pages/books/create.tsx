@@ -1,6 +1,5 @@
 import { useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import { Book } from "@/lib/schema";
 import { BooksNav } from "@/components/BooksNav";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
