@@ -1,13 +1,23 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Loading from "./Loading";
 import MainNav from "./MainNav";
+import { getLocalUser } from "@/lib/utils";
 
 export default function PageFrame(props: { title: string; children: React.ReactNode }) {
   const router = useRouter();
+  const [preferences, setPreferences] = useState<any>({});
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    async function updatePreferences() {
+      const pref = await getLocalUser();
+      setPreferences(pref);
+    }
+    updatePreferences();
+  }, []);
 
   if (status === "loading") {
     return <Loading />;
@@ -15,7 +25,7 @@ export default function PageFrame(props: { title: string; children: React.ReactN
   if (status === "authenticated") {
     return (
       <div>
-        <MainNav />
+        <MainNav preferences={preferences} />
         <div className="mx-5 my-2">
           <div className="py-2">
             <h2 className="text-3xl font-bold tracking-tight py-2">{props.title}</h2>
@@ -25,8 +35,8 @@ export default function PageFrame(props: { title: string; children: React.ReactN
             <div className="hidden lg:grid lg:col-span-2 p-2">
               <div className="flex flex-col mt-2 space-y-3">
                 <SideLink text="Home" link="/" />
-                <SideLink text="Documents" link="/documents" />
-                <SideLink text="Books" link="/books" />
+                {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
+                {preferences.showBooks && <SideLink text="Books" link="/books" />}
                 <SideLink text="Profile" link="/profile" />
               </div>
             </div>

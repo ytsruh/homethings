@@ -11,6 +11,7 @@ import { useLoadingContext } from "@/lib/LoadingContext";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import FormError from "@/components/FormError";
+import { setLocalUser } from "@/lib/utils";
 
 export default function Profile(props: { profile: User }) {
   const router = useRouter();
@@ -32,11 +33,16 @@ export default function Profile(props: { profile: User }) {
         //Throw error if not ok
         throw Error(response.statusText);
       }
+      setLocalUser({
+        name: profile.name,
+        email: profile.email,
+        showDocuments: profile.showDocuments,
+        showBooks: profile.showBooks,
+      });
       router.push("/");
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      console.log(error);
       setError(true);
     }
   }

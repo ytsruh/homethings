@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Loading from "@/components/Loading";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { setLocalUser } from "@/lib/utils";
 
 export default function Login() {
   const router = useRouter();
@@ -33,11 +34,24 @@ export default function Login() {
         redirect: false,
       });
       if (result?.ok) {
+        const res = await fetch(`/api/profile`);
+        //Check for ok response
+        if (!res.ok) {
+          //Throw error if not ok
+          throw Error(res.statusText);
+        }
+        const profile = await res.json();
+        await setLocalUser(profile);
         router.push("/");
       }
     } catch (error) {
       console.log(error);
       setSubmitting(false);
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: error as string,
+      });
     }
   };
 

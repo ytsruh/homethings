@@ -18,13 +18,24 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { signOut } from "next-auth/react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { ToggleTheme } from "./ToggleTheme";
 import { HomeIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { removeLocalUser } from "../utils";
 
-export default function MainNav() {
+function getInitials(name: string) {
+  return name.split(" ").map((n) => n[0]);
+}
+
+export default function MainNav(props: any) {
+  const { preferences } = props;
+
+  function handleLogout() {
+    removeLocalUser();
+    signOut({ callbackUrl: "/login" });
+  }
+
   return (
     <div className="border-b">
       <Sheet>
@@ -42,16 +53,20 @@ export default function MainNav() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src="/avatars/01.png" alt="User" />
-                    <AvatarFallback>AA</AvatarFallback>
+                    <AvatarImage src={preferences.profileImage} alt="User" />
+                    <AvatarFallback>{preferences.name ? getInitials(preferences.name) : "--"}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">username</p>
-                    <p className="text-xs leading-none text-muted-foreground">user@example.com</p>
+                    <p className="text-sm font-medium leading-none">
+                      {preferences.name ? preferences.name : <span className="italic">Name</span>}
+                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {preferences.email ? preferences.email : ""}
+                    </p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -64,9 +79,7 @@ export default function MainNav() {
                   </a>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/login" })}>
-                  Log out
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -80,18 +93,22 @@ export default function MainNav() {
                 <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
                   Home
                 </Link>
-                <Link
-                  href="/documents"
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                >
-                  Documents
-                </Link>
-                <Link
-                  href="/books"
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                >
-                  Books
-                </Link>
+                {preferences.showDocuments && (
+                  <Link
+                    href="/documents"
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Documents
+                  </Link>
+                )}
+                {preferences.showBooks && (
+                  <Link
+                    href="/books"
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Books
+                  </Link>
+                )}
               </nav>
             </SheetDescription>
           </SheetHeader>
