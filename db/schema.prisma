@@ -21,13 +21,14 @@ model Account {
 
 model User {
   id            String    @id @default(cuid())   
-  name          String?
+  name          String    @default("User Name")
   email         String    @unique
   password      String 
-  icon          String    @default("GoPerson")   
-  darkMode      String    @default("system")
+  profileImage  String?   
   account       Account   @relation(fields: [accountId], references: [id])
   accountId     String    // relation scalar field  (used in the `@relation` attribute above) 
+  showDocuments      Boolean    @default(true)
+  showBooks     Boolean    @default(true)
   books         Book[]
   feedback      Feedback[]
   createdAt     DateTime  @default(now())

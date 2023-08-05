@@ -6,8 +6,8 @@ import { getToken } from "next-auth/jwt";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token = await combinedDecodeToken(req);
-  if (req.method === "POST") {
-    await controller.post(req, res, token);
+  if (req.method === "PATCH") {
+    await controller.patch(req, res, token);
   } else {
     await controller.get(req, res, token);
   }
@@ -30,7 +30,7 @@ const controller = {
       res.status(500).json({ error: "An error has occured" });
     }
   },
-  post: async (req: NextApiRequest, res: NextApiResponse, token: any) => {
+  patch: async (req: NextApiRequest, res: NextApiResponse, token: any) => {
     try {
       if (token) {
         const userdata: User = UserSchema.parse(req.body);

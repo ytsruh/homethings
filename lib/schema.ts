@@ -14,11 +14,14 @@ declare global {
 }
 
 export const UserSchema = z.object({
+  id: z.string().optional(),
+  accountId: z.string().optional(),
   name: z.string().optional(),
   email: z.string().email().optional(),
   password: z.string().optional(),
-  icon: z.string().optional(),
-  darkMode: z.string().optional(),
+  profileImage: z.string().nullable().optional(),
+  showDocuments: z.boolean().optional(),
+  showBooks: z.boolean().optional(),
 });
 
 export type User = z.infer<typeof UserSchema>;

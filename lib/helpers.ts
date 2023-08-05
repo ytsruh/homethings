@@ -63,9 +63,9 @@ export const filterUserData = async (data: User) => {
   return {
     name: data.name,
     email: data.email,
-    darkMode: data.darkMode,
-    icon: data.icon,
-    accountId: data.accountId,
+    profileImage: data.profileImage,
+    showDocuments: data.showDocuments,
+    showBooks: data.showBooks,
   };
 };
 
@@ -75,8 +75,6 @@ export const filterOutPassword = (array: Array<User>) => {
       id: data.id,
       name: data.name,
       email: data.email,
-      darkMode: data.darkMode,
-      icon: data.icon,
       accountId: data.accountId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,

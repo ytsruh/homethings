@@ -75,7 +75,7 @@ export default function Login() {
           </form>
         </div>
 
-        <img src="img/login.jpg" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
+        <img src="img/login.webp" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
       </div>
       <Toaster />
     </div>

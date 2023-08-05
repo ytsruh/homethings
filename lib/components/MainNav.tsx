@@ -31,7 +31,7 @@ export default function MainNav() {
         <div className="flex h-16 items-center px-6">
           <a className="text-accent flex justify-center items-center gap-2" href="/">
             <HomeIcon className="hidden lg:block h-[1.4rem] w-[1.4rem]" />
-            <p>Homethings</p>
+            <p className="hidden lg:block">Homethings</p>
           </a>
           <SheetTrigger>
             <HamburgerMenuIcon className="h-[1.4rem] w-[1.4rem] lg:hidden cursor-pointer" />
