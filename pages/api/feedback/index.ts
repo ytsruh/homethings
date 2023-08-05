@@ -2,10 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { db, combinedDecodeToken } from "@/lib/helpers";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!req.headers.token) {
-    res.status(401).json({ error: "Unauthorised" });
-    return;
-  }
   const token: any = await combinedDecodeToken(req);
   switch (req.method) {
     case "POST":

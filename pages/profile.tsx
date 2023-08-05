@@ -99,7 +99,7 @@ export default function Profile(props: { profile: User }) {
             </div>
             <div className="flex justify-between w-full py-5">
               <Button asChild variant="secondary">
-                <Link href="/documents">Cancel</Link>
+                <Link href="/">Cancel</Link>
               </Button>
               <Button type="submit">Update</Button>
             </div>
