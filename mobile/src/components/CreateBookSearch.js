@@ -59,7 +59,11 @@ export default function CreateBookSearch(props) {
               icon="project"
               size={18}
               secondary
-              onPress={() => alert("Barcode scan doesnt work yet")}
+              onPress={() =>
+                props.navigation.navigate({
+                  name: "BarcodeScanner",
+                })
+              }
             />
           </View>
         </View>

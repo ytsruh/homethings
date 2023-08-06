@@ -8,6 +8,7 @@ import DeleteBook from "./screens/books/DeleteBook";
 import DeleteIcon from "./components/DeleteIcon";
 import Wishlist from "./screens/books/Wishlist";
 import BookLists from "./screens/books/BookLists";
+import BarcodeScanner from "./screens/books/BarcodeScanner";
 
 const Stack = createNativeStackNavigator();
 
@@ -72,6 +73,15 @@ export default function BooksStack() {
         component={BookLists}
         options={({ route }) => ({
           title: "Read / Unread",
+          headerBackVisible: true,
+          headerShown: true,
+        })}
+      />
+      <Stack.Screen
+        name="BarcodeScanner"
+        component={BarcodeScanner}
+        options={({ route }) => ({
+          title: "Scan a barcode",
           headerBackVisible: true,
           headerShown: true,
         })}
