@@ -1,48 +1,34 @@
 import { useState } from "react";
-import Protected from "@/components/Protected";
-import PageTitle from "@/lib/ui/PageTitle";
-import Button from "@/lib/ui/Button";
-import Loading from "@/lib/ui/Loading";
-import { getSingleDoc } from "../api/documents/[id]";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import PageFrame from "@/components/PageFrame";
+import { getSingleDoc } from "pages/api/documents/[id]";
+import type { Document } from "@/db/schema";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/router";
-import Alert from "@/lib/ui/Alert";
+import { useLoadingContext } from "@/lib/LoadingContext";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import FormError from "@/components/FormError";
 
-type DocProps = {
-  document: { data: Document[] };
-};
-
-type Document = {
-  id: string;
-  title: string;
-  description: string;
-  fileName: string;
-  accountId: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export default function Document(props: DocProps) {
+export default function SingleDocument(props: { document: Document }) {
   const router = useRouter();
-  const [title, setTitle] = useState(props.document.data[0].title);
-  const [description, setDescription] = useState(props.document.data[0].description || "");
-  const [alert, setAlert] = useState("");
-  const [error, setError] = useState<boolean>(false);
-  const [submitting, setSubmitting] = useState(false);
-  const desc = "Update your document";
+  const { setLoading } = useLoadingContext();
+  const [error, setError] = useState(false);
+  const [title, setTitle] = useState(props.document.title);
+  const [description, setDescription] = useState(props.document.description || "");
 
-  async function submitForm() {
-    const url = `/api/documents/${props.document.data[0].id}`;
+  async function submit(e: any) {
+    e.preventDefault();
     try {
-      setSubmitting(true);
-      const response = await fetch(url, {
+      setLoading(true);
+      const response = await fetch(`/api/documents/${props.document.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title,
-          description,
+          title: title,
+          description: description,
         }),
       });
       //Check for ok response
@@ -51,78 +37,66 @@ export default function Document(props: DocProps) {
         throw Error(response.statusText);
       }
       router.push("/documents");
-    } catch (err) {
-      setSubmitting(false);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
       setError(true);
     }
   }
 
-  if (error) {
-    router.push("/500");
-  }
-
-  if (submitting) {
-    return <Loading />;
-  }
-
   return (
-    <Protected>
-      <div className="py-3">
-        <PageTitle title="Document" description={desc} image="/img/docs.jpg" alt="Users in a theatre" />
-        <div className="flex justify-center py-5 px-5 md:px-10 lg:px-16">
-          <div>
-            {alert ? (
-              <div className="py-3">
-                <Alert text={alert} close={setAlert} />
-              </div>
-            ) : (
-              ""
-            )}
-            <form id="update" onSubmit={submitForm} className="py-8 space-y-5 text-coal dark:text-salt">
-              <input
+    <PageFrame title="Documents">
+      <div className="py-4">
+        <h1 className="text-2xl">Update : {props.document.title}</h1>
+        <h2 className="text-sm text-zinc-500 dark:text-zinc-300 italic">Make changes to your document</h2>
+      </div>
+      <div className="w-full flex justify-center py-2">
+        {error ? (
+          <FormError reset={setError} />
+        ) : (
+          <form
+            onSubmit={(e) => submit(e)}
+            className="w-full flex flex-col justify-center items-center gap-2"
+          >
+            <div className="w-full">
+              <Label>Document Title / Name:</Label>
+              <Input
+                className="my-2"
                 type="text"
+                placeholder="Filename"
                 value={title}
-                className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
-                placeholder="Title"
                 onChange={(e) => setTitle(e.target.value)}
               />
-              <textarea
-                rows={5}
+            </div>
+            <div className="w-full">
+              <Label>Document Description:</Label>
+              <Textarea
+                className="my-2"
+                placeholder="Description of document"
                 value={description}
-                className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
-                placeholder="Description"
                 onChange={(e) => setDescription(e.target.value)}
               />
-            </form>
-            <div className="flex items-center justify-between">
-              <div
-                onClick={() => {
-                  submitForm();
-                }}
-              >
-                <Button form="update" type="submit">
-                  Update
-                </Button>
-              </div>
-              <a href="/documents">
-                <Button color="bg-coal dark:bg-salt" text="text-salt dark:text-coal" disabled>
-                  Cancel
-                </Button>
-              </a>
             </div>
-          </div>
-        </div>
+            <div className="flex justify-between w-full py-5">
+              <Button asChild variant="secondary">
+                <Link href="/documents">Cancel</Link>
+              </Button>
+              <Button type="submit">Update</Button>
+            </div>
+          </form>
+        )}
       </div>
-    </Protected>
+    </PageFrame>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const document = await getSingleDoc(context);
+  const doc = await getSingleDoc(context);
   // Have to stringify then parse otherwise date objects cannot be passed to page
-  const stringify = JSON.stringify(document);
+  const stringify = JSON.stringify(doc);
   const parsed = JSON.parse(stringify);
   return {
-    props: { document: parsed }, // will be passed to the page component as props
+    props: { document: parsed.data[0] }, // will be passed to the page component as props
   };
 };

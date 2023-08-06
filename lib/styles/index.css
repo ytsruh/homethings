@@ -4,19 +4,12 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
 
-* {
-  font-family: "Ubuntu", sans-serif !important;
+:root {
+  --accent: 6, 88%, 45%;
+  --accent-foreground: 6, 88%, 45%;
 }
 
-table {
-  border-spacing: 5px;
-}
-
-td {
-  padding: 10px;
-}
-
-th {
-  padding-left: 10px;
-  padding-right: 10px;
+.dark {
+  --accent: 6, 88%, 45%;
+  --accent-foreground: 6, 88%, 45%;
 }

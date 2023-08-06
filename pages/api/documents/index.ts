@@ -1,6 +1,9 @@
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
-import { db, combinedDecodeToken } from "@/lib/helpers";
+import { combinedDecodeToken } from "@/lib/helpers";
 import { getToken } from "next-auth/jwt";
+import { db, document } from "@/db/schema";
+import type { Document, NewDocument } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Check auth
@@ -8,11 +11,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   switch (req.method) {
     case "GET":
       try {
-        const documents = await db.document.findMany({
-          where: {
-            accountId: token.accountId,
-          },
-        });
+        const documents: Document[] = await db
+          .select()
+          .from(document)
+          .where(eq(document.accountId, token.accountId));
         res.status(200).json({ count: documents.length, data: documents });
       } catch (error) {
         // For errors, log to console and send a 500 response back
@@ -24,15 +26,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case "POST":
       try {
         const { body } = req;
-        const document = await db.document.create({
-          data: {
-            title: body.title,
-            description: body.description,
-            fileName: body.fileName,
-            accountId: token.accountId,
-          },
-        });
-        res.status(200).json({ message: "success", data: document });
+        const newDocument: NewDocument = {
+          title: body.title,
+          description: body.description,
+          fileName: body.fileName,
+          accountId: token.accountId,
+        };
+        const data: Document[] = await db.insert(document).values(newDocument).returning();
+        res.status(200).json({ message: "success", data: data });
       } catch (error) {
         // For errors, log to console and send a 500 response back
         console.log(error);
@@ -49,11 +50,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 export const getDocs = async (ctx: GetServerSidePropsContext) => {
   const token = await getToken({ req: ctx.req });
   try {
-    const documents = await db.document.findMany({
-      where: {
-        accountId: token?.accountId as string,
-      },
-    });
+    const documents: Document[] = await db
+      .select()
+      .from(document)
+      .where(eq(document.accountId, token?.accountId as string));
     if (documents) return { count: documents.length, data: documents };
   } catch (err) {
     throw err;

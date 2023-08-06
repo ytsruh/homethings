@@ -1,20 +1,22 @@
 import type { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
-import { db, combinedDecodeToken } from "@/lib/helpers";
+import { combinedDecodeToken } from "@/lib/helpers";
 import { getToken } from "next-auth/jwt";
 import { deleteFile } from "@/lib/storage";
+import { db, document } from "@/db/schema";
+import type { Document, NewDocument } from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const token: any = await combinedDecodeToken(req);
+  const queryParam: string = req.query.id?.toString() as string;
   switch (req.method) {
     case "GET":
       try {
-        const doc = await db.document.findMany({
-          where: {
-            id: req.query.id?.toString(),
-            accountId: token.accountId,
-          },
-        });
-        res.status(200).json({ data: doc });
+        const documents: Document[] = await db
+          .select()
+          .from(document)
+          .where(and(eq(document.id, queryParam), eq(document.accountId, token.accountId)));
+        res.status(200).json({ data: documents[0] });
       } catch (error) {
         // For errors, log to console and send a 500 response back
         console.log(error);
@@ -25,16 +27,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case "PATCH":
       try {
         const { body } = req;
-        const doc = await db.document.updateMany({
-          where: {
-            id: req.query.id?.toString(),
-            accountId: token.accountId,
-          },
-          data: {
-            title: body.title,
-            description: body.description,
-          },
-        });
+        const documents: Document[] = await db
+          .update(document)
+          .set({ title: body.title, description: body.description })
+          .where(and(eq(document.id, queryParam), eq(document.accountId, token.accountId)))
+          .returning();
+        const doc = documents[0];
         res.status(200).json({ message: "success", data: doc });
       } catch (error) {
         // For errors, log to console and send a 500 response back
@@ -45,12 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case "DELETE":
       try {
-        //Delete the file from the database
-        const deletedDoc = await db.document.delete({
-          where: {
-            id: req.query.id?.toString(),
-          },
-        });
+        const results: Document[] = await db.delete(document).where(eq(document.id, queryParam)).returning();
+        const deletedDoc = results[0];
         // Delete the file from storage
         const result = await deleteFile(deletedDoc.fileName);
         if (!result.success) {
@@ -73,13 +67,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 export const getSingleDoc = async (ctx: GetServerSidePropsContext) => {
   const token = await getToken({ req: ctx.req });
   try {
-    const document = await db.document.findMany({
-      where: {
-        id: ctx.query.id?.toString(),
-        accountId: token?.accountId as string,
-      },
-    });
-    if (document) return { data: document };
+    const queryParam = ctx.query.id?.toString() as string;
+    const results: Document[] = await db
+      .select()
+      .from(document)
+      .where(and(eq(document.id, queryParam), eq(document.accountId, token?.accountId as string)));
+    if (results)
+      return {
+        data: results,
+      };
   } catch (err) {
     throw err;
   }

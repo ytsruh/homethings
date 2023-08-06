@@ -1,20 +1,32 @@
-import { SyntheticEvent, useState } from "react";
-import { useRouter } from "next/router";
+import { useState } from "react";
 import { signIn } from "next-auth/react";
-import Button from "@/lib/ui/Button";
-import Alert from "@/lib/ui/Alert";
-import Loading from "@/lib/ui/Loading";
+import { ToggleTheme } from "@/components/ToggleTheme";
+import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/toaster";
+import Loading from "@/components/Loading";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { setLocalUser } from "@/lib/utils";
 
 export default function Login() {
   const router = useRouter();
-  const [error, setError] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const submitForm = async (e: any) => {
     try {
       e.preventDefault();
       const email = e.target[0].value;
       const password = e.target[1].value;
+      if (email == "" || password == "") {
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: "Please ensure that email & password are both set",
+        });
+        return;
+      }
+      setSubmitting(true);
       // Pass credentials to NextAuth & login
       const result = await signIn("credentials", {
         email: email,
@@ -22,15 +34,24 @@ export default function Login() {
         redirect: false,
       });
       if (result?.ok) {
+        const res = await fetch(`/api/profile`);
+        //Check for ok response
+        if (!res.ok) {
+          //Throw error if not ok
+          throw Error(res.statusText);
+        }
+        const profile = await res.json();
+        await setLocalUser(profile);
         router.push("/");
-      } else {
-        setError("There has been an error. Please try to enter you email & password again.");
-        setSubmitting(false);
       }
     } catch (error) {
       console.log(error);
-      setError("There has been an error. Something went wrong so please try again.");
       setSubmitting(false);
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: error as string,
+      });
     }
   };
 
@@ -39,35 +60,38 @@ export default function Login() {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen bg-salt dark:bg-coal text-coal dark:text-salt">
-      <div className="relative flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0">
+    <div className="flex items-center justify-center h-screen">
+      <div className="relative flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0 dark:bg-zinc-900">
         <div className="p-6 md:p-20">
           <div className="text-center py-5">
-            <h1 className="text-primary text-5xl py-2">Welcome to Homethings</h1>
+            <h1 className="text-5xl py-2">
+              Welcome to <span className="text-accent">Homethings</span>
+            </h1>
             <h6 className="text-xl py-2">Login to view awesome things</h6>
           </div>
-          <form id="login-form" onSubmit={submitForm} className="py-5 space-y-5 text-coal dark:text-salt">
+          <form id="login-form" onSubmit={submitForm} className="py-5 space-y-5">
             <input
               type="email"
-              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
+              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border"
               placeholder="Email"
             />
             <input
               type="password"
-              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
+              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border"
               placeholder="Password"
             />
             <div className="flex flex-col items-center justify-between mt-6 space-y-6 md:flex-row md:space-y-0">
               <Button form="login-form" type="submit">
                 Login
               </Button>
+              <ToggleTheme />
             </div>
           </form>
-          {error ? <Alert text={error} close={setError} /> : ""}
         </div>
 
-        <img src="img/login.jpg" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
+        <img src="img/login.webp" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
       </div>
+      <Toaster />
     </div>
   );
 }

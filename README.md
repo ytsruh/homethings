@@ -4,6 +4,13 @@ The Homethings Apps & API
 
 ## Versions
 
+### v1
+
+- Removed Prisma dependancy for DrizzleORM
+- Rebuilt UI using ShadCN UI
+- Added user preferences
+- Resized imagery for performance
+
 ### 0.10
 
 - Merged in expo project for mobile app

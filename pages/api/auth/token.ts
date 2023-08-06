@@ -1,24 +1,24 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import bcrypt from "bcryptjs";
 import jsonwebtoken from "jsonwebtoken";
-import { db } from "@/lib/helpers";
+import { db, user } from "@/db/schema";
+import type { User } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case "POST":
       try {
         const { body } = req;
-        const user = await db.user.findUnique({
-          where: {
-            email: body.email,
-          },
-        });
+        // Look up a user in the database based on the email field sumitted in the body
+        const users: User[] = await db.select().from(user).where(eq(user.email, body.email));
+        const foundUser = users[0];
         //Compare the password with the encrypted one
-        if (!user) {
+        if (!foundUser) {
           res.status(401).json({ error: "Unauthorised: Wrong username or password" });
           return;
         }
-        const match = await bcrypt.compare(body.password, user.password);
+        const match = await bcrypt.compare(body.password, foundUser.password);
         //Send response based on result
         if (match) {
           const expiry = Math.floor(Date.now() / 1000) + 60 * 60 * 24; //Expires in 24 hours
@@ -29,9 +29,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           const token = jsonwebtoken.sign(
             {
               data: {
-                id: user?.id,
-                email: user?.email,
-                accountId: user?.accountId,
+                id: foundUser?.id,
+                email: foundUser?.email,
+                accountId: foundUser?.accountId,
               },
               exp: expiry,
             },

@@ -1,25 +1,7 @@
-import { PrismaClient, User } from "@prisma/client";
 import { getToken } from "next-auth/jwt";
-import type { NextApiRequest, NextApiResponse } from "next";
+import { User } from "@/db/schema";
+import type { NextApiRequest } from "next";
 import jsonwebtoken from "jsonwebtoken";
-
-// Fix for having too many DB connections in development.
-// https://github.com/prisma/prisma/issues/5007#issuecomment-618433162
-// https://github.com/prisma/prisma/issues/5103
-// https://www.prisma.io/docs/guides/database/troubleshooting-orm/help-articles/nextjs-prisma-client-dev-practices
-export let db: PrismaClient;
-
-if (process.env.NODE_ENV === "production") {
-  db = new PrismaClient();
-} else {
-  let globalWithPrisma = global as typeof globalThis & {
-    prisma: PrismaClient;
-  };
-  if (!globalWithPrisma.prisma) {
-    globalWithPrisma.prisma = new PrismaClient();
-  }
-  db = globalWithPrisma.prisma;
-}
 
 export const combinedDecodeToken = async (req: NextApiRequest) => {
   // Check if Secret is set in ENV variables
@@ -63,9 +45,9 @@ export const filterUserData = async (data: User) => {
   return {
     name: data.name,
     email: data.email,
-    darkMode: data.darkMode,
-    icon: data.icon,
-    accountId: data.accountId,
+    profileImage: data.profileImage,
+    showDocuments: data.showDocuments,
+    showBooks: data.showBooks,
   };
 };
 
@@ -75,8 +57,6 @@ export const filterOutPassword = (array: Array<User>) => {
       id: data.id,
       name: data.name,
       email: data.email,
-      darkMode: data.darkMode,
-      icon: data.icon,
       accountId: data.accountId,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,

@@ -1,46 +1,43 @@
-import { useState, useRef } from "react";
-import Protected from "@/components/Protected";
-import PageTitle from "@/lib/ui/PageTitle";
-import Button from "@/lib/ui/Button";
-import Loading from "@/lib/ui/Loading";
-import { getDocs } from "../api/documents";
+import { useState } from "react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-import { createId } from "@paralleldrive/cuid2";
+import PageFrame from "@/components/PageFrame";
+import { getDocs } from "pages/api/documents";
+import type { Document } from "@/db/schema";
+import { DocumentsTable } from "@/components/DocumentsTable";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
-import Icon from "@/lib/ui/Icon";
-import DeleteModal from "@/lib/ui/DeleteModal";
+import { createId } from "@paralleldrive/cuid2";
+import { useLoadingContext } from "@/lib/LoadingContext";
+import FormError from "@/components/FormError";
 
-export default function Documents(props: any) {
+type DocumentProps = {
+  count: number;
+  data: Document[];
+};
+
+export default function Documents(props: { documents: DocumentProps }) {
   const { documents } = props;
+
   return (
-    <Protected>
-      <div className="flex flex-col">
-        <PageTitle title="Documents" image={"img/docs.jpg"} alt="Documents Hero" />
-        <div className="flex flex-col px-5 md:px-10 items-center justify-center">
+    <PageFrame title="Documents">
+      <div className="w-full xl:w-10/12">
+        <DocumentsTable data={documents.data} />
+        <div className="py-5">
+          <h3 className="py-4 text-xl">Upload a new document</h3>
           <UploadForm />
-          <DocumentsTable documents={documents} />
         </div>
       </div>
-    </Protected>
+    </PageFrame>
   );
 }
 
 const UploadForm = () => {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { setLoading } = useLoadingContext();
   const [fileTitle, setFileTitle] = useState("");
   const [fileObject, setFileObject] = useState<any>(undefined);
-  const [error, setError] = useState("");
-  // Create a reference to the hidden file input element
-  const hiddenFileInput = useRef<any>(null);
-
-  // Programatically click the hidden file input element
-  // when the Button component is clicked
-  const handleClick = () => {
-    if (hiddenFileInput.current) {
-      hiddenFileInput?.current.click();
-    }
-  };
+  const [error, setError] = useState(false);
 
   async function submit(e: any) {
     e.preventDefault();
@@ -65,7 +62,6 @@ const UploadForm = () => {
       if (!uploadRes.ok) {
         console.log(uploadRes);
         console.log("failed");
-
         throw new Error("Failed to upload to S3");
       }
 
@@ -85,148 +81,23 @@ const UploadForm = () => {
     } catch (error) {
       setLoading(false);
       console.log(error);
-      setError("Error");
+      setError(true);
     }
   }
 
   if (error) {
-    return (
-      <div className="py-5">
-        <p>Error</p>
-      </div>
-    );
+    return <FormError reset={setError} />;
   }
 
-  if (loading) {
-    return (
-      <div className="py-5">
-        <Loading small />
-      </div>
-    );
-  }
   return (
     <form
       onSubmit={(e) => submit(e)}
-      className="w-full md:w-2/3 flex flex-col lg:flex-row justify-center items-center gap-2 py-5 md:py-10"
+      className="w-full flex flex-col md:flex-row justify-center items-center gap-2"
     >
-      <input
-        type="text"
-        className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
-        placeholder="Filename"
-        onChange={(e) => setFileTitle(e.target.value)}
-      />
-      <label
-        onClick={handleClick}
-        className="w-1/2 text-center px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border hover:bg-coal hover:text-salt dark:hover:bg-salt dark:hover:text-coal transition-colors duration-200 ease-in-out"
-      >
-        Select File
-      </label>
-      <input
-        type="file"
-        ref={hiddenFileInput}
-        className="hidden"
-        onChange={(e) => setFileObject(e.target?.files?.[0])}
-      />
+      <Input type="text" placeholder="Filename" onChange={(e) => setFileTitle(e.target.value)} />
+      <Input id="file" type="file" onChange={(e) => setFileObject(e.target?.files?.[0])} />
       <Button type="submit">Upload</Button>
     </form>
-  );
-};
-
-type TableProps = {
-  documents: {
-    count: number;
-    data: Document[];
-  };
-};
-
-type Document = {
-  id: string;
-  title: string;
-  description: string;
-  fileName: string;
-  accountId: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-const DocumentsTable = (props: TableProps) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-
-  async function download(filename: string) {
-    const response = await fetch(`/api/documents/url?fileName=${filename}`);
-    if (!response.ok) {
-      throw new Error("Failed to get S3 url");
-    }
-    const res = await response.json();
-    window.open(res.url, "_blank", "noreferrer");
-  }
-
-  async function deleteItem(id: string) {
-    setLoading(true);
-    try {
-      const response = await fetch("/api/documents/" + id, {
-        method: "DELETE",
-      });
-      //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
-      }
-      router.reload();
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  }
-
-  const rows = props.documents.data.map((document: Document, i: number) => {
-    return (
-      <tr className="text-center" key={i}>
-        <td>{document.title}</td>
-        <td className="hidden md:table-cell">{document.description}</td>
-        <td>
-          <Button color="bg-slate dark:bg-salt" onClick={() => download(document.fileName)}>
-            <Icon icon="GoCloudDownload" color="dark:text-coal" />
-          </Button>
-        </td>
-        <td>
-          <a href={`/documents/${document.id}`}>
-            <Button color="bg-warning">
-              <Icon icon="GoPencil" />
-            </Button>
-          </a>
-        </td>
-        <td>
-          <DeleteModal action={() => deleteItem(document.id)} />
-        </td>
-      </tr>
-    );
-  });
-
-  if (loading) {
-    return (
-      <div className="py-5">
-        <Loading small />
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full md:w-4/5 py-2 md:py-5">
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="text-center bg-primary text-white">
-            <th className="p-2">Title</th>
-            <th className="hidden md:table-cell">Description</th>
-            <th>Download</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
-    </div>
   );
 };
 

@@ -1,36 +1,31 @@
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import Loading from "@/lib/ui/Loading";
-import Protected from "@/components/Protected";
-import PageTitle from "@/lib/ui/PageTitle";
-import Icon from "@/lib/ui/Icon";
-import Button from "@/lib/ui/Button";
-import { getProfile } from "./api/profile";
+import { useState } from "react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import PageFrame from "@/components/PageFrame";
+import { getProfile } from "pages/api/profile";
+import type { User } from "@/db/schema";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { useRouter } from "next/router";
+import { useLoadingContext } from "@/lib/LoadingContext";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import FormError from "@/components/FormError";
+import { setLocalUser } from "@/lib/utils";
 
-export default function Profile(props: any) {
+export default function Profile(props: { profile: User }) {
   const router = useRouter();
-  const { profileData } = props;
-  const [profile, setProfile] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  const { setLoading } = useLoadingContext();
   const [error, setError] = useState(false);
-  const [redirect, setRedirect] = useState(false);
-  const desc = "Your profile & account settings";
+  const [profile, setProfile] = useState(props.profile);
 
-  useEffect(() => {
-    if (router.isReady && !profileData) {
-      router.push("/404");
-    }
-  }, [router, profileData]);
-
-  const submitData = async () => {
+  async function submit(e: any) {
+    e.preventDefault();
     try {
-      setSubmitting(true);
+      setLoading(true);
       const response = await fetch(`/api/profile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile),
       });
       //Check for ok response
@@ -38,102 +33,82 @@ export default function Profile(props: any) {
         //Throw error if not ok
         throw Error(response.statusText);
       }
-      setSubmitting(false);
-      setRedirect(true);
-    } catch (err) {
-      setSubmitting(false);
-      console.log(err);
+      setLocalUser({
+        name: profile.name,
+        email: profile.email,
+        showDocuments: profile.showDocuments,
+        showBooks: profile.showBooks,
+      } as User);
+      router.push("/");
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setError(true);
     }
-  };
-
-  if (error) {
-    router.push("/500");
-  }
-
-  if (submitting) {
-    return <Loading />;
-  }
-
-  if (redirect) {
-    router.push("/");
   }
 
   return (
-    <Protected>
-      <div className="py-3">
-        <PageTitle title="Profile" description={desc} image="img/settings.jpg" alt="Settings" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 py-5 px-5 md:px-10 lg:px-16">
-          <div>
-            <h2 className="text-primary text-2xl pb-3 text-center">Account Settings</h2>
-            <div className="px-5">
-              <div className="py-3">
-                <div className="px-3 py-1 mb-2">Name</div>
-                <input
-                  className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border-coal dark:border-salt border"
-                  type="text"
-                  defaultValue={profileData.name}
-                  placeholder="Name"
-                  onChange={(e) => setProfile({ ...profileData, name: e.target.value })}
+    <PageFrame title="Documents">
+      <div className="py-4">
+        <h1 className="text-2xl">Profile & Settings</h1>
+        <h2 className="text-sm text-zinc-500 dark:text-zinc-300 italic">
+          Change your profile picture or show/hide features to personalise your experience.
+        </h2>
+      </div>
+      <div className="w-full flex justify-center py-2">
+        {error ? (
+          <FormError reset={setError} />
+        ) : (
+          <form
+            onSubmit={(e) => submit(e)}
+            className="w-full flex flex-col justify-center items-center gap-2"
+          >
+            <div className="w-full">
+              <Label>Name:</Label>
+              <Input
+                className="my-2"
+                type="text"
+                placeholder="Filename"
+                value={profile.name}
+                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+              />
+            </div>
+            <div className="w-full">
+              <Label>Email:</Label>
+              <Input className="my-2" type="text" value={profile.email} disabled />
+            </div>
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
+              <div className="w-full flex justify-between items-center">
+                <div>
+                  <Label>Show Documents:</Label>
+                </div>
+                <Switch
+                  checked={profile.showDocuments}
+                  onCheckedChange={(bool) => setProfile({ ...profile, showDocuments: bool })}
                 />
               </div>
-              <div className="py-3">
-                <div className="px-3 py-1 mb-2">Dark Mode</div>
-                <div className="flex justify-around px-5 py-2">
-                  {["light", "dark", "system"].map((type, i) => (
-                    <div key={i}>
-                      <input
-                        defaultValue={type}
-                        name="darkMode"
-                        type="radio"
-                        defaultChecked={profileData.darkMode === type}
-                        key={i}
-                        className="text-white text-capitalize"
-                      />
-                      <label className="capitalize px-3">{type}</label>
-                    </div>
-                  ))}
+              <div className="w-full flex justify-between items-center">
+                <div>
+                  <Label>Show Books:</Label>
                 </div>
-                <div className="text-sm text-zinc-400 px-3 py-1 mb-2">
-                  Please note: This feature does not currently work
-                </div>
+                <Switch
+                  checked={profile.showBooks}
+                  onCheckedChange={(bool) => setProfile({ ...profile, showBooks: bool })}
+                />
               </div>
             </div>
-          </div>
-          <div>
-            <h2 className="text-primary text-2xl pb-3 text-center">Profile Icon</h2>
-            <div className="flex justify-around px-5">
-              {["GoPerson", "GoRocket", "GoKey", "GoKebabVertical"].map((type, i) => (
-                <div key={i}>
-                  <input
-                    defaultValue={type}
-                    name="icon"
-                    type="radio"
-                    defaultChecked={profileData.icon === type}
-                    id={i.toString()}
-                    onChange={(e) => setProfile({ ...profileData, icon: e.target.value })}
-                  />
-                  <label>
-                    <Icon icon={type} styles={iconStyles} color="text-coal dark:text-salt" />
-                  </label>
-                </div>
-              ))}
+            <div className="flex justify-between w-full py-5">
+              <Button asChild variant="secondary">
+                <Link href="/">Cancel</Link>
+              </Button>
+              <Button type="submit">Update</Button>
             </div>
-            <div className="text-sm text-zinc-400 p-3">
-              Please note: This will only update the next time you log in.
-            </div>
-          </div>
-        </div>
-        <div className="flex justify-center py-5" onClick={() => submitData()}>
-          <Button>Submit</Button>
-        </div>
+          </form>
+        )}
       </div>
-    </Protected>
+    </PageFrame>
   );
 }
-
-const iconStyles = {
-  fontSize: "40px",
-};
 
 export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
   const profile = await getProfile(context);
@@ -141,6 +116,6 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   const stringify = JSON.stringify(profile);
   const parsed = JSON.parse(stringify);
   return {
-    props: { profileData: parsed }, // will be passed to the page component as props
+    props: { profile: parsed }, // will be passed to the page component as props
   };
 };

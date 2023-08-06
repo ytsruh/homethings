@@ -1,12 +1,10 @@
-import Protected from "@/components/Protected";
-import PageTitle from "@/lib/ui/PageTitle";
+import React from "react";
+import PageFrame from "@/components/PageFrame";
 
 export default function Home() {
   return (
-    <Protected>
-      <div className="flex flex-col">
-        <PageTitle title="Welcome to Homethings" image={"img/home.jpg"} alt="Homepage Hero" />
-      </div>
-    </Protected>
+    <PageFrame title="Dashboard">
+      <h1>Home</h1>
+    </PageFrame>
   );
 }
