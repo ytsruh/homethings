@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import PageFrame from "@/components/PageFrame";
 import { getSingleDoc } from "pages/api/documents/[id]";
-import { Document } from "@/lib/schema";
+import type { Document } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";

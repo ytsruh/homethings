@@ -1,8 +1,10 @@
 // @ts-nocheck
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import * as helpers from "@/lib/helpers";
 import bcrypt from "bcryptjs";
+import { db, user } from "@/db/schema";
+import type { User } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
 export const authOptions = {
   providers: [
@@ -13,19 +15,16 @@ export const authOptions = {
       },
       async authorize(credentials) {
         try {
-          // Look up a unique admin in the database based on the email field sumitted in the body
-          const user = await helpers.db.user.findUnique({
-            where: {
-              email: credentials.email,
-            },
-          });
+          // Look up a user in the database based on the email field sumitted in the body
+          const users: User[] = await db.select().from(user).where(eq(user.email, credentials.email));
+          const foundUser = users[0];
           // Compare the password with the encrypted one
-          const match = await bcrypt.compare(credentials.password, user.password);
+          const match = await bcrypt.compare(credentials.password, foundUser.password);
           // If no error and we have user data, return it
           if (match) {
-            return user;
+            return foundUser;
           }
-          // Return null if user data could not be retrieved
+          // Return false if user data could not be retrieved
           return false;
         } catch (error) {
           return false;

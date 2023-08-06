@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Document } from "../schema";
+import type { Document } from "@/db/schema";
 import { useRouter } from "next/router";
 import { useLoadingContext } from "../LoadingContext";
 
@@ -59,7 +59,7 @@ export const columns: ColumnDef<Document>[] = [
     accessorKey: "updatedAt",
     header: () => <div className="text-right">Last Updated</div>,
     cell: ({ row }) => {
-      const updatedAt = row.original.updatedAt as Date;
+      const updatedAt = row.original.updatedAt as string;
       // Format the amount as a dollar amount
       const formatted = new Date(updatedAt).toLocaleString("en-GB", {
         year: "2-digit",

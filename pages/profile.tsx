@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import PageFrame from "@/components/PageFrame";
 import { getProfile } from "pages/api/profile";
-import { User } from "@/lib/schema";
+import type { User } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -38,7 +38,7 @@ export default function Profile(props: { profile: User }) {
         email: profile.email,
         showDocuments: profile.showDocuments,
         showBooks: profile.showBooks,
-      });
+      } as User);
       router.push("/");
       setLoading(false);
     } catch (error) {

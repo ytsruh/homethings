@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import { User } from "@/lib/schema";
+import type { User } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";

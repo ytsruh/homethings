@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import PageFrame from "@/components/PageFrame";
 import { getDocs } from "pages/api/documents";
-import { Document } from "@/lib/schema";
+import type { Document } from "@/db/schema";
 import { DocumentsTable } from "@/components/DocumentsTable";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

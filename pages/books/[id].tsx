@@ -2,7 +2,7 @@ import { useState } from "react";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import PageFrame from "@/components/PageFrame";
 import { getBook } from "pages/api/books/[id]";
-import { Book } from "@/lib/schema";
+import type { Book } from "@/db/schema";
 import { BooksNav } from "@/components/BooksNav";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -57,7 +57,7 @@ export default function SingleBook(props: { book: Book }) {
     <PageFrame title="Books">
       <BooksNav />
       <div className="py-5 flex w-full">
-        <img src={props.book.image} alt="" className="md:basis-1/4 hidden md:block" />
+        <img src={props.book.image as string} alt="" className="md:basis-1/4 hidden md:block" />
         <div className="basis-full md:basis-3/4 flex justify-center px-2">
           {error ? (
             <FormError reset={setError} />

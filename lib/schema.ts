@@ -5,6 +5,7 @@ export const envVariables = z.object({
   DATABASE_URL: z.string(),
   NEXT_PUBLIC_IMAGES_ENDPOINT: z.string(),
   NEXTAUTH_SECRET: z.string(),
+  NEON_DB_URL: z.string(),
 });
 
 declare global {
@@ -12,51 +13,3 @@ declare global {
     interface ProcessEnv extends z.infer<typeof envVariables> {}
   }
 }
-
-export const UserSchema = z.object({
-  id: z.string().optional(),
-  accountId: z.string().optional(),
-  name: z.string().optional(),
-  email: z.string().email().optional(),
-  password: z.string().optional(),
-  profileImage: z.string().nullable().optional(),
-  showDocuments: z.boolean().optional(),
-  showBooks: z.boolean().optional(),
-});
-
-export type User = z.infer<typeof UserSchema>;
-
-export const BookSchema = z.object({
-  id: z.string().optional(),
-  name: z.string().optional(),
-  isbn: z.string().optional(),
-  author: z.string().optional(),
-  genre: z.string().optional(),
-  rating: z.number().int().optional(),
-  image: z.string().optional(),
-  wishlist: z.boolean().optional(),
-  read: z.boolean().optional(),
-  userId: z.string().optional(),
-});
-
-export type Book = z.infer<typeof BookSchema>;
-
-export const FeedbackSchema = z.object({
-  title: z.string().optional(),
-  body: z.string().optional(),
-  userId: z.string().optional(),
-});
-
-export type Feedback = z.infer<typeof FeedbackSchema>;
-
-export const DocumentSchema = z.object({
-  id: z.string().optional(),
-  accountId: z.string().optional(),
-  createdAt: z.date().optional(),
-  updatedAt: z.date().optional(),
-  title: z.string().optional(),
-  description: z.string().optional(),
-  fileName: z.string().optional(),
-});
-
-export type Document = z.infer<typeof DocumentSchema>;

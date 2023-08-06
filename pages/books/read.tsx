@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import PageFrame from "@/components/PageFrame";
 import { getReadBooks } from "pages/api/books/read";
-import { Book } from "@/lib/schema";
+import type { Book } from "@/db/schema";
 import { BooksNav } from "@/components/BooksNav";
 
 type BooksProps = {
@@ -23,8 +23,8 @@ export default function BooksRead(props: { books: BooksProps }) {
 
 function BookItem(props: { data: Book }) {
   return (
-    <a href={`/book/${props.data.id}`} className="p-2 hover:border-zinc-500 hover:border hover:rounded-lg">
-      <img className="object-contain h-64 w-full " src={props.data.image} alt={props.data.name} />
+    <a href={`/books/${props.data.id}`} className="p-2 hover:border-zinc-500 hover:border hover:rounded-lg">
+      <img className="object-contain h-64 w-full " src={props.data.image as string} alt={props.data.name} />
     </a>
   );
 }

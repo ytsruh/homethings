@@ -1,7 +1,7 @@
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import PageFrame from "@/components/PageFrame";
 import { getBooks } from "pages/api/books";
-import { Book } from "@/lib/schema";
+import type { Book } from "@/db/schema";
 import { BooksNav } from "@/components/BooksNav";
 
 type BooksProps = {
