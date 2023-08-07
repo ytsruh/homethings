@@ -10,6 +10,7 @@ The Homethings Apps & API
 - Rebuilt UI using ShadCN UI
 - Added user preferences
 - Resized imagery for performance
+- Added barcode scanner to mobile app
 
 ### 0.10
 
