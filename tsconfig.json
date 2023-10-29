@@ -3,11 +3,21 @@
     "target": "es6",
     "baseUrl": "./",
     "paths": {
-      "@/components/*": ["lib/components/*"],
-      "@/lib/*": ["lib/*"],
-      "@/db/*": ["db/*"]
+      "@/components/*": [
+        "lib/components/*"
+      ],
+      "@/lib/*": [
+        "lib/*"
+      ],
+      "@/db/*": [
+        "db/*"
+      ]
     },
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,8 +29,20 @@
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

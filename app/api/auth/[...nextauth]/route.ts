@@ -13,7 +13,7 @@ export const authOptions = {
         strategy: "jwt",
         maxAge: 30 * 24 * 60 * 60,
       },
-      async authorize(credentials) {
+      async authorize(credentials: any) {
         try {
           // Look up a user in the database based on the email field sumitted in the body
           const users: User[] = await db.select().from(user).where(eq(user.email, credentials.email));
@@ -33,21 +33,21 @@ export const authOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
+    async signIn({ user, account, profile, email, credentials }: any) {
       return true;
     },
-    async redirect({ url, baseUrl }) {
+    async redirect({ url, baseUrl }: any) {
       // Allows relative callback URLs
       if (url.startsWith("/")) return `${baseUrl}${url}`;
       // Allows callback URLs on the same origin
       else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     },
-    async session({ session, user, token }) {
+    async session({ session, user, token }: any) {
       session.user.accountId = token.accountId;
       return session;
     },
-    async jwt({ token, user, account, profile, isNewUser }) {
+    async jwt({ token, user, account, profile, isNewUser }: any) {
       if (user) {
         token.accountId = user.accountId;
       }
@@ -60,4 +60,6 @@ export const authOptions = {
   },
 };
 
-export default NextAuth(authOptions);
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };
