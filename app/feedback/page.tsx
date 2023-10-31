@@ -1,10 +1,11 @@
+"use client";
 import { useState } from "react";
 import PageFrame from "@/components/PageFrame";
 import type { User } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
@@ -54,8 +55,7 @@ export default function Feedback(props: { profile: User }) {
         ) : (
           <form
             onSubmit={(e) => submit(e)}
-            className="w-full flex flex-col justify-center items-center gap-2"
-          >
+            className="w-full flex flex-col justify-center items-center gap-2">
             <div className="w-full">
               <Label>Summary:</Label>
               <Input

@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { ToggleTheme } from "@/components/ToggleTheme";
@@ -8,7 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { setLocalUser } from "@/lib/utils";
 
-export default function Login() {
+export default function Page() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();

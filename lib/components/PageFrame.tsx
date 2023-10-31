@@ -1,6 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Loading from "./Loading";
 import MainNav from "./MainNav";
@@ -57,8 +58,7 @@ function SideLink(props: { text: string; link: string }) {
   return (
     <a
       className="hover:bg-zinc-800 rounded-md px-1 py-2 hover:cursor-pointer hover:text-white"
-      href={props.link}
-    >
+      href={props.link}>
       {props.text}
     </a>
   );
