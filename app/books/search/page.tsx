@@ -1,3 +1,4 @@
+"use client";
 import { useState } from "react";
 import { BooksNav } from "@/components/BooksNav";
 import PageFrame from "@/components/PageFrame";
@@ -5,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React from "react";
 import { useLoadingContext } from "@/lib/LoadingContext";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function OpenBookSearch() {
   const [isbn, setISBN] = useState("");

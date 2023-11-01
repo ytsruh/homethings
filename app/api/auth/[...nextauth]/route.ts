@@ -1,12 +1,12 @@
 // @ts-nocheck
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db, user } from "@/db/schema";
 import type { User } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
-export const authOptions = {
+const authOptions: AuthOptions = {
   providers: [
     CredentialsProvider({
       session: {

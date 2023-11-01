@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import type { User } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import FormError from "@/components/FormError";
 
-export default function Feedback(props: { profile: User }) {
+export default function Feedback() {
   const router = useRouter();
   const { setLoading } = useLoadingContext();
   const [error, setError] = useState(false);

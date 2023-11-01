@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -27,15 +28,13 @@ export function BooksNav() {
               <ListItem
                 href="/books/create"
                 title="Create"
-                className="hover:bg-slate-50 hover:text-slate-950 h-full"
-              >
+                className="hover:bg-slate-50 hover:text-slate-950 h-full">
                 Manually create a new book
               </ListItem>
               <ListItem
                 href="/books/search"
                 title="Search"
-                className="hover:bg-slate-50 hover:text-slate-950 h-full"
-              >
+                className="hover:bg-slate-50 hover:text-slate-950 h-full">
                 Search the OpenBooks API to update your book list
               </ListItem>
             </ul>
@@ -48,22 +47,19 @@ export function BooksNav() {
               <ListItem
                 href="/books/read"
                 title="Read"
-                className="hover:bg-slate-50 hover:text-slate-950 h-full"
-              >
+                className="hover:bg-slate-50 hover:text-slate-950 h-full">
                 Filter to only show read books
               </ListItem>
               <ListItem
                 href="/books/unread"
                 title="Unread"
-                className="hover:bg-slate-50 hover:text-slate-950 h-full"
-              >
+                className="hover:bg-slate-50 hover:text-slate-950 h-full">
                 Filter to only show unread books
               </ListItem>
               <ListItem
                 href="/books/wishlist"
                 title="Wishlist"
-                className="hover:bg-slate-50 hover:text-slate-950 h-full"
-              >
+                className="hover:bg-slate-50 hover:text-slate-950 h-full">
                 View your wishlist of books
               </ListItem>
             </ul>
@@ -85,8 +81,7 @@ const ListItem = React.forwardRef<React.ElementRef<"a">, React.ComponentPropsWit
               "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
               className
             )}
-            {...props}
-          >
+            {...props}>
             <div className="text-sm font-medium leading-none">{title}</div>
             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
           </a>
