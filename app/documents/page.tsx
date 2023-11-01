@@ -1,39 +1,52 @@
-import { useState } from "react";
-import { GetServerSideProps, GetServerSidePropsContext } from "next";
+"use client";
+import { useEffect, useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import { getDocs } from "pages/api/documents";
-import type { Document } from "@/db/schema";
 import { DocumentsTable } from "@/components/DocumentsTable";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/router";
+import Loading from "@/components/Loading";
 import { createId } from "@paralleldrive/cuid2";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import FormError from "@/components/FormError";
 
-type DocumentProps = {
-  count: number;
-  data: Document[];
-};
+export default function Documents() {
+  const { loading } = useLoadingContext();
+  const [loaded, setLoaded] = useState(loading);
+  const [documents, setDocuments] = useState();
 
-export default function Documents(props: { documents: DocumentProps }) {
-  const { documents } = props;
+  useEffect(() => {
+    async function getData() {
+      const res = await fetch("/api/documents");
+      if (!res.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const docs = await res.json();
+      setDocuments(docs.data);
+      setLoaded(true);
+    }
+    getData();
+  }, []);
 
-  return (
-    <PageFrame title="Documents">
-      <div className="w-full xl:w-10/12">
-        <DocumentsTable data={documents.data} />
-        <div className="py-5">
-          <h3 className="py-4 text-xl">Upload a new document</h3>
-          <UploadForm />
+  if (!loaded) {
+    return <Loading />;
+  }
+
+  if (documents) {
+    return (
+      <PageFrame title="Documents">
+        <div className="w-full xl:w-10/12">
+          <DocumentsTable data={documents} />
+          <div className="py-5">
+            <h3 className="py-4 text-xl">Upload a new document</h3>
+            <UploadForm />
+          </div>
         </div>
-      </div>
-    </PageFrame>
-  );
+      </PageFrame>
+    );
+  }
 }
 
 const UploadForm = () => {
-  const router = useRouter();
   const { setLoading } = useLoadingContext();
   const [fileTitle, setFileTitle] = useState("");
   const [fileObject, setFileObject] = useState<any>(undefined);
@@ -77,7 +90,7 @@ const UploadForm = () => {
         throw new Error("Failed to save file");
       }
       e.target.reset();
-      router.reload();
+      window.location.reload();
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -92,21 +105,10 @@ const UploadForm = () => {
   return (
     <form
       onSubmit={(e) => submit(e)}
-      className="w-full flex flex-col md:flex-row justify-center items-center gap-2"
-    >
+      className="w-full flex flex-col md:flex-row justify-center items-center gap-2">
       <Input type="text" placeholder="Filename" onChange={(e) => setFileTitle(e.target.value)} />
       <Input id="file" type="file" onChange={(e) => setFileObject(e.target?.files?.[0])} />
       <Button type="submit">Upload</Button>
     </form>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const docs = await getDocs(context);
-  // Have to stringify then parse otherwise date objects cannot be passed to page
-  const stringify = JSON.stringify(docs);
-  const parsed = JSON.parse(stringify);
-  return {
-    props: { documents: parsed }, // will be passed to the page component as props
-  };
 };

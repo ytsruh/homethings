@@ -34,7 +34,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Document } from "@/db/schema";
-import { useRouter } from "next/router";
 import { useLoadingContext } from "../LoadingContext";
 
 export const columns: ColumnDef<Document>[] = [
@@ -108,7 +107,6 @@ export const columns: ColumnDef<Document>[] = [
 ];
 
 function DeleteModal(props: { id: string }) {
-  const router = useRouter();
   const { setLoading } = useLoadingContext();
   async function deleteItem() {
     setLoading(true);
@@ -121,7 +119,7 @@ function DeleteModal(props: { id: string }) {
         //Throw error if not ok
         throw Error(response.statusText);
       }
-      router.reload();
+      window.location.reload();
     } catch (error) {
       console.log(error);
       setLoading(false);
