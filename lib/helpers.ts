@@ -1,9 +1,10 @@
 import { getToken } from "next-auth/jwt";
 import { User } from "@/db/schema";
-import type { NextApiRequest } from "next";
+import { NextRequest } from "next/server";
+import { headers } from "next/headers";
 import jsonwebtoken from "jsonwebtoken";
 
-export const combinedDecodeToken = async (req: NextApiRequest) => {
+export const combinedDecodeToken = async (req: NextRequest) => {
   // Check if Secret is set in ENV variables
   if (!process.env.NEXTAUTH_SECRET) {
     throw new Error("JWT_KEY must be defined");
@@ -16,18 +17,14 @@ export const combinedDecodeToken = async (req: NextApiRequest) => {
       return { id: token.sub, accountId: token.accountId };
     } else {
       // If token is not found then check if a token from custom auth can be found in the headers
-      if (!req.headers.token) {
+      const headersList = headers();
+      const token = headersList.get("token");
+      if (!token) {
         throw new Error("Unauthorised: Token not found");
       }
       // If token is found then verify it using custom auth
-      const decoded: any = await jsonwebtoken.verify(
-        req.headers.token?.toString(),
-        process.env.NEXTAUTH_SECRET
-      );
-      console.log(decoded);
+      const decoded: any = await jsonwebtoken.verify(token, process.env.NEXTAUTH_SECRET);
       if (decoded) {
-        console.log(decoded);
-
         // If token is verified then return it
         return { id: decoded.data.id, accountId: decoded.data.accountId };
       }

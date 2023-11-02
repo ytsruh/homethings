@@ -4,6 +4,10 @@ The Homethings Apps & API
 
 ## Versions
 
+### v1.1
+
+- Updated Next to use App Directory
+
 ### v1
 
 - Removed Prisma dependancy for DrizzleORM

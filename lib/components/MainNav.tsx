@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import Link from "next/link";
 import {
@@ -96,16 +97,14 @@ export default function MainNav(props: any) {
                 {preferences.showDocuments && (
                   <Link
                     href="/documents"
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                     Documents
                   </Link>
                 )}
                 {preferences.showBooks && (
                   <Link
                     href="/books"
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
+                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                     Books
                   </Link>
                 )}
