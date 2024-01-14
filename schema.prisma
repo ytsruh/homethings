@@ -1,0 +1,70 @@
+generator db {
+  provider = "go run github.com/steebchen/prisma-client-go"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id        String     @id @default(dbgenerated("gen_random_uuid()"))
+  name      String?
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime   @default(now())
+  Document  Document[]
+  User      User[]
+}
+
+model Book {
+  id        String    @id @default(dbgenerated("gen_random_uuid()"))
+  name      String
+  isbn      String
+  author    String?
+  genre     String?
+  rating    Int?
+  image     String?
+  read      Boolean   @default(false)
+  userId    String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @default(now())
+  wishlist  Boolean   @default(false)
+  User      User      @relation(fields: [userId], references: [id], map: "Book_userId_User_id_fk")
+}
+
+model Document {
+  id          String    @id @default(dbgenerated("gen_random_uuid()"))
+  title       String
+  description String?
+  accountId   String
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime  @default(now())
+  fileName    String
+  Account     Account   @relation(fields: [accountId], references: [id], map: "Document_accountId_Account_id_fk")
+}
+
+model Feedback {
+  id        String    @id @default(dbgenerated("gen_random_uuid()"))
+  title     String
+  body      String?
+  userId    String
+  createdAt DateTime? @default(now())
+  updatedAt DateTime  @default(now())
+  User      User      @relation(fields: [userId], references: [id], map: "Feedback_userId_User_id_fk")
+}
+
+model User {
+  id            String     @id @default(dbgenerated("gen_random_uuid()"))
+  name          String     @default("User Name")
+  email         String     @unique
+  password      String
+  createdAt     DateTime?  @default(now())
+  updatedAt     DateTime   @default(now())
+  accountId     String
+  profileImage  String?
+  showBooks     Boolean    @default(true)
+  showDocuments Boolean    @default(true)
+  Book          Book[]
+  Feedback      Feedback[]
+  Account       Account    @relation(fields: [accountId], references: [id], map: "User_accountId_Account_id_fk")
+}

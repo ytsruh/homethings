@@ -9,6 +9,7 @@ node_modules
 # misc
 .DS_Store
 .env
+/tmp
 
 #expo
 .expo
