@@ -32,7 +32,6 @@ func main() {
 	e := echo.New()
 	routes.SetRoutes(e)
 	database := db.InitDB()
-
 	// Start server
 	go func() {
 		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
@@ -47,7 +46,12 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// Disconnect from database
-	if err := database.Prisma.Disconnect(); err != nil {
+	d, err := database.DB()
+	if err != nil {
+		log.Println(err)
+		log.Println("Error disconnecting from database")
+	}
+	if err := d.Close(); err != nil {
 		log.Println(err)
 		log.Println("Error disconnecting from database")
 	}

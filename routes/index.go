@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"net/http"
+	"errors"
 	"os"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,27 +17,31 @@ type CustomClaims struct {
 	jwt.RegisteredClaims `json:"claims"`
 }
 
+func GetUser(c echo.Context) (*CustomClaims, error) {
+	token, ok := c.Get("user").(*jwt.Token)
+	if !ok {
+		return nil, errors.New("JWT token missing or invalid")
+	}
+	claims, ok := token.Claims.(*CustomClaims)
+	if !ok {
+		return nil, errors.New("failed to cast claims as jwt.MapClaims")
+	}
+	return claims, nil
+}
+
 func SetRoutes(server *echo.Echo) {
 	group := server.Group("/v1")
-	group.GET("/", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, echo.Map{
-			"message": "Hello, World!",
-		})
-	})
 	group.POST("/login", login)
 
-	// Configure middleware with the custom claims type
-	config := echojwt.Config{
+	// Configure JWT middleware with the custom claims type
+	group.Use(echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(CustomClaims)
 		},
-		SigningKey: []byte(SecretKey),
-	}
-	group.Use(echojwt.WithConfig(config))
+		SigningKey:  []byte(SecretKey),
+		TokenLookup: "header:Authorization",
+	}))
 
-	group.GET("/protected", func(c echo.Context) error {
-		return c.JSON(http.StatusOK, echo.Map{
-			"message": "protcted",
-		})
-	})
+	group.GET("/profile", getProfile)
+	group.PATCH("/profile", patchProfile)
 }

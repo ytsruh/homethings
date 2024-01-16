@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"context"
 	"net/http"
 	"time"
 
@@ -29,10 +28,8 @@ func login(c echo.Context) error {
 
 	// Check if user exists
 	client := db.GetDB()
-	user, err := client.User.FindUnique(
-		db.User.Email.Equals(input.Email),
-	).Exec(context.Background())
-	if err != nil {
+	user := db.User{}
+	if err := client.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		return c.JSON(http.StatusUnauthorized, "unauthorized")
 	}
 

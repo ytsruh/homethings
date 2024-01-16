@@ -1,20 +1,36 @@
 package db
 
-import "log"
+import (
+	"fmt"
+	"os"
 
-var client *PrismaClient
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
 
-func InitDB() *PrismaClient {
-	// Create client and assign to global variable
-	client = NewClient()
-	if err := client.Prisma.Connect(); err != nil {
-		panic("Unable to connect to database")
+var DBConn *gorm.DB
+
+func InitDB() *gorm.DB {
+	dburl := os.Getenv("DATABASE_URL")
+	var err error
+	DBConn, err = gorm.Open(postgres.Open(dburl))
+	if err != nil {
+		fmt.Println("Failed to connect to database")
+		panic("Failed to connect to database")
 	}
-	log.Println("Database successfully connected!")
-	return client
+
+	// Enable uuid-ossp extension
+	err = DBConn.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"").Error
+	if err != nil {
+		fmt.Println("Failed to enable uuid-ossp extension")
+		panic(err)
+	}
+
+	DBConn.AutoMigrate(&Account{}, &User{})
+
+	return DBConn
 }
 
-// GetDB returns the global client
-func GetDB() *PrismaClient {
-	return client
+func GetDB() *gorm.DB {
+	return DBConn
 }
