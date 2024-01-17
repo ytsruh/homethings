@@ -40,7 +40,7 @@ func SetRoutes(server *echo.Echo) {
 			return new(CustomClaims)
 		},
 		SigningKey:  []byte(SecretKey),
-		TokenLookup: "header:Authorization",
+		TokenLookup: "header:Authorization", // Include token in Authorization header with no prefix
 	}))
 
 	group.GET("/profile", getProfile)
@@ -48,4 +48,9 @@ func SetRoutes(server *echo.Echo) {
 	group.POST("/feedback", createFeedback)
 	group.GET("/documents", getDocuments)
 	group.POST("/documents", createDocument)
+	group.GET("/documents/:id", getSingleDocument)
+	group.PUT("/documents/:id", updateSingleDocument)
+	group.DELETE("/documents/:id", deleteSingleDocument)
+	group.GET("/documents/url", createGetPresignedUrl)
+	group.PUT("/documents/url", createPutPresignedUrl)
 }
