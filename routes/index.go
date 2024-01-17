@@ -14,6 +14,7 @@ var SecretKey = os.Getenv("SECRET_KEY")
 type CustomClaims struct {
 	User                 string `json:"user"`
 	Id                   string `json:"id"`
+	AccountId            string `json:"accountId"`
 	jwt.RegisteredClaims `json:"claims"`
 }
 
@@ -44,4 +45,7 @@ func SetRoutes(server *echo.Echo) {
 
 	group.GET("/profile", getProfile)
 	group.PATCH("/profile", patchProfile)
+	group.POST("/feedback", createFeedback)
+	group.GET("/documents", getDocuments)
+	group.POST("/documents", createDocument)
 }

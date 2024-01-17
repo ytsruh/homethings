@@ -42,6 +42,7 @@ func login(c echo.Context) error {
 	claims := CustomClaims{
 		user.Email,
 		user.ID,
+		user.AccountId,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			Issuer:    "homethings",

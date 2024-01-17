@@ -1,12 +1,15 @@
 package db
 
-import "time"
+import (
+	"time"
+)
 
 type Account struct {
 	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
 	Name      string
 	CreatedAt *time.Time
 	UpdatedAt time.Time
+	Documents []Document `gorm:"foreignKey:AccountId"`
 }
 
 type User struct {
@@ -23,26 +26,30 @@ type User struct {
 	UpdatedAt     time.Time
 }
 
-// type Feedback struct {
-// 	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
-// 	Title     string
-// 	Body      *string
-// 	UserId    string `gorm:"type:uuid"`
-// 	User      User   `gorm:"foreignKey:UserId;references:ID"`
-// 	CreatedAt *time.Time
-// 	UpdatedAt time.Time
-// }
+type Feedback struct {
+	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Title     string
+	Body      *string
+	UserId    string `gorm:"type:uuid"`
+	User      User   `gorm:"foreignKey:UserId;references:ID"`
+	CreatedAt *time.Time
+	UpdatedAt time.Time
+}
 
-// type Document struct {
-// 	ID          string `gorm:"type:uuid;default:uuid_generate_v4()"`
-// 	Title       string
-// 	Description *string
-// 	AccountId   string
-// 	FileName    string
-// 	Account     Account `gorm:"foreignKey:AccountId;references:ID"`
-// 	CreatedAt   *time.Time
-// 	UpdatedAt   time.Time
-// }
+func (f *Feedback) TableName() string {
+	return "feedback"
+}
+
+type Document struct {
+	ID          string `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Title       string
+	Description *string
+	AccountId   string `gorm:"type:uuid"`
+	FileName    string
+	Account     Account `gorm:"foreignKey:AccountId;references:ID"`
+	CreatedAt   *time.Time
+	UpdatedAt   time.Time
+}
 
 // type Book struct {
 // 	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
