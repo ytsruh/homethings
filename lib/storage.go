@@ -37,7 +37,19 @@ func getS3Client() (*s3.Client, error) {
 	return s3.NewFromConfig(cfg), nil
 }
 
-func CreatePresignedGetURL(key string) (*v4.PresignedHTTPRequest, error) {
+func DeleteObject(fileName string) error {
+	client, err := getS3Client()
+	if err != nil {
+		return err
+	}
+	client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+		Bucket: &storageBucket,
+		Key:    aws.String("docs/" + fileName),
+	})
+	return nil
+}
+
+func CreatePresignedGetURL(fileName string) (*v4.PresignedHTTPRequest, error) {
 	client, err := getS3Client()
 	if err != nil {
 		return nil, err
@@ -45,7 +57,7 @@ func CreatePresignedGetURL(key string) (*v4.PresignedHTTPRequest, error) {
 	presignClient := s3.NewPresignClient(client)
 	params := &s3.GetObjectInput{
 		Bucket: &storageBucket,
-		Key:    &key,
+		Key:    aws.String("docs/" + fileName),
 	}
 	presignedURL, err := presignClient.PresignGetObject(context.TODO(), params, func(o *s3.PresignOptions) {
 		o.Expires = 15 * time.Minute
@@ -56,7 +68,7 @@ func CreatePresignedGetURL(key string) (*v4.PresignedHTTPRequest, error) {
 	return presignedURL, nil
 }
 
-func CreatePresignedPutURL(key string) (*v4.PresignedHTTPRequest, error) {
+func CreatePresignedPutURL(fileName string) (*v4.PresignedHTTPRequest, error) {
 	client, err := getS3Client()
 	if err != nil {
 		return nil, err
@@ -64,7 +76,7 @@ func CreatePresignedPutURL(key string) (*v4.PresignedHTTPRequest, error) {
 	presignClient := s3.NewPresignClient(client)
 	params := &s3.PutObjectInput{
 		Bucket: &storageBucket,
-		Key:    &key,
+		Key:    aws.String("docs/" + fileName),
 	}
 	presignedURL, err := presignClient.PresignPutObject(context.TODO(), params, func(o *s3.PresignOptions) {
 		o.Expires = 15 * time.Minute

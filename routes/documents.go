@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm/clause"
 	"homethings.ytsruh.com/db"
 	"homethings.ytsruh.com/lib"
 )
@@ -171,11 +172,19 @@ func deleteSingleDocument(c echo.Context) error {
 	}
 	id := c.Param("id")
 	client := db.GetDB()
-	tx := client.Where("id = ? AND account_id = ?", id, claims.AccountId).Delete(&db.Document{})
+	doc := &db.Document{}
+	tx := client.Clauses(clause.Returning{}).Where("id = ? AND account_id = ?", id, claims.AccountId).Delete(doc)
 	if tx.Error != nil {
 		fmt.Println(tx.Error)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to delete document",
+		})
+	}
+	err = lib.DeleteObject(doc.FileName)
+	if err != nil {
+		fmt.Println(err)
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "failed to delete document from storage",
 		})
 	}
 	return c.JSON(200, echo.Map{
