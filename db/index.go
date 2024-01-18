@@ -26,7 +26,7 @@ func InitDB() *gorm.DB {
 		panic(err)
 	}
 
-	//DBConn.AutoMigrate(&Account{}, &User{}, &Feedback{}, &Document{})
+	DBConn.AutoMigrate(&Account{}, &User{}, &Feedback{}, &Document{}, &Book{})
 
 	return DBConn
 }

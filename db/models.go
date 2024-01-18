@@ -24,6 +24,7 @@ type User struct {
 	Account       Account `gorm:"foreignKey:AccountId;references:ID"`
 	CreatedAt     *time.Time
 	UpdatedAt     time.Time
+	Books         []Book `gorm:"foreignKey:UserId"`
 }
 
 type Feedback struct {
@@ -44,25 +45,25 @@ type Document struct {
 	ID          string `gorm:"type:uuid;default:uuid_generate_v4()"`
 	Title       string
 	Description *string
-	AccountId   string `gorm:"type:uuid"`
 	FileName    string
+	AccountId   string  `gorm:"type:uuid"`
 	Account     Account `gorm:"foreignKey:AccountId;references:ID"`
 	CreatedAt   *time.Time
 	UpdatedAt   time.Time
 }
 
-// type Book struct {
-// 	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
-// 	Name      string
-// 	Isbn      string
-// 	Author    string
-// 	Genre     string
-// 	Rating    int
-// 	Image     string
-// 	Read      bool `gorm:"default:false"`
-// 	Wishlist  bool `gorm:"default:false"`
-// 	UserId    string
-// 	User      User `gorm:"foreignKey:UserId;references:ID"`
-// 	CreatedAt *time.Time
-// 	UpdatedAt time.Time
-// }
+type Book struct {
+	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Name      string
+	Isbn      string
+	Author    *string
+	Genre     *string
+	Rating    *int
+	Image     *string
+	Read      bool `gorm:"default:false"`
+	Wishlist  bool `gorm:"default:false"`
+	UserId    string
+	User      User `gorm:"foreignKey:UserId;references:ID"`
+	CreatedAt *time.Time
+	UpdatedAt time.Time
+}

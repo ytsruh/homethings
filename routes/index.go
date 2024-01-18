@@ -42,10 +42,12 @@ func SetRoutes(server *echo.Echo) {
 		SigningKey:  []byte(SecretKey),
 		TokenLookup: "header:Authorization", // Include token in Authorization header with no prefix
 	}))
-
+	// Profile routes
 	group.GET("/profile", getProfile)
 	group.PATCH("/profile", patchProfile)
+	// Feedback route
 	group.POST("/feedback", createFeedback)
+	// Document routes
 	group.GET("/documents", getDocuments)
 	group.POST("/documents", createDocument)
 	group.GET("/documents/:id", getSingleDocument)
@@ -53,4 +55,13 @@ func SetRoutes(server *echo.Echo) {
 	group.DELETE("/documents/:id", deleteSingleDocument)
 	group.GET("/documents/url", createGetPresignedUrl)
 	group.PUT("/documents/url", createPutPresignedUrl)
+	// Book routes
+	group.GET("/books", getBooks)
+	group.POST("/books", createBook)
+	group.GET("/books/:id", getSingleBook)
+	group.PUT("/books/:id", updateSingleBook)
+	group.DELETE("/books/:id", deleteSingleBook)
+	group.GET("/books/wishlist", getWishlist)
+	group.GET("/books/read", getRead)
+	group.GET("/books/unread", getUnRead)
 }
