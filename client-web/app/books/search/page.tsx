@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import React from "react";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import { useRouter } from "next/navigation";
+import { getLocalToken } from "@/lib/utils";
 
 export default function OpenBookSearch() {
   const [isbn, setISBN] = useState("");
@@ -89,13 +90,16 @@ function SearchError() {
 function SearchResults(props: any) {
   const router = useRouter();
   const { setLoading } = useLoadingContext();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
   async function submit() {
     try {
       setLoading(true);
-      const response = await fetch(`/api/books/`, {
+      const token = await getLocalToken();
+      const response = await fetch(`${baseUrl}/books`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: token as string,
         },
         body: JSON.stringify({
           name: props.data.title,
@@ -104,13 +108,15 @@ function SearchResults(props: any) {
           image: `https://covers.openlibrary.org/b/isbn/${props.isbn}-M.jpg`,
         }),
       });
-      //Check for ok response
-      if (!response.ok) {
-        throw new Error("Something went wrong please try again");
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       router.push("/books");
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       console.log(error);
       setLoading(false);
     }

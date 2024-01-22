@@ -22,3 +22,11 @@ export async function getLocalUser() {
 export async function removeLocalUser() {
   await localStorage.removeItem("user");
 }
+
+export async function getLocalToken() {
+  return await sessionStorage.getItem("token");
+}
+
+export async function removeLocalToken() {
+  return await sessionStorage.removeItem("token");
+}

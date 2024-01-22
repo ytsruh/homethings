@@ -5,28 +5,37 @@ import { BooksNav } from "@/components/BooksNav";
 import { useEffect, useState } from "react";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import Loading from "@/components/Loading";
-
-type BooksData = {
-  count: number;
-  data: Book[];
-};
+import { getLocalToken } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function Books() {
+  const router = useRouter();
   const { loading } = useLoadingContext();
   const [loaded, setLoaded] = useState(loading);
-  const [books, setBooks] = useState<BooksData>();
+  const [books, setBooks] = useState();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     async function getData() {
-      const res = await fetch("/api/books");
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
+      try {
+        const token = await getLocalToken();
+        const res = await fetch(`${baseUrl}/books`, {
+          headers: {
+            Authorization: token as string,
+          },
+        });
+        if (res.status === 401) {
+          throw Error("unauthorized");
+        }
+        const data = await res.json();
+        setBooks(data.books);
+        setLoaded(true);
+      } catch (error: any) {
+        if (error.message === "unauthorized") {
+          router.push("/login");
+        }
+        console.log(error);
       }
-      const data: BooksData = await res.json();
-      console.log(data);
-
-      setBooks(data);
-      setLoaded(true);
     }
     getData();
   }, []);
@@ -36,7 +45,7 @@ export default function Books() {
   }
 
   if (books) {
-    const booksData = books.data.map((book: Book, i: number) => {
+    const booksData = (books as Book[]).map((book: Book, i: number) => {
       return <BookItem data={book} key={i} />;
     });
     return (

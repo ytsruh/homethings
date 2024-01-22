@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import { useRouter } from "next/navigation";
 import { Switch } from "@/components/ui/switch";
+import { getLocalToken } from "@/lib/utils";
 
 export default function CreateBook() {
   const router = useRouter();
@@ -23,23 +24,27 @@ export default function CreateBook() {
     read: false,
     wishlist: false,
   });
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   async function submit(e: any) {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(`/api/books/`, {
+      const token = await getLocalToken();
+      const response = await fetch(`${baseUrl}/books`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token as string },
         body: JSON.stringify(bookData),
       });
-      //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       router.push("/books");
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       setLoading(false);
       console.log(error);
       setError(true);

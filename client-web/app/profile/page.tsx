@@ -11,24 +11,36 @@ import { useLoadingContext } from "@/lib/LoadingContext";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import FormError from "@/components/FormError";
-import { setLocalUser } from "@/lib/utils";
+import { getLocalToken, setLocalUser } from "@/lib/utils";
 
 export default function Profile() {
   const router = useRouter();
   const { loading, setLoading } = useLoadingContext();
-  const [loaded, setLoaded] = useState(loading);
   const [error, setError] = useState(false);
   const [profile, setProfile] = useState<User>();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     async function getData() {
-      const res = await fetch("/api/profile");
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
+      const token = await getLocalToken();
+      try {
+        const res = await fetch(`${baseUrl}/profile`, {
+          headers: {
+            Authorization: token as string,
+          },
+        });
+        if (res.status === 401) {
+          throw Error("unauthorized");
+        }
+        const data = await res.json();
+        setProfile(data);
+        setLoading(false);
+      } catch (error: any) {
+        if (error.message === "unauthorized") {
+          router.push("/login");
+        }
+        console.log(error);
       }
-      const data = await res.json();
-      setProfile(data);
-      setLoaded(true);
     }
     getData();
   }, []);
@@ -39,16 +51,16 @@ export default function Profile() {
       if (!profile) {
         return;
       }
+      const token = await getLocalToken();
       setLoading(true);
-      const response = await fetch(`/api/profile`, {
+      const res = await fetch(`${baseUrl}/profile`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token as string },
         body: JSON.stringify(profile),
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (res.status === 401) {
+        throw Error("unauthorized");
       }
       setLocalUser({
         name: profile.name,
@@ -58,13 +70,16 @@ export default function Profile() {
       } as User);
       router.push("/");
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       setLoading(false);
       setError(true);
     }
   }
 
-  if (!loaded) {
+  if (loading) {
     return <Loading />;
   }
 

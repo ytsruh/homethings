@@ -8,21 +8,34 @@ import Loading from "@/components/Loading";
 import { createId } from "@paralleldrive/cuid2";
 import { useLoadingContext } from "@/lib/LoadingContext";
 import FormError from "@/components/FormError";
+import { getLocalToken } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function Documents() {
+  const router = useRouter();
   const { loading } = useLoadingContext();
   const [loaded, setLoaded] = useState(loading);
   const [documents, setDocuments] = useState();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     async function getData() {
-      const res = await fetch("/api/documents");
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
+      try {
+        const token = await getLocalToken();
+        const res = await fetch(`${baseUrl}/documents`, {
+          headers: { "Content-Type": "application/json", Authorization: token as string },
+        });
+        if (res.status === 401) {
+          throw Error("unauthorized");
+        }
+        const data = await res.json();
+        setDocuments(data);
+        setLoaded(true);
+      } catch (error: any) {
+        if (error.message === "unauthorized") {
+          router.push("/login");
+        }
       }
-      const docs = await res.json();
-      setDocuments(docs.data);
-      setLoaded(true);
     }
     getData();
   }, []);
@@ -47,21 +60,25 @@ export default function Documents() {
 }
 
 const UploadForm = () => {
+  const router = useRouter();
   const { setLoading } = useLoadingContext();
   const [fileTitle, setFileTitle] = useState("");
   const [fileObject, setFileObject] = useState<any>(undefined);
   const [error, setError] = useState(false);
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   async function submit(e: any) {
     e.preventDefault();
     try {
       setLoading(true);
       const id = createId();
-      const response = await fetch(`/api/documents/url?fileName=${id + "-" + fileObject.name}`, {
+      const token = await getLocalToken();
+      const response = await fetch(`${baseUrl}/documents/url?fileName=${id + "-" + fileObject.name}`, {
         method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: token as string },
       });
-      if (!response.ok) {
-        throw new Error("Failed to get S3 url");
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       const res = await response.json();
       const uploadRes = await fetch(res.url, {
@@ -77,21 +94,23 @@ const UploadForm = () => {
         console.log("failed");
         throw new Error("Failed to upload to S3");
       }
-
-      const save = await fetch(`/api/documents`, {
+      const save = await fetch(`${baseUrl}/documents`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token as string },
         body: JSON.stringify({
           title: fileTitle,
           fileName: id + "-" + fileObject.name,
         }),
       });
-      if (!save.ok) {
-        throw new Error("Failed to save file");
+      if (save.status === 401) {
+        throw Error("unauthorized");
       }
       e.target.reset();
       window.location.reload();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       setLoading(false);
       console.log(error);
       setError(true);

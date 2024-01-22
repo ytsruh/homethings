@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import Loading from "./Loading";
 import MainNav from "./MainNav";
 import { getLocalUser } from "@/lib/utils";
@@ -10,7 +9,7 @@ import { getLocalUser } from "@/lib/utils";
 export default function PageFrame(props: { title: string; children: React.ReactNode }) {
   const router = useRouter();
   const [preferences, setPreferences] = useState<any>({});
-  const { data: session, status } = useSession();
+  const [status, setStatus] = useState("loading");
 
   useEffect(() => {
     async function updatePreferences() {
@@ -18,11 +17,18 @@ export default function PageFrame(props: { title: string; children: React.ReactN
       setPreferences(pref);
     }
     updatePreferences();
+    async function checkAuth() {
+      const token = await sessionStorage.getItem("token");
+      if (token) {
+        setStatus("authenticated");
+      } else {
+        setStatus("unauthenticated");
+        router.push("/login");
+      }
+    }
+    checkAuth();
   }, []);
 
-  if (status === "loading") {
-    return <Loading />;
-  }
   if (status === "authenticated") {
     return (
       <div>
@@ -46,9 +52,6 @@ export default function PageFrame(props: { title: string; children: React.ReactN
         </div>
       </div>
     );
-  }
-  if (status === "unauthenticated") {
-    router.push("/login");
   }
 
   return <Loading />;

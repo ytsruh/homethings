@@ -28,6 +28,20 @@ export default function Page() {
         return;
       }
       setSubmitting(true);
+      const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      //Check for ok response
+      if ((loginRes.status as number) != 200) {
+        //Throw error if not ok
+        throw Error(loginRes.statusText);
+      }
+      const loginData = await loginRes.json();
+      sessionStorage.setItem("token", loginData.token);
       // Pass credentials to NextAuth & login
       const result = await signIn("credentials", {
         email: email,
@@ -51,7 +65,7 @@ export default function Page() {
       toast({
         variant: "destructive",
         title: "An error occurred",
-        description: error as string,
+        description: "Please ensure that email & password are both correct",
       });
     }
   };

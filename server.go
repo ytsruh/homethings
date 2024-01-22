@@ -10,6 +10,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"homethings.ytsruh.com/db"
 	"homethings.ytsruh.com/routes"
 )
@@ -30,6 +31,7 @@ func main() {
 
 	// Initialize Echo, set routes & database
 	e := echo.New()
+	e.Use(echo.MiddlewareFunc(middleware.CORS()))
 	routes.SetRoutes(e)
 	database := db.InitDB()
 	// Start server

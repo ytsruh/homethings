@@ -10,31 +10,26 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { signOut } from "next-auth/react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { ToggleTheme } from "./ToggleTheme";
 import { HomeIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { removeLocalUser } from "../utils";
+import { removeLocalToken, removeLocalUser } from "../utils";
+import { useRouter } from "next/navigation";
 
 function getInitials(name: string) {
   return name.split(" ").map((n) => n[0]);
 }
 
 export default function MainNav(props: any) {
+  const router = useRouter();
   const { preferences } = props;
 
   function handleLogout() {
     removeLocalUser();
-    signOut({ callbackUrl: "/login" });
+    removeLocalToken();
+    router.push("/login");
   }
 
   return (
@@ -89,8 +84,8 @@ export default function MainNav(props: any) {
         <SheetContent side="left">
           <SheetHeader>
             <SheetTitle>What do you want to do?</SheetTitle>
-            <SheetDescription>
-              <nav className="mt-5 flex flex-col space-y-5">
+            <div className="py-2">
+              <div className="mt-5 flex flex-col space-y-5">
                 <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
                   Home
                 </Link>
@@ -108,8 +103,8 @@ export default function MainNav(props: any) {
                     Books
                   </Link>
                 )}
-              </nav>
-            </SheetDescription>
+              </div>
+            </div>
           </SheetHeader>
         </SheetContent>
       </Sheet>

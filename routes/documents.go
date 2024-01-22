@@ -11,13 +11,13 @@ import (
 )
 
 type CreateDocumentInput struct {
-	Name        string `json:"name"`
+	Title       string `json:"title"`
 	Description string `json:"description"`
 	FileName    string `json:"fileName"`
 }
 
 type UpdateDocumentInput struct {
-	Name        string `json:"name"`
+	Title       string `json:"title"`
 	Description string `json:"description"`
 }
 
@@ -56,7 +56,7 @@ func createDocument(c echo.Context) error {
 		})
 	}
 	document := db.Document{
-		Title:       input.Name,
+		Title:       input.Title,
 		Description: &input.Description,
 		FileName:    input.FileName,
 		AccountId:   claims.AccountId,
@@ -88,7 +88,7 @@ func createGetPresignedUrl(c echo.Context) error {
 		})
 	}
 	return c.JSON(200, echo.Map{
-		"url": url,
+		"url": url.URL,
 	})
 }
 
@@ -107,7 +107,7 @@ func createPutPresignedUrl(c echo.Context) error {
 		})
 	}
 	return c.JSON(200, echo.Map{
-		"url": url,
+		"url": url.URL,
 	})
 }
 
@@ -147,19 +147,20 @@ func updateSingleDocument(c echo.Context) error {
 			"message": "failed to bind document",
 		})
 	}
-	document := db.Document{
-		Title:       input.Name,
+	document := &db.Document{
+		Title:       input.Title,
 		Description: &input.Description,
 	}
-	tx := client.Model(&db.Document{}).Where("id = ? AND account_id = ?", id, claims.ID).Updates(document)
+	fmt.Println(input)
+	tx := client.Model(&db.Document{}).Where("id = ? AND account_id = ?", id, claims.AccountId).Updates(document)
 	if tx.Error != nil {
 		fmt.Println(tx.Error)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
-			"message": "failed to create document",
+			"message": "failed to update document",
 		})
 	}
 	return c.JSON(200, echo.Map{
-		"message": "created new document",
+		"message": "updated document",
 	})
 }
 

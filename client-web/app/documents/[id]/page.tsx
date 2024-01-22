@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import FormError from "@/components/FormError";
 import Loading from "@/components/Loading";
+import { getLocalToken } from "@/lib/utils";
 
 export default function SingleDocument({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -18,16 +19,26 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
   const [loaded, setLoaded] = useState(loading);
   const [error, setError] = useState(false);
   const [document, setDocument] = useState<Document>();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     async function getData() {
-      const res = await fetch(`/api/documents/${params.id}`);
-      if (!res.ok) {
-        throw new Error("Failed to fetch data");
+      try {
+        const token = await getLocalToken();
+        const res = await fetch(`${baseUrl}/documents/${params.id}`, {
+          headers: { Authorization: token as string },
+        });
+        if (res.status === 401) {
+          throw Error("unauthorized");
+        }
+        const doc = await res.json();
+        setDocument(doc as Document);
+        setLoaded(true);
+      } catch (error: any) {
+        if (error.message === "unauthorized") {
+          router.push("/login");
+        }
       }
-      const doc = await res.json();
-      setDocument(doc.data as Document);
-      setLoaded(true);
     }
     getData();
   }, []);
@@ -36,22 +47,25 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(`/api/documents/${params.id}`, {
+      const token = await getLocalToken();
+      const response = await fetch(`${baseUrl}/documents/${params.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token as string },
         body: JSON.stringify({
           title: document?.title,
           description: document?.description,
         }),
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       router.push("/documents");
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       setLoading(false);
       console.log(error);
       setError(true);

@@ -12,22 +12,16 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-var storageSecret = os.Getenv("STORAGE_SECRET")
-var storageKey = os.Getenv("STORAGE_KEY")
-var storageRegion = os.Getenv("STORAGE_REGION")
-var storageBucket = os.Getenv("STORAGE_BUCKET")
-var storageEndpoint = os.Getenv("STORAGE_ENDPOINT")
-
 func getS3Client() (*s3.Client, error) {
-	creds := credentials.NewStaticCredentialsProvider(storageKey, storageSecret, "")
+	creds := credentials.NewStaticCredentialsProvider(os.Getenv("STORAGE_KEY"), os.Getenv("STORAGE_SECRET"), "")
 	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
 		return aws.Endpoint{
-			URL: storageEndpoint,
+			URL: os.Getenv("STORAGE_ENDPOINT"),
 		}, nil
 	})
 
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion(storageRegion),
+		config.WithRegion(os.Getenv("STORAGE_REGION")),
 		config.WithCredentialsProvider(creds),
 		config.WithEndpointResolverWithOptions(customResolver))
 	if err != nil {
@@ -42,8 +36,9 @@ func DeleteObject(fileName string) error {
 	if err != nil {
 		return err
 	}
+	bucket := os.Getenv("STORAGE_BUCKET")
 	client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
-		Bucket: &storageBucket,
+		Bucket: &bucket,
 		Key:    aws.String("docs/" + fileName),
 	})
 	return nil
@@ -55,8 +50,9 @@ func CreatePresignedGetURL(fileName string) (*v4.PresignedHTTPRequest, error) {
 		return nil, err
 	}
 	presignClient := s3.NewPresignClient(client)
+	bucket := os.Getenv("STORAGE_BUCKET")
 	params := &s3.GetObjectInput{
-		Bucket: &storageBucket,
+		Bucket: &bucket,
 		Key:    aws.String("docs/" + fileName),
 	}
 	presignedURL, err := presignClient.PresignGetObject(context.TODO(), params, func(o *s3.PresignOptions) {
@@ -74,8 +70,12 @@ func CreatePresignedPutURL(fileName string) (*v4.PresignedHTTPRequest, error) {
 		return nil, err
 	}
 	presignClient := s3.NewPresignClient(client)
+	bucket := os.Getenv("STORAGE_BUCKET")
+	if bucket == "" {
+		return nil, err
+	}
 	params := &s3.PutObjectInput{
-		Bucket: &storageBucket,
+		Bucket: &bucket,
 		Key:    aws.String("docs/" + fileName),
 	}
 	presignedURL, err := presignClient.PresignPutObject(context.TODO(), params, func(o *s3.PresignOptions) {

@@ -9,32 +9,36 @@ import { useLoadingContext } from "@/lib/LoadingContext";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import FormError from "@/components/FormError";
+import { getLocalToken } from "@/lib/utils";
 
 export default function Feedback() {
   const router = useRouter();
   const { setLoading } = useLoadingContext();
   const [error, setError] = useState(false);
   const [feedback, setFeedback] = useState({});
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   async function submit(e: any) {
     e.preventDefault();
     try {
       setLoading(true);
-      const response = await fetch(`/api/feedback`, {
+      const token = await getLocalToken();
+      const response = await fetch(`${baseUrl}/feedback`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: token as string },
         body: JSON.stringify(feedback),
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       router.push("/");
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       console.log(error);
-
       setLoading(false);
       setError(true);
     }

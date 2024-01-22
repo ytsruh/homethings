@@ -36,6 +36,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import type { Document } from "@/db/schema";
 import { useLoadingContext } from "../LoadingContext";
+import { getLocalToken } from "../utils";
+import { useRouter } from "next/navigation";
+import router from "next/navigation";
 
 export const columns: ColumnDef<Document>[] = [
   {
@@ -75,14 +78,21 @@ export const columns: ColumnDef<Document>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const data = row.original;
-
       async function download(filename: string) {
-        const response = await fetch(`/api/documents/url?fileName=${filename}`);
-        if (!response.ok) {
-          throw new Error("Failed to get S3 url");
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+        const token = await getLocalToken();
+        try {
+          const response = await fetch(`${baseUrl}/documents/url?fileName=${filename}`, {
+            headers: { Authorization: token as string },
+          });
+          if (response.status === 401) {
+            throw Error("unauthorized");
+          }
+          const res = await response.json();
+          window.open(res.url, "_blank", "noreferrer");
+        } catch (error: any) {
+          history.pushState({}, "", "/documents");
         }
-        const res = await response.json();
-        window.open(res.url, "_blank", "noreferrer");
       }
 
       return (
@@ -108,20 +118,27 @@ export const columns: ColumnDef<Document>[] = [
 ];
 
 function DeleteModal(props: { id: string }) {
+  const router = useRouter();
   const { setLoading } = useLoadingContext();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   async function deleteItem() {
     setLoading(true);
     try {
-      const response = await fetch("/api/documents/" + props.id, {
+      const token = await getLocalToken();
+      const response = await fetch(`${baseUrl}/documents/` + props.id, {
         method: "DELETE",
+        headers: { Authorization: token as string },
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       window.location.reload();
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message === "unauthorized") {
+        router.push("/login");
+      }
       console.log(error);
       setLoading(false);
     }

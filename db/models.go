@@ -13,18 +13,18 @@ type Account struct {
 }
 
 type User struct {
-	ID            string `gorm:"type:uuid;default:uuid_generate_v4()"`
-	Name          string `gorm:"default:'User Name'"`
-	Email         string `gorm:"unique"`
-	Password      string
-	ProfileImage  *string
-	ShowBooks     bool `gorm:"default:true"`
-	ShowDocuments bool `gorm:"default:true"`
-	AccountId     string
-	Account       Account `gorm:"foreignKey:AccountId;references:ID"`
-	CreatedAt     *time.Time
-	UpdatedAt     time.Time
-	Books         []Book `gorm:"foreignKey:UserId"`
+	ID            string     `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	Name          string     `gorm:"default:'User Name'" json:"name"`
+	Email         string     `gorm:"unique" json:"email"`
+	Password      string     `json:"-"`
+	ProfileImage  *string    `json:"profileImage"`
+	ShowBooks     bool       `gorm:"default:true" json:"showBooks"`
+	ShowDocuments bool       `gorm:"default:true" json:"showDocuments"`
+	AccountId     string     `json:"accountId"`
+	Account       Account    `gorm:"foreignKey:AccountId;references:ID" json:"account"`
+	CreatedAt     *time.Time `json:"createdAt"`
+	UpdatedAt     time.Time  `json:"updatedAt"`
+	Books         []Book     `gorm:"foreignKey:UserId" json:"books"`
 }
 
 type Feedback struct {
@@ -42,28 +42,28 @@ func (f *Feedback) TableName() string {
 }
 
 type Document struct {
-	ID          string `gorm:"type:uuid;default:uuid_generate_v4()"`
-	Title       string
-	Description *string
-	FileName    string
-	AccountId   string  `gorm:"type:uuid"`
-	Account     Account `gorm:"foreignKey:AccountId;references:ID"`
-	CreatedAt   *time.Time
-	UpdatedAt   time.Time
+	ID          string     `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	Title       string     `json:"title"`
+	Description *string    `json:"description"`
+	FileName    string     `json:"fileName"`
+	AccountId   string     `gorm:"type:uuid" json:"accountId"`
+	Account     Account    `gorm:"foreignKey:AccountId;references:ID" json:"account"`
+	CreatedAt   *time.Time `json:"createdAt"`
+	UpdatedAt   time.Time  `json:"updatedAt"`
 }
 
 type Book struct {
-	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
-	Name      string
-	Isbn      string
-	Author    *string
-	Genre     *string
-	Rating    *int
-	Image     *string
-	Read      bool `gorm:"default:false"`
-	Wishlist  bool `gorm:"default:false"`
-	UserId    string
-	User      User `gorm:"foreignKey:UserId;references:ID"`
-	CreatedAt *time.Time
-	UpdatedAt time.Time
+	ID        string     `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	Name      string     `json:"name"`
+	Isbn      string     `json:"isbn"`
+	Author    *string    `json:"author"`
+	Genre     *string    `json:"genre"`
+	Rating    *int       `json:"rating"`
+	Image     *string    `json:"image"`
+	Read      bool       `gorm:"default:false" json:"read"`
+	Wishlist  bool       `gorm:"default:false" json:"wishlist"`
+	UserId    string     `json:"userId"`
+	User      User       `gorm:"foreignKey:UserId;references:ID" json:"user"`
+	CreatedAt *time.Time `json:"createdAt"`
+	UpdatedAt time.Time  `json:"updatedAt"`
 }

@@ -126,7 +126,7 @@ func updateSingleBook(c echo.Context) error {
 		Read:     input.Read,
 		Wishlist: input.Wishlist,
 	}
-	tx := client.Model(&db.Book{}).Where("id = ? AND user_id = ?", id, claims.ID).Updates(book)
+	tx := client.Model(&db.Book{}).Where("id = ? AND user_id = ?", id, claims.Id).Updates(book)
 	if tx.Error != nil {
 		fmt.Println(tx.Error)
 		return c.JSON(http.StatusInternalServerError, echo.Map{
@@ -147,7 +147,7 @@ func deleteSingleBook(c echo.Context) error {
 		})
 	}
 	client := db.GetDB()
-	tx := client.Where("id = ? AND user_id = ?", id, claims.ID).Delete(&db.Book{})
+	tx := client.Where("id = ? AND user_id = ?", id, claims.Id).Delete(&db.Book{})
 	if tx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to delete book",
@@ -167,7 +167,7 @@ func getWishlist(c echo.Context) error {
 	}
 	client := db.GetDB()
 	var books []db.Book
-	tx := client.Where("user_id = ? AND wishlist = ?", claims.ID, true).Find(&books)
+	tx := client.Where("user_id = ? AND wishlist = ?", claims.Id, true).Find(&books)
 	if tx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to get books",
@@ -187,7 +187,7 @@ func getRead(c echo.Context) error {
 	}
 	client := db.GetDB()
 	var books []db.Book
-	tx := client.Where("user_id = ? AND read = ?", claims.ID, true).Find(&books)
+	tx := client.Where("user_id = ? AND read = ?", claims.Id, true).Find(&books)
 	if tx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to get books",
@@ -207,7 +207,7 @@ func getUnRead(c echo.Context) error {
 	}
 	client := db.GetDB()
 	var books []db.Book
-	tx := client.Where("user_id = ? AND read = ?", claims.ID, false).Find(&books)
+	tx := client.Where("user_id = ? AND read = ?", claims.Id, false).Find(&books)
 	if tx.Error != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to get books",
