@@ -151,7 +151,6 @@ func updateSingleDocument(c echo.Context) error {
 		Title:       input.Title,
 		Description: &input.Description,
 	}
-	fmt.Println(input)
 	tx := client.Model(&db.Document{}).Where("id = ? AND account_id = ?", id, claims.AccountId).Updates(document)
 	if tx.Error != nil {
 		fmt.Println(tx.Error)
