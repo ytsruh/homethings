@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { View, Text } from "react-native";
 import Button from "../../components/Button";
 import { BASE_URL, getToken } from "../../config";
@@ -8,6 +8,7 @@ import { AuthContext } from "../../context/AuthContext";
 export default function DeleteBook(props) {
   const data = props.route.params.data;
   const [isLoading, setIsLoading] = useState(false);
+  const { logout } = useContext(AuthContext);
 
   async function confirmDelete() {
     let token = await getToken();
@@ -17,12 +18,12 @@ export default function DeleteBook(props) {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          Authorization: token,
         },
       });
       //Check for ok response
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       const responseData = await response.json();
       setIsLoading(false);
@@ -31,6 +32,9 @@ export default function DeleteBook(props) {
         params: { refresh: true },
       });
     } catch (error) {
+      if (err.message === "unauthorized") {
+        logout();
+      }
       console.log(error);
       setIsLoading(false);
     }

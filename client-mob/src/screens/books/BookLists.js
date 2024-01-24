@@ -1,33 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableWithoutFeedback } from "react-native";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import { FlatList } from "react-native-gesture-handler";
 import { BASE_URL, getToken } from "../../config";
 import Loading from "../../components/Loading";
 import Icon from "../../components/Icon";
+import { AuthContext } from "../../context/AuthContext";
 
 export default BookLists = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [read, setRead] = useState(true);
   const [data, setData] = useState(null);
+  const { logout } = useContext(AuthContext);
 
   const fetchData = async () => {
     setIsLoading(true);
     let token = await getToken();
     try {
       const response = await fetch(`${BASE_URL}/books/${read ? "read" : "unread"}`, {
-        headers: { token: token },
+        headers: { Authorization: token },
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       // Set to json and store in state
-      const books = await response.json();
-      setData(books.data);
+      const data = await response.json();
+      setData(data.books);
       setIsLoading(false);
     } catch (err) {
+      if (err.message === "unauthorized") {
+        logout();
+      }
       console.log(err);
       setIsLoading(false);
     }

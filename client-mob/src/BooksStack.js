@@ -18,8 +18,7 @@ export default function BooksStack() {
       initialRouteName="All Books"
       screenOptions={({ route }) => ({
         headerShown: false,
-      })}
-    >
+      })}>
       <Stack.Screen name="All Books" component={AllBooks} />
       <Stack.Screen
         name="New Book"

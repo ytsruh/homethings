@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   KeyboardAvoidingView,
   ScrollView,
@@ -11,12 +11,14 @@ import {
 import { BASE_URL, getToken } from "../config";
 import Button from "../components/Button";
 import Loading from "../components/Loading";
+import { AuthContext } from "../context/AuthContext";
 
 export default function GiveFeedback(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState({ read: false });
   const [show, setShow] = useState(false);
   const [error, setError] = useState(false);
+  const { logout } = useContext(AuthContext);
 
   const submit = async () => {
     if (!data.title) {
@@ -30,13 +32,13 @@ export default function GiveFeedback(props) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          Authorization: token,
         },
         body: JSON.stringify(data),
       });
       //Check for ok response
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       const responseData = await response.json();
       setIsLoading(false);
@@ -44,6 +46,9 @@ export default function GiveFeedback(props) {
         name: "Account Home",
       });
     } catch (error) {
+      if (err.message === "unauthorized") {
+        logout();
+      }
       console.log(error);
       setIsLoading(false);
     }
@@ -64,8 +69,7 @@ export default function GiveFeedback(props) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-salt h-full px-3"
-    >
+      className="flex-1 bg-salt h-full px-3">
       {!error ? (
         <ScrollView className="flex-1 py-2 bg-salt landscape:flex-none landscape:my-2">
           <Text className="text-sm pb-1 pt-2 text-coal">Title</Text>

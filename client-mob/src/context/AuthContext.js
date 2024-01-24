@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch(`${BASE_URL}/auth/token`, {
+      const response = await fetch(`${BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,13 +22,14 @@ export const AuthProvider = ({ children }) => {
       //Check for ok response
       if (!response.ok) {
         //Throw error if not ok
-        throw Error(response.statusText);
+        throw Error("error logging in");
       }
       // Set to json, put token in storage & redirect
       const data = await response.json();
-      setUserToken(data);
-      AsyncStorage.setItem("userToken", JSON.stringify(data));
+      setUserToken(data.token);
+      AsyncStorage.setItem("userToken", JSON.stringify(data.token));
     } catch (err) {
+      console.log("failed");
       console.log(err);
     }
   };
@@ -36,7 +37,6 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     await AsyncStorage.removeItem("userToken");
     setUserToken(null);
-    return;
   };
 
   return (

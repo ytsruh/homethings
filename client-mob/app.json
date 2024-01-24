@@ -10,11 +10,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.ytsruh.homethings",
-      "buildNumber": "4"
+      "buildNumber": "9"
     },
     "android": {
       "adaptiveIcon": {

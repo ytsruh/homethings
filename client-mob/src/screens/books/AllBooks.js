@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { KeyboardAvoidingView, View, Text, TextInput, Image, TouchableWithoutFeedback } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { AuthContext } from "../../context/AuthContext";
@@ -15,24 +15,27 @@ export default function AllBooks(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { logout } = useContext(AuthContext);
 
   const fetchData = async () => {
     setIsLoading(true);
     let token = await getToken();
     try {
       const response = await fetch(`${BASE_URL}/books`, {
-        headers: { token: token },
+        headers: { Authorization: token },
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       // Set to json and store in state
-      const books = await response.json();
-      setData(books.data);
+      const data = await response.json();
+      setData(data.books);
       setIsLoading(false);
     } catch (err) {
+      if (err.message === "unauthorized") {
+        logout();
+      }
       console.log(err);
       setIsLoading(false);
     }
@@ -49,8 +52,7 @@ export default function AllBooks(props) {
   return (
     <KeyboardAvoidingView
       className="flex-1 h-full bg-salt landscape:flex-none landscape:my-2"
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
+      behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <FlatList
         data={
           setSearchTerm

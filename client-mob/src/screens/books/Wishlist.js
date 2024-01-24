@@ -1,32 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TouchableWithoutFeedback } from "react-native";
 import Loading from "../../components/Loading";
 import { BASE_URL, getToken } from "../../config";
 import { FlatList } from "react-native-gesture-handler";
 import Icon from "../../components/Icon";
+import { AuthContext } from "../../context/AuthContext";
 
 export default Wishlist = (props) => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
+  const { logout } = useContext(AuthContext);
 
   const fetchData = async () => {
     setIsLoading(true);
     let token = await getToken();
     try {
       const response = await fetch(`${BASE_URL}/books/wishlist`, {
-        headers: { token: token },
+        headers: { Authorization: token },
       });
       //Check for ok response
-      if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       // Set to json and store in state
-      const books = await response.json();
-      setData(books);
+      const data = await response.json();
+      setData(data.books);
       setIsLoading(false);
     } catch (err) {
-      console.log(err);
+      if (err.message === "unauthorized") {
+        logout();
+      }
       setIsLoading(false);
     }
   };
@@ -42,7 +45,7 @@ export default Wishlist = (props) => {
   return (
     <View className="h-full bg-salt landscape:flex-none landscape:my-2">
       <FlatList
-        data={data.data}
+        data={data}
         renderItem={({ item }) => <BookItem data={item} navigation={props.navigation} />}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={<ListEmpty />}

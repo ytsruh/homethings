@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Text, View, Image } from "react-native";
 import Button from "./Button";
 import ButtonIcon from "./ButtonIcon";
 import Loading from "./Loading";
 import { BASE_URL, getToken } from "../config";
+import { AuthContext } from "../context/AuthContext";
 
 export default function ResultTile(props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { logout } = useContext(AuthContext);
 
   async function handleSubmit() {
     try {
@@ -17,7 +19,7 @@ export default function ResultTile(props) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          Authorization: token,
         },
         body: JSON.stringify({
           name: props.data.title,
@@ -26,16 +28,22 @@ export default function ResultTile(props) {
           image: `https://covers.openlibrary.org/b/isbn/${props.data.isbn_13[0]}-M.jpg`,
         }),
       });
+      console.log(response);
+      console.log("response");
       //Check for ok response
-      if (!response.ok) {
-        throw new Error("Something went wrong please try again");
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
+      console.log("response");
       setLoading(false);
       props.navigation.navigate({
         name: "All Books",
         params: { refresh: true },
       });
     } catch (error) {
+      if (error.message === "unauthorized") {
+        logout();
+      }
       console.log(error);
       setError(error);
       setLoading(false);

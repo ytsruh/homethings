@@ -23,8 +23,7 @@ const MainApp = () => {
         tabBarInactiveBackgroundColor: "#f9fafb",
         headerShown: false,
         tabBarStyle: { marginBottom: 5 },
-      })}
-    >
+      })}>
       <Tab.Screen
         name="Books"
         component={BooksStack}
@@ -50,22 +49,9 @@ const MainApp = () => {
 const MainStack = (props) => {
   const { userToken, setUserToken, logout } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-
+  console.log("Token : " + userToken);
   const isLoggedIn = async () => {
     try {
-      if (userToken && userToken?.expiry > Date.now() / 1000) {
-        // Token is set in state & has not expired
-        setLoading(false);
-        return;
-      }
-
-      if (userToken && userToken?.expiry < Date.now() / 1000) {
-        // Token is set but is expired
-        await AsyncStorage.removeItem("userToken");
-        setUserToken(null);
-        throw new Error("Token is expired or does not exist");
-      }
-
       if (!userToken) {
         // Token is not set in state so need to check in storage
         const token = await AsyncStorage.getItem("userToken");
@@ -73,14 +59,14 @@ const MainStack = (props) => {
           throw Error("Token is not stored");
         }
         const parsedToken = JSON.parse(token);
-        // Check if token is expired
-        if (parsedToken && parsedToken.expiry > Date.now() / 1000) {
-          // Token is ok so can be set to global state
+        // Token is ok so can be set to global state
+        if (parsedToken) {
           setUserToken(parsedToken);
           setLoading(false);
           return;
         }
         // Token is either not valid or has expired
+        await logout();
         throw new Error("Token is stored but has expired");
       }
     } catch (err) {
@@ -98,17 +84,17 @@ const MainStack = (props) => {
     return <Loading />;
   }
 
-  if (!userToken) {
-    return <LoginScreen />;
+  if (userToken) {
+    return (
+      <SafeAreaView className="flex-1 bg-salt">
+        <NavigationContainer>
+          <MainApp />
+        </NavigationContainer>
+      </SafeAreaView>
+    );
   }
 
-  return (
-    <SafeAreaView className="flex-1 bg-salt">
-      <NavigationContainer>
-        <MainApp />
-      </NavigationContainer>
-    </SafeAreaView>
-  );
+  return <LoginScreen />;
 };
 
 export default MainStack;

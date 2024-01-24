@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ScrollView, View, Text, TextInput, Image, TouchableWithoutFeedback } from "react-native";
 import { BASE_URL, getToken } from "../config";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import Button from "./Button";
 import Loading from "./Loading";
 import KeyboardView from "./KeyboardView";
+import { AuthContext } from "../context/AuthContext";
 
 export default function CreateBookManual(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState({ read: false });
   const [show, setShow] = useState(false);
   const [error, setError] = useState(false);
+  const { logout } = useContext(AuthContext);
 
   const submit = async () => {
     if (!data.name || !data.isbn) {
@@ -24,21 +26,23 @@ export default function CreateBookManual(props) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          Authorization: token,
         },
         body: JSON.stringify(data),
       });
       //Check for ok response
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
-      const responseData = await response.json();
       setIsLoading(false);
       props.navigation.navigate({
         name: "All Books",
         params: { refresh: true },
       });
     } catch (error) {
+      if (error.message === "unauthorized") {
+        logout();
+      }
       console.log(error);
       setIsLoading(false);
     }

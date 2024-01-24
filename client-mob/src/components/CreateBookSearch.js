@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { ScrollView, View, TextInput, Text, Image } from "react-native";
 import Button from "./Button";
 import ButtonIcon from "./ButtonIcon";
 import Loading from "./Loading";
 import KeyboardView from "./KeyboardView";
 import { BASE_URL, getToken } from "../config";
+import { AuthContext } from "../context/AuthContext";
 
 export default function CreateBookSearch(props) {
   const [loading, setLoading] = useState(false);
@@ -102,6 +103,7 @@ function ErrorTile(props) {
 }
 
 function ResultTile(props) {
+  const { logout } = useContext(AuthContext);
   async function handleSubmit() {
     try {
       let token = await getToken();
@@ -110,7 +112,7 @@ function ResultTile(props) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          Authorization: token,
         },
         body: JSON.stringify({
           name: props.data.title,
@@ -120,8 +122,8 @@ function ResultTile(props) {
         }),
       });
       //Check for ok response
-      if (!response.ok) {
-        throw new Error("Something went wrong please try again");
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       props.setLoading(false);
       props.navigation.navigate({
@@ -129,7 +131,10 @@ function ResultTile(props) {
         params: { refresh: true },
       });
     } catch (error) {
-      console.log(error);
+      if (error.message === "unauthorized") {
+        logout();
+      }
+      console.log("error");
       props.setError(error);
       props.setLoading(false);
     }

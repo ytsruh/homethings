@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { ScrollView, View, Text, TextInput, Platform } from "react-native";
 import Button from "../../components/Button";
 import Loading from "../../components/Loading";
@@ -7,11 +7,13 @@ import { BASE_URL, getToken } from "../../config";
 import SegmentedControl from "@react-native-segmented-control/segmented-control";
 import DeleteIcon from "../../components/DeleteIcon";
 import KeyboardView from "../../components/KeyboardView";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function SingleBook(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(props.route.params.data);
   const [show, setShow] = useState();
+  const { logout } = useContext(AuthContext);
 
   useEffect(() => {
     if (data.read) {
@@ -45,13 +47,13 @@ export default function SingleBook(props) {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          token: token,
+          Authorization: token,
         },
         body: JSON.stringify(data),
       });
       //Check for ok response
-      if (!response.ok) {
-        throw Error(response.statusText);
+      if (response.status === 401) {
+        throw Error("unauthorized");
       }
       const responseData = await response.json();
       setIsLoading(false);
@@ -60,6 +62,9 @@ export default function SingleBook(props) {
         params: { refresh: true },
       });
     } catch (error) {
+      if (err.message === "unauthorized") {
+        logout();
+      }
       console.log(error);
       setIsLoading(false);
     }
