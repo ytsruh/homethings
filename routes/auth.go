@@ -1,9 +1,11 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"golang.org/x/crypto/bcrypt"
@@ -11,8 +13,8 @@ import (
 )
 
 type LoginInput struct {
-	Email    string `json:"email" `
-	Password string `json:"password" `
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required,email"`
 }
 
 func login(c echo.Context) error {
@@ -22,20 +24,41 @@ func login(c echo.Context) error {
 	}
 
 	// Validate Form Data
-	if input.Email == "" || input.Password == "" {
-		return c.JSON(http.StatusBadRequest, "bad request")
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err := validate.Struct(input)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Println(err.Namespace())
+			fmt.Println(err.Field())
+			fmt.Println(err.StructNamespace())
+			fmt.Println(err.StructField())
+			fmt.Println(err.Tag())
+			fmt.Println(err.ActualTag())
+			fmt.Println(err.Kind())
+			fmt.Println(err.Type())
+			fmt.Println(err.Value())
+			fmt.Println(err.Param())
+			fmt.Println()
+		}
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "bad request",
+		})
 	}
 
 	// Check if user exists
 	client := db.GetDB()
 	user := db.User{}
 	if err := client.Where("email = ?", input.Email).First(&user).Error; err != nil {
-		return c.JSON(http.StatusUnauthorized, "unauthorized")
+		return c.JSON(http.StatusUnauthorized, echo.Map{
+			"message": "unauthorized",
+		})
 	}
 
 	// Compare Passwords
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-		return c.JSON(http.StatusUnauthorized, "unauthorized")
+		return c.JSON(http.StatusUnauthorized, echo.Map{
+			"message": "unauthorized",
+		})
 	}
 
 	// Create JWT
@@ -52,7 +75,9 @@ func login(c echo.Context) error {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	signedToken, err := token.SignedString([]byte(SecretKey))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, "bad request")
+		return c.JSON(http.StatusInternalServerError, echo.Map{
+			"message": "bad request",
+		})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{

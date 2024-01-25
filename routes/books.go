@@ -4,11 +4,23 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"homethings.ytsruh.com/db"
 )
 
-type BookInput struct {
+type CreateBookInput struct {
+	Name     string `json:"name" validate:"required"`
+	Isbn     string `json:"isbn" validate:"required"`
+	Author   string `json:"author"`
+	Genre    string `json:"genre"`
+	Wishlist bool   `json:"wishlist"`
+	Read     bool   `json:"read"`
+	Rating   int    `json:"rating"`
+	Image    string `json:"image"`
+}
+
+type UpdateBookInput struct {
 	Name     string `json:"name"`
 	Isbn     string `json:"isbn"`
 	Author   string `json:"author"`
@@ -40,15 +52,31 @@ func getBooks(c echo.Context) error {
 }
 
 func createBook(c echo.Context) error {
-	input := BookInput{}
+	input := CreateBookInput{}
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to bind book",
 		})
 	}
-	if input.Name == "" || input.Isbn == "" {
+	// Validate Form Data
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err := validate.Struct(input)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Println(err.Namespace())
+			fmt.Println(err.Field())
+			fmt.Println(err.StructNamespace())
+			fmt.Println(err.StructField())
+			fmt.Println(err.Tag())
+			fmt.Println(err.ActualTag())
+			fmt.Println(err.Kind())
+			fmt.Println(err.Type())
+			fmt.Println(err.Value())
+			fmt.Println(err.Param())
+			fmt.Println()
+		}
 		return c.JSON(http.StatusBadRequest, echo.Map{
-			"message": "name & isbn required",
+			"message": "bad request",
 		})
 	}
 	claims, err := GetUser(c)
@@ -103,7 +131,7 @@ func getSingleBook(c echo.Context) error {
 
 func updateSingleBook(c echo.Context) error {
 	id := c.Param("id")
-	input := BookInput{}
+	input := UpdateBookInput{}
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to bind book",
@@ -198,7 +226,7 @@ func getRead(c echo.Context) error {
 	})
 }
 
-func getUnRead(c echo.Context) error {
+func getUnread(c echo.Context) error {
 	claims, err := GetUser(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{

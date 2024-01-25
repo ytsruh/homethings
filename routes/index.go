@@ -63,5 +63,5 @@ func SetRoutes(server *echo.Echo) {
 	group.DELETE("/books/:id", deleteSingleBook)
 	group.GET("/books/wishlist", getWishlist)
 	group.GET("/books/read", getRead)
-	group.GET("/books/unread", getUnRead)
+	group.GET("/books/unread", getUnread)
 }
