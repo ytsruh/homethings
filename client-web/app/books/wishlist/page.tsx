@@ -1,6 +1,5 @@
 "use client";
 import PageFrame from "@/components/PageFrame";
-import type { Book } from "@/db/schema";
 import { BooksNav } from "@/components/BooksNav";
 import { useEffect, useState } from "react";
 import { useLoadingContext } from "@/lib/LoadingContext";
@@ -45,22 +44,31 @@ export default function BooksWishlist() {
   }
 
   if (books) {
-    const wishlistBooks = (books as Book[]).map((book: Book, i: number) => {
+    const wishlistBooks = (books as any).map((book: any, i: number) => {
       return <BookItem data={book} key={i} />;
     });
     return (
       <PageFrame title="Books">
         <BooksNav />
-        <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 py-5">{wishlistBooks}</div>
+        <div className="grid w-full grid-cols-2 py-5 md:grid-cols-3 lg:grid-cols-4">
+          {wishlistBooks}
+        </div>
       </PageFrame>
     );
   }
 }
 
-function BookItem(props: { data: Book }) {
+function BookItem(props: { data: any }) {
   return (
-    <a href={`/books/${props.data.id}`} className="p-2 hover:border-zinc-500 hover:border hover:rounded-lg">
-      <img className="object-contain h-64 w-full " src={props.data.image as string} alt={props.data.name} />
+    <a
+      href={`/books/${props.data.id}`}
+      className="p-2 hover:rounded-lg hover:border hover:border-zinc-500"
+    >
+      <img
+        className="h-64 w-full object-contain "
+        src={props.data.image as string}
+        alt={props.data.name}
+      />
     </a>
   );
 }

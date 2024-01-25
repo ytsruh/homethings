@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import type { User } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -17,7 +16,7 @@ export default function Profile() {
   const router = useRouter();
   const { loading, setLoading } = useLoadingContext();
   const [error, setError] = useState(false);
-  const [profile, setProfile] = useState<User>();
+  const [profile, setProfile] = useState<any>();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
@@ -55,7 +54,10 @@ export default function Profile() {
       setLoading(true);
       const res = await fetch(`${baseUrl}/profile`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: token as string },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token as string,
+        },
         body: JSON.stringify(profile),
       });
       //Check for ok response
@@ -67,7 +69,7 @@ export default function Profile() {
         email: profile.email,
         showDocuments: profile.showDocuments,
         showBooks: profile.showBooks,
-      } as User);
+      });
       router.push("/");
       setLoading(false);
     } catch (error: any) {
@@ -88,17 +90,19 @@ export default function Profile() {
       <PageFrame title="Profile">
         <div className="py-4">
           <h1 className="text-2xl">Profile & Settings</h1>
-          <h2 className="text-sm text-zinc-500 dark:text-zinc-300 italic">
-            Change your profile picture or show/hide features to personalise your experience.
+          <h2 className="text-sm italic text-zinc-500 dark:text-zinc-300">
+            Change your profile picture or show/hide features to personalise
+            your experience.
           </h2>
         </div>
-        <div className="w-full flex justify-center py-2">
+        <div className="flex w-full justify-center py-2">
           {error ? (
             <FormError reset={setError} />
           ) : (
             <form
               onSubmit={(e) => submit(e)}
-              className="w-full flex flex-col justify-center items-center gap-2">
+              className="flex w-full flex-col items-center justify-center gap-2"
+            >
               <div className="w-full">
                 <Label>Name:</Label>
                 <Input
@@ -106,34 +110,45 @@ export default function Profile() {
                   type="text"
                   placeholder="Filename"
                   value={profile.name}
-                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                  onChange={(e) =>
+                    setProfile({ ...profile, name: e.target.value })
+                  }
                 />
               </div>
               <div className="w-full">
                 <Label>Email:</Label>
-                <Input className="my-2" type="text" value={profile.email} disabled />
+                <Input
+                  className="my-2"
+                  type="text"
+                  value={profile.email}
+                  disabled
+                />
               </div>
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
-                <div className="w-full flex justify-between items-center">
+              <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:gap-10">
+                <div className="flex w-full items-center justify-between">
                   <div>
                     <Label>Show Documents:</Label>
                   </div>
                   <Switch
                     checked={profile.showDocuments || false}
-                    onCheckedChange={(bool) => setProfile({ ...profile, showDocuments: bool })}
+                    onCheckedChange={(bool) =>
+                      setProfile({ ...profile, showDocuments: bool })
+                    }
                   />
                 </div>
-                <div className="w-full flex justify-between items-center">
+                <div className="flex w-full items-center justify-between">
                   <div>
                     <Label>Show Books:</Label>
                   </div>
                   <Switch
                     checked={profile.showBooks}
-                    onCheckedChange={(bool) => setProfile({ ...profile, showBooks: bool })}
+                    onCheckedChange={(bool) =>
+                      setProfile({ ...profile, showBooks: bool })
+                    }
                   />
                 </div>
               </div>
-              <div className="flex justify-between w-full py-5">
+              <div className="flex w-full justify-between py-5">
                 <Button asChild variant="secondary">
                   <Link href="/">Cancel</Link>
                 </Button>

@@ -33,30 +33,42 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Document } from "@/db/schema";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useLoadingContext } from "../LoadingContext";
 import { getLocalToken } from "../utils";
 import { useRouter } from "next/navigation";
-import router from "next/navigation";
 
-export const columns: ColumnDef<Document>[] = [
+export const columns: ColumnDef<any>[] = [
   {
     accessorKey: "title",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Title
           <CaretSortIcon className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => <div className="capitalize">{row.getValue("title")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("title")}</div>
+    ),
   },
   {
     accessorKey: "description",
     header: "Description",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("description")}</div>
+    ),
   },
   {
     accessorKey: "updatedAt",
@@ -82,9 +94,12 @@ export const columns: ColumnDef<Document>[] = [
         const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
         const token = await getLocalToken();
         try {
-          const response = await fetch(`${baseUrl}/documents/url?fileName=${filename}`, {
-            headers: { Authorization: token as string },
-          });
+          const response = await fetch(
+            `${baseUrl}/documents/url?fileName=${filename}`,
+            {
+              headers: { Authorization: token as string },
+            },
+          );
           if (response.status === 401) {
             throw Error("unauthorized");
           }
@@ -104,7 +119,9 @@ export const columns: ColumnDef<Document>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => download(data.fileName as string)}>Download</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => download(data.fileName as string)}>
+              Download
+            </DropdownMenuItem>
             <a href={`/documents/${data.id}`}>
               <DropdownMenuItem>Edit</DropdownMenuItem>
             </a>
@@ -153,13 +170,15 @@ function DeleteModal(props: { id: string }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this document and it cannot be
-            recovered.
+            This action cannot be undone. This will permanently delete this
+            document and it cannot be recovered.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => deleteItem()}>Confirm</AlertDialogAction>
+          <AlertDialogAction onClick={() => deleteItem()}>
+            Confirm
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -168,8 +187,11 @@ function DeleteModal(props: { id: string }) {
 
 export function DocumentsTable(props: { data: Document[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
@@ -197,7 +219,9 @@ export function DocumentsTable(props: { data: Document[] }) {
         <Input
           placeholder="Filter documents by title..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
+          onChange={(event) =>
+            table.getColumn("title")?.setFilterValue(event.target.value)
+          }
           className="max-w-sm"
         />
       </div>
@@ -211,7 +235,10 @@ export function DocumentsTable(props: { data: Document[] }) {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(header.column.columnDef.header, header.getContext())}
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </TableHead>
                   );
                 })}
@@ -221,17 +248,26 @@ export function DocumentsTable(props: { data: Document[] }) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
                   No results.
                 </TableCell>
               </TableRow>
