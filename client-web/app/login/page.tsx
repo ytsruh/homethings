@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { ToggleTheme } from "@/components/ToggleTheme";
 import { Button } from "@/components/ui/button";
 import { Toaster } from "@/components/ui/toaster";
@@ -28,37 +27,24 @@ export default function Page() {
         return;
       }
       setSubmitting(true);
-      const loginRes = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const loginRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
         },
-        body: JSON.stringify({ email, password }),
-      });
+      );
       //Check for ok response
-      if ((loginRes.status as number) != 200) {
-        //Throw error if not ok
-        throw Error(loginRes.statusText);
+      if (loginRes.status !== 200) {
+        throw Error("unauthorized");
       }
       const loginData = await loginRes.json();
       sessionStorage.setItem("token", loginData.token);
-      // Pass credentials to NextAuth & login
-      const result = await signIn("credentials", {
-        email: email,
-        password: password,
-        redirect: false,
-      });
-      if (result?.ok) {
-        const res = await fetch(`/api/profile`);
-        //Check for ok response
-        if (!res.ok) {
-          //Throw error if not ok
-          throw Error(res.statusText);
-        }
-        const profile = await res.json();
-        await setLocalUser(profile);
-        router.push("/");
-      }
+      await setLocalUser(loginData.profile);
+      router.push("/");
     } catch (error) {
       console.log(error);
       setSubmitting(false);
@@ -75,27 +61,31 @@ export default function Page() {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="relative flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0 dark:bg-zinc-900">
+    <div className="flex h-screen items-center justify-center">
+      <div className="relative m-6 flex flex-col space-y-10 rounded-2xl shadow-2xl md:m-0 md:flex-row md:space-y-0 dark:bg-zinc-900">
         <div className="p-6 md:p-20">
-          <div className="text-center py-5">
-            <h1 className="text-5xl py-2">
+          <div className="py-5 text-center">
+            <h1 className="py-2 text-5xl">
               Welcome to <span className="text-accent">Homethings</span>
             </h1>
-            <h6 className="text-xl py-2">Login to view awesome things</h6>
+            <h6 className="py-2 text-xl">Login to view awesome things</h6>
           </div>
-          <form id="login-form" onSubmit={submitForm} className="py-5 space-y-5">
+          <form
+            id="login-form"
+            onSubmit={submitForm}
+            className="space-y-5 py-5"
+          >
             <input
               type="email"
-              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border"
+              className="w-full rounded-md border bg-transparent px-6 py-3 focus:outline-none"
               placeholder="Email"
             />
             <input
               type="password"
-              className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border"
+              className="w-full rounded-md border bg-transparent px-6 py-3 focus:outline-none"
               placeholder="Password"
             />
-            <div className="flex flex-col items-center justify-between mt-6 space-y-6 md:flex-row md:space-y-0">
+            <div className="mt-6 flex flex-col items-center justify-between space-y-6 md:flex-row md:space-y-0">
               <Button form="login-form" type="submit">
                 Login
               </Button>
@@ -104,7 +94,11 @@ export default function Page() {
           </form>
         </div>
 
-        <img src="img/login.webp" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
+        <img
+          src="img/login.webp"
+          alt=""
+          className="hidden w-96 rounded-r-2xl lg:block"
+        />
       </div>
       <Toaster />
     </div>
