@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"homethings.ytsruh.com/db"
 )
 
 var SecretKey = os.Getenv("SECRET_KEY")
@@ -32,7 +33,9 @@ func GetUser(c echo.Context) (*CustomClaims, error) {
 
 func SetRoutes(server *echo.Echo) {
 	group := server.Group("/v1")
-	group.POST("/login", login)
+	// Auth routes
+	newuser := db.User{}
+	group.POST("/login", login(&newuser))
 
 	// Configure JWT middleware with the custom claims type
 	group.Use(echojwt.WithConfig(echojwt.Config{
@@ -42,11 +45,14 @@ func SetRoutes(server *echo.Echo) {
 		SigningKey:  []byte(SecretKey),
 		TokenLookup: "header:Authorization", // Include token in Authorization header with no prefix
 	}))
+
 	// Profile routes
 	group.GET("/profile", getProfile)
 	group.PATCH("/profile", patchProfile)
+
 	// Feedback route
 	group.POST("/feedback", createFeedback)
+
 	// Document routes
 	group.GET("/documents", getDocuments)
 	group.POST("/documents", createDocument)
@@ -55,6 +61,7 @@ func SetRoutes(server *echo.Echo) {
 	group.DELETE("/documents/:id", deleteSingleDocument)
 	group.GET("/documents/url", createGetPresignedUrl)
 	group.PUT("/documents/url", createPutPresignedUrl)
+
 	// Book routes
 	group.GET("/books", getBooks)
 	group.POST("/books", createBook)
