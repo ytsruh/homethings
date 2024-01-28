@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import type { Book } from "@/db/schema";
 import { BooksNav } from "@/components/BooksNav";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -31,7 +30,7 @@ export default function SingleBook({ params }: { params: { id: string } }) {
   const { loading, setLoading } = useLoadingContext();
   const [loaded, setLoaded] = useState(loading);
   const [error, setError] = useState(false);
-  const [bookData, setBookData] = useState<Book>();
+  const [bookData, setBookData] = useState<any>();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
@@ -45,7 +44,7 @@ export default function SingleBook({ params }: { params: { id: string } }) {
           throw Error("unauthorized");
         }
         const bookData = await res.json();
-        setBookData(bookData.book as Book);
+        setBookData(bookData.book);
         setLoaded(true);
       } catch (error: any) {
         if (error.message === "unauthorized") {
@@ -64,7 +63,10 @@ export default function SingleBook({ params }: { params: { id: string } }) {
       const token = await getLocalToken();
       const response = await fetch(`${baseUrl}/books/${params.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: token as string },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token as string,
+        },
         body: JSON.stringify(bookData),
       });
       //Check for ok response
@@ -91,15 +93,20 @@ export default function SingleBook({ params }: { params: { id: string } }) {
     return (
       <PageFrame title="Books">
         <BooksNav />
-        <div className="py-5 flex w-full">
-          <img src={bookData.image as string} alt="" className="md:basis-1/4 hidden md:block" />
-          <div className="basis-full md:basis-3/4 flex justify-center px-2">
+        <div className="flex w-full py-5">
+          <img
+            src={bookData.image as string}
+            alt=""
+            className="hidden md:block md:basis-1/4"
+          />
+          <div className="flex basis-full justify-center px-2 md:basis-3/4">
             {error ? (
               <FormError reset={setError} />
             ) : (
               <form
                 onSubmit={(e) => submit(e)}
-                className="w-full flex flex-col justify-center items-center gap-2 px-2 lg:px-5">
+                className="flex w-full flex-col items-center justify-center gap-2 px-2 lg:px-5"
+              >
                 <div className="w-full">
                   <Label>Title / Name:</Label>
                   <Input
@@ -107,7 +114,9 @@ export default function SingleBook({ params }: { params: { id: string } }) {
                     type="text"
                     placeholder="Name"
                     value={bookData.name || ""}
-                    onChange={(e) => setBookData({ ...bookData, name: e.target.value })}
+                    onChange={(e) =>
+                      setBookData({ ...bookData, name: e.target.value })
+                    }
                   />
                 </div>
                 <div className="w-full">
@@ -117,7 +126,9 @@ export default function SingleBook({ params }: { params: { id: string } }) {
                     type="text"
                     placeholder="Author"
                     value={bookData.author || ""}
-                    onChange={(e) => setBookData({ ...bookData, author: e.target.value })}
+                    onChange={(e) =>
+                      setBookData({ ...bookData, author: e.target.value })
+                    }
                   />
                 </div>
                 <div className="w-full">
@@ -127,7 +138,9 @@ export default function SingleBook({ params }: { params: { id: string } }) {
                     type="text"
                     placeholder="Genre"
                     value={bookData.genre || ""}
-                    onChange={(e) => setBookData({ ...bookData, genre: e.target.value })}
+                    onChange={(e) =>
+                      setBookData({ ...bookData, genre: e.target.value })
+                    }
                   />
                 </div>
                 <div className="w-full">
@@ -137,28 +150,34 @@ export default function SingleBook({ params }: { params: { id: string } }) {
                     type="text"
                     placeholder="ISBN"
                     value={bookData.isbn || ""}
-                    onChange={(e) => setBookData({ ...bookData, isbn: e.target.value })}
+                    onChange={(e) =>
+                      setBookData({ ...bookData, isbn: e.target.value })
+                    }
                   />
                 </div>
-                <div className="w-full flex justify-between items-center">
+                <div className="flex w-full items-center justify-between">
                   <div>
                     <Label>Read:</Label>
                   </div>
                   <Switch
                     checked={bookData.read}
-                    onCheckedChange={(bool) => setBookData({ ...bookData, read: bool })}
+                    onCheckedChange={(bool) =>
+                      setBookData({ ...bookData, read: bool })
+                    }
                   />
                 </div>
-                <div className="w-full flex justify-between items-center">
+                <div className="flex w-full items-center justify-between">
                   <div>
                     <Label>Wishlist:</Label>
                   </div>
                   <Switch
                     checked={bookData.wishlist}
-                    onCheckedChange={(bool) => setBookData({ ...bookData, wishlist: bool })}
+                    onCheckedChange={(bool) =>
+                      setBookData({ ...bookData, wishlist: bool })
+                    }
                   />
                 </div>
-                <div className="flex justify-between w-full py-5">
+                <div className="flex w-full justify-between py-5">
                   <DeleteModal id={bookData.id as string} />
                   <div className="flex gap-2">
                     <Button asChild variant="secondary">
@@ -212,12 +231,15 @@ function DeleteModal(props: { id: string }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this book and it cannot be recovered.
+            This action cannot be undone. This will permanently delete this book
+            and it cannot be recovered.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => deleteItem()}>Confirm</AlertDialogAction>
+          <AlertDialogAction onClick={() => deleteItem()}>
+            Confirm
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

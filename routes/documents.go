@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm/clause"
 	"homethings.ytsruh.com/db"
@@ -11,7 +12,7 @@ import (
 )
 
 type CreateDocumentInput struct {
-	Title       string `json:"title"`
+	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`
 	FileName    string `json:"fileName"`
 }
@@ -53,6 +54,27 @@ func createDocument(c echo.Context) error {
 	if err := c.Bind(&input); err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{
 			"message": "failed to bind document",
+		})
+	}
+	// Validate Form Data
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	err = validate.Struct(input)
+	if err != nil {
+		for _, err := range err.(validator.ValidationErrors) {
+			fmt.Println(err.Namespace())
+			fmt.Println(err.Field())
+			fmt.Println(err.StructNamespace())
+			fmt.Println(err.StructField())
+			fmt.Println(err.Tag())
+			fmt.Println(err.ActualTag())
+			fmt.Println(err.Kind())
+			fmt.Println(err.Type())
+			fmt.Println(err.Value())
+			fmt.Println(err.Param())
+			fmt.Println()
+		}
+		return c.JSON(http.StatusBadRequest, echo.Map{
+			"message": "bad request",
 		})
 	}
 	document := db.Document{

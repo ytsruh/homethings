@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import PageFrame from "@/components/PageFrame";
-import type { Document } from "@/db/schema";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,7 +17,7 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
   const { loading, setLoading } = useLoadingContext();
   const [loaded, setLoaded] = useState(loading);
   const [error, setError] = useState(false);
-  const [document, setDocument] = useState<Document>();
+  const [document, setDocument] = useState<any>();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
@@ -50,7 +49,10 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
       const token = await getLocalToken();
       const response = await fetch(`${baseUrl}/documents/${params.id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json", Authorization: token as string },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token as string,
+        },
         body: JSON.stringify({
           title: document?.title,
           description: document?.description,
@@ -81,15 +83,18 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
       <PageFrame title="Documents">
         <div className="py-4">
           <h1 className="text-2xl">Update : {document.title}</h1>
-          <h2 className="text-sm text-zinc-500 dark:text-zinc-300 italic">Make changes to your document</h2>
+          <h2 className="text-sm italic text-zinc-500 dark:text-zinc-300">
+            Make changes to your document
+          </h2>
         </div>
-        <div className="w-full flex justify-center py-2">
+        <div className="flex w-full justify-center py-2">
           {error ? (
             <FormError reset={setError} />
           ) : (
             <form
               onSubmit={(e) => submit(e)}
-              className="w-full flex flex-col justify-center items-center gap-2">
+              className="flex w-full flex-col items-center justify-center gap-2"
+            >
               <div className="w-full">
                 <Label>Document Title / Name:</Label>
                 <Input
@@ -97,7 +102,9 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
                   type="text"
                   placeholder="Filename"
                   value={document.title}
-                  onChange={(e) => setDocument({ ...document, title: e.target.value })}
+                  onChange={(e) =>
+                    setDocument({ ...document, title: e.target.value })
+                  }
                 />
               </div>
               <div className="w-full">
@@ -106,10 +113,12 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
                   className="my-2"
                   placeholder="Description of document"
                   value={document.description || ""}
-                  onChange={(e) => setDocument({ ...document, description: e.target.value })}
+                  onChange={(e) =>
+                    setDocument({ ...document, description: e.target.value })
+                  }
                 />
               </div>
-              <div className="flex justify-between w-full py-5">
+              <div className="flex w-full justify-between py-5">
                 <Button asChild variant="secondary">
                   <Link href="/documents">Cancel</Link>
                 </Button>
