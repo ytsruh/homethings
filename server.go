@@ -81,4 +81,14 @@ func setRoutes(e *echo.Echo) {
 	// Feedback route
 	feedback := &models.Feedback{}
 	group.POST("/feedback", controllers.CreateFeedback(feedback))
+
+	// Document routes
+	document := &models.Document{}
+	group.GET("/document", controllers.GetDocuments(document))
+	group.POST("/document", controllers.CreateDocument(document))
+	group.GET("/document/:id", controllers.GetSingleDocument(document))
+	group.PATCH("/document/:id", controllers.UpdateSingleDocument(document))
+	group.DELETE("/document/:id", controllers.DeleteSingleDocument(document))
+	group.GET("/document/url", controllers.CreateGetPresignedUrl(document))
+	group.PUT("/document/url", controllers.CreatePutPresignedUrl(document))
 }
