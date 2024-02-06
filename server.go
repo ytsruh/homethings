@@ -84,11 +84,22 @@ func setRoutes(e *echo.Echo) {
 
 	// Document routes
 	document := &models.Document{}
-	group.GET("/document", controllers.GetDocuments(document))
-	group.POST("/document", controllers.CreateDocument(document))
-	group.GET("/document/:id", controllers.GetSingleDocument(document))
-	group.PATCH("/document/:id", controllers.UpdateSingleDocument(document))
-	group.DELETE("/document/:id", controllers.DeleteSingleDocument(document))
-	group.GET("/document/url", controllers.CreateGetPresignedUrl(document))
-	group.PUT("/document/url", controllers.CreatePutPresignedUrl(document))
+	group.GET("/documents", controllers.GetDocuments(document))
+	group.POST("/documents", controllers.CreateDocument(document))
+	group.GET("/documents/:id", controllers.GetSingleDocument(document))
+	group.PATCH("/documents/:id", controllers.UpdateSingleDocument(document))
+	group.DELETE("/documents/:id", controllers.DeleteSingleDocument(document))
+	group.GET("/documents/url", controllers.CreateGetPresignedUrl(document))
+	group.PUT("/documents/url", controllers.CreatePutPresignedUrl(document))
+
+	// Book routes
+	book := &models.Book{}
+	group.GET("/books", controllers.GetBooks(book))
+	group.POST("/books", controllers.CreateBook(book))
+	group.GET("/books/:id", controllers.GetSingleBook(book))
+	group.PATCH("/books/:id", controllers.UpdateSingleBook(book))
+	group.DELETE("/books/:id", controllers.DeleteSingleBook(book))
+	group.GET("/books/wishlist", controllers.GetWishlist(book))
+	group.GET("/books/read", controllers.GetRead(book))
+	group.GET("/books/unread", controllers.GetUnread(book))
 }
