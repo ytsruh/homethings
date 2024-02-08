@@ -29,16 +29,6 @@ type MockBook struct {
 	UpdatedAt time.Time  `json:"updatedAt"`
 }
 
-var mockClaims = &CustomClaims{
-	User:      "testuser@gmail.com",
-	Id:        "123456",
-	AccountId: "1234567890",
-	RegisteredClaims: jwt.RegisteredClaims{
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Hour)),
-		Issuer:    "homethings",
-	},
-}
-
 var books = []models.Book{
 	{
 		ID:   "1",

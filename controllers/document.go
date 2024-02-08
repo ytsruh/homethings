@@ -150,7 +150,6 @@ func DeleteSingleDocument(d models.DocumentModel) echo.HandlerFunc {
 		}
 		err = lib.DeleteObject(deleted.FileName)
 		if err != nil {
-			fmt.Println(err)
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to delete document from storage",
 			})
