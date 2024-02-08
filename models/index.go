@@ -1,12 +1,20 @@
-package db
+package models
 
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+type Account struct {
+	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Name      string
+	CreatedAt *time.Time
+	UpdatedAt time.Time
+}
 
 var DBConn *gorm.DB
 
@@ -26,7 +34,7 @@ func InitDB() *gorm.DB {
 		panic(err)
 	}
 
-	//DBConn.AutoMigrate(&Account{}, &User{}, &Feedback{}, &Document{}, &Book{})
+	DBConn.AutoMigrate(&Account{}, &User{}, &Feedback{}, &Document{}, &Book{})
 
 	return DBConn
 }

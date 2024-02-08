@@ -1,4 +1,4 @@
-package db
+package models
 
 import (
 	"errors"
@@ -7,8 +7,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserInterface interface {
-	LoginUser(email string, password string) (*User, error)
+type UserModel interface {
+	Login(email string, password string) (*User, error)
+	GetUserById(id string) (*User, error)
+	Update(user User) error
 }
 
 type User struct {
@@ -20,13 +22,11 @@ type User struct {
 	ShowBooks     bool       `gorm:"default:true" json:"showBooks"`
 	ShowDocuments bool       `gorm:"default:true" json:"showDocuments"`
 	AccountId     string     `json:"accountId"`
-	Account       Account    `gorm:"foreignKey:AccountId;references:ID" json:"account"`
 	CreatedAt     *time.Time `json:"createdAt"`
 	UpdatedAt     time.Time  `json:"updatedAt"`
-	Books         []Book     `gorm:"foreignKey:UserId" json:"books"`
 }
 
-func (u *User) LoginUser(email string, password string) (*User, error) {
+func (u *User) Login(email string, password string) (*User, error) {
 	// Find User
 	if err := DBConn.Where("email = ?", email).First(&u).Error; err != nil {
 		return nil, errors.New("user not found")
@@ -36,4 +36,19 @@ func (u *User) LoginUser(email string, password string) (*User, error) {
 		return nil, errors.New("invalid password")
 	}
 	return u, nil
+}
+
+func (u *User) GetUserById(id string) (*User, error) {
+	if err := DBConn.Where("id = ?", id).First(&u).Error; err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
+func (u *User) Update(user User) error {
+	tx := DBConn.Model(&u).Where("id = ?", user.ID).Updates(user)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
 }

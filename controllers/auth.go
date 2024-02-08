@@ -1,14 +1,15 @@
-package routes
+package controllers
 
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/db"
+	"homethings.ytsruh.com/models"
 )
 
 type LoginInput struct {
@@ -16,7 +17,7 @@ type LoginInput struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func login(user db.UserInterface) echo.HandlerFunc {
+func Login(user models.UserModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := new(LoginInput)
 		if err := c.Bind(input); err != nil {
@@ -34,7 +35,7 @@ func login(user db.UserInterface) echo.HandlerFunc {
 		}
 
 		// Check if user exists
-		u, err := user.LoginUser(input.Email, input.Password)
+		u, err := user.Login(input.Email, input.Password)
 		if err != nil {
 			return c.JSON(http.StatusUnauthorized, echo.Map{
 				"message": "unauthorized",
@@ -50,9 +51,10 @@ func login(user db.UserInterface) echo.HandlerFunc {
 				Issuer:    "homethings",
 			},
 		}
+
 		// Create & sign and get the complete encoded token as a string using the secret
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		signedToken, err := token.SignedString([]byte(SecretKey))
+		signedToken, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "bad request",

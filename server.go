@@ -11,8 +11,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"homethings.ytsruh.com/db"
-	"homethings.ytsruh.com/routes"
+	"homethings.ytsruh.com/controllers"
+	"homethings.ytsruh.com/models"
 )
 
 func main() {
@@ -32,8 +32,8 @@ func main() {
 	// Initialize Echo, set routes & database
 	e := echo.New()
 	e.Use(echo.MiddlewareFunc(middleware.CORS()))
-	routes.SetRoutes(e)
-	database := db.InitDB()
+	setRoutes(e)
+	database := models.InitDB()
 	// Start server
 	go func() {
 		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
@@ -63,4 +63,43 @@ func main() {
 		e.Logger.Fatal(err)
 	}
 	log.Println("Server successfully shut down")
+}
+
+func setRoutes(e *echo.Echo) {
+	group := e.Group("/v1")
+	// Auth routes
+	user := &models.User{}
+	group.POST("/login", controllers.Login(user))
+
+	// Configure JWT middleware for Authentication
+	group.Use(controllers.SetJWTAuth())
+
+	// Profile routes
+	group.GET("/profile", controllers.GetProfile(user))
+	group.PATCH("/profile", controllers.PatchProfile(user))
+
+	// Feedback route
+	feedback := &models.Feedback{}
+	group.POST("/feedback", controllers.CreateFeedback(feedback))
+
+	// Document routes
+	document := &models.Document{}
+	group.GET("/documents", controllers.GetDocuments(document))
+	group.POST("/documents", controllers.CreateDocument(document))
+	group.GET("/documents/:id", controllers.GetSingleDocument(document))
+	group.PATCH("/documents/:id", controllers.UpdateSingleDocument(document))
+	group.DELETE("/documents/:id", controllers.DeleteSingleDocument(document))
+	group.GET("/documents/url", controllers.CreateGetPresignedUrl(document))
+	group.PUT("/documents/url", controllers.CreatePutPresignedUrl(document))
+
+	// Book routes
+	book := &models.Book{}
+	group.GET("/books", controllers.GetBooks(book))
+	group.POST("/books", controllers.CreateBook(book))
+	group.GET("/books/:id", controllers.GetSingleBook(book))
+	group.PATCH("/books/:id", controllers.UpdateSingleBook(book))
+	group.DELETE("/books/:id", controllers.DeleteSingleBook(book))
+	group.GET("/books/wishlist", controllers.GetWishlist(book))
+	group.GET("/books/read", controllers.GetRead(book))
+	group.GET("/books/unread", controllers.GetUnread(book))
 }
