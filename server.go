@@ -11,7 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"homethings.ytsruh.com/controllers"
+	"homethings.ytsruh.com/handlers"
 	"homethings.ytsruh.com/models"
 )
 
@@ -69,37 +69,37 @@ func setRoutes(e *echo.Echo) {
 	group := e.Group("/v1")
 	// Auth routes
 	user := &models.User{}
-	group.POST("/login", controllers.Login(user))
+	group.POST("/login", handlers.Login(user))
 
 	// Configure JWT middleware for Authentication
-	group.Use(controllers.SetJWTAuth())
+	group.Use(handlers.SetJWTAuth())
 
 	// Profile routes
-	group.GET("/profile", controllers.GetProfile(user))
-	group.PATCH("/profile", controllers.PatchProfile(user))
+	group.GET("/profile", handlers.GetProfile(user))
+	group.PATCH("/profile", handlers.PatchProfile(user))
 
 	// Feedback route
 	feedback := &models.Feedback{}
-	group.POST("/feedback", controllers.CreateFeedback(feedback))
+	group.POST("/feedback", handlers.CreateFeedback(feedback))
 
 	// Document routes
 	document := &models.Document{}
-	group.GET("/documents", controllers.GetDocuments(document))
-	group.POST("/documents", controllers.CreateDocument(document))
-	group.GET("/documents/:id", controllers.GetSingleDocument(document))
-	group.PATCH("/documents/:id", controllers.UpdateSingleDocument(document))
-	group.DELETE("/documents/:id", controllers.DeleteSingleDocument(document))
-	group.GET("/documents/url", controllers.CreateGetPresignedUrl(document))
-	group.PUT("/documents/url", controllers.CreatePutPresignedUrl(document))
+	group.GET("/documents", handlers.GetDocuments(document))
+	group.POST("/documents", handlers.CreateDocument(document))
+	group.GET("/documents/:id", handlers.GetSingleDocument(document))
+	group.PATCH("/documents/:id", handlers.UpdateSingleDocument(document))
+	group.DELETE("/documents/:id", handlers.DeleteSingleDocument(document))
+	group.GET("/documents/url", handlers.CreateGetPresignedUrl(document))
+	group.PUT("/documents/url", handlers.CreatePutPresignedUrl(document))
 
 	// Book routes
 	book := &models.Book{}
-	group.GET("/books", controllers.GetBooks(book))
-	group.POST("/books", controllers.CreateBook(book))
-	group.GET("/books/:id", controllers.GetSingleBook(book))
-	group.PATCH("/books/:id", controllers.UpdateSingleBook(book))
-	group.DELETE("/books/:id", controllers.DeleteSingleBook(book))
-	group.GET("/books/wishlist", controllers.GetWishlist(book))
-	group.GET("/books/read", controllers.GetRead(book))
-	group.GET("/books/unread", controllers.GetUnread(book))
+	group.GET("/books", handlers.GetBooks(book))
+	group.POST("/books", handlers.CreateBook(book))
+	group.GET("/books/:id", handlers.GetSingleBook(book))
+	group.PATCH("/books/:id", handlers.UpdateSingleBook(book))
+	group.DELETE("/books/:id", handlers.DeleteSingleBook(book))
+	group.GET("/books/wishlist", handlers.GetWishlist(book))
+	group.GET("/books/read", handlers.GetRead(book))
+	group.GET("/books/unread", handlers.GetUnread(book))
 }

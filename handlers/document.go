@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/lib"
 	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type CreateDocumentInput struct {
@@ -148,7 +148,7 @@ func DeleteSingleDocument(d models.DocumentModel) echo.HandlerFunc {
 				"message": "failed to delete document",
 			})
 		}
-		err = lib.DeleteObject(deleted.FileName)
+		err = storage.DeleteObject(deleted.FileName)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to delete document from storage",
@@ -168,7 +168,7 @@ func CreateGetPresignedUrl(d models.DocumentModel) echo.HandlerFunc {
 				"message": "fileName is required",
 			})
 		}
-		url, err := lib.CreatePresignedGetURL(key)
+		url, err := storage.CreatePresignedGetURL(key)
 		if err != nil {
 			fmt.Println(err)
 			return c.JSON(http.StatusInternalServerError, echo.Map{
@@ -189,7 +189,7 @@ func CreatePutPresignedUrl(d models.DocumentModel) echo.HandlerFunc {
 				"message": "fileName is required",
 			})
 		}
-		url, err := lib.CreatePresignedPutURL(key)
+		url, err := storage.CreatePresignedPutURL(key)
 		if err != nil {
 			fmt.Println(err)
 			return c.JSON(http.StatusInternalServerError, echo.Map{
