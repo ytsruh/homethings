@@ -21,7 +21,8 @@ type User struct {
 	ProfileImage  *string    `json:"profileImage"`
 	ShowBooks     bool       `gorm:"default:true" json:"showBooks"`
 	ShowDocuments bool       `gorm:"default:true" json:"showDocuments"`
-	AccountId     string     `json:"accountId"`
+	AccountId     string     `gorm:"type:uuid" json:"accountId"`
+	IsAdmin       bool       `gorm:"default:false" json:"isAdmin"`
 	CreatedAt     *time.Time `json:"createdAt"`
 	UpdatedAt     time.Time  `json:"updatedAt"`
 }
@@ -29,6 +30,18 @@ type User struct {
 func (u *User) Login(email string, password string) (*User, error) {
 	// Find User
 	if err := DBConn.Where("email = ?", email).First(&u).Error; err != nil {
+		return nil, errors.New("user not found")
+	}
+	// Compare Passwords
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+		return nil, errors.New("invalid password")
+	}
+	return u, nil
+}
+
+func (u *User) LoginAsAdmin(email string, password string) (*User, error) {
+	// Find User
+	if err := DBConn.Where("email = ? AND is_admin = ?", email, true).First(&u).Error; err != nil {
 		return nil, errors.New("user not found")
 	}
 	// Compare Passwords

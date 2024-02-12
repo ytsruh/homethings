@@ -32,7 +32,9 @@ func main() {
 	// Initialize Echo, set routes & database
 	e := echo.New()
 	e.Use(echo.MiddlewareFunc(middleware.CORS()))
+	e.Static("/static", "static")
 	setRoutes(e)
+	setAdminRoutes(e)
 	database := models.InitDB()
 	// Start server
 	go func() {
@@ -51,11 +53,11 @@ func main() {
 	d, err := database.DB()
 	if err != nil {
 		log.Println(err)
-		log.Println("Error disconnecting from database")
+		panic("Error disconnecting from database")
 	}
 	if err := d.Close(); err != nil {
 		log.Println(err)
-		log.Println("Error disconnecting from database")
+		panic("Error disconnecting from database")
 	}
 	log.Println("Database successfully disconnected")
 	// Shutdown server
@@ -102,4 +104,11 @@ func setRoutes(e *echo.Echo) {
 	group.GET("/books/wishlist", handlers.GetWishlist(book))
 	group.GET("/books/read", handlers.GetRead(book))
 	group.GET("/books/unread", handlers.GetUnread(book))
+}
+
+func setAdminRoutes(e *echo.Echo) {
+	admin := e.Group("/admin")
+	// Auth routes
+	admin.GET("/", handlers.HomeHandler)
+	admin.GET("/login", handlers.LoginHandler)
 }

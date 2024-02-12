@@ -3,6 +3,7 @@ module homethings.ytsruh.com
 go 1.20
 
 require (
+	github.com/a-h/templ v0.2.543
 	github.com/aws/aws-sdk-go-v2 v1.24.1
 	github.com/aws/aws-sdk-go-v2/config v1.26.4
 	github.com/aws/aws-sdk-go-v2/credentials v1.16.15
