@@ -1,6 +1,6 @@
 package views
 
-templ AdminPage(){
+templ AdminPage() {
 	@AdminLayout("Home", home())
 }
 
@@ -11,39 +11,47 @@ templ home() {
 			<form>
 				<div class="w-full max-w-sm mx-auto my-5">
 					<label>Urls per hour:</label>
-					<input type="number" min="0" placeholder="0" class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50" />
+					<input type="number" min="0" placeholder="0" class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"/>
 				</div>
 				<div x-data="{ switchOn: false }" class="flex items-center justify-between w-full max-w-sm mx-auto my-5">
-					<label @click="$refs.switchButton.click(); $refs.switchButton.focus()" :id="$id('switch')" 
+					<label
+						@click="$refs.switchButton.click(); $refs.switchButton.focus()"
+						:id="$id('switch')"
 						class="text-sm select-none"
-						x-cloak>
+						x-cloak
+					>
 						Search On:
 					</label>
-					<input id="thisId" type="checkbox" name="switch" class="hidden" :checked="switchOn" />
-					<button 
+					<input id="thisId" type="checkbox" name="switch" class="hidden" :checked="switchOn"/>
+					<button
 						x-ref="switchButton"
-						type="button" 
+						type="button"
 						@click="switchOn = ! switchOn"
-						:class="switchOn ? 'bg-red-800' : 'bg-neutral-200'" 
+						:class="switchOn ? 'bg-red-800' : 'bg-neutral-200'"
 						class="relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10"
-						x-cloak>
+						x-cloak
+					>
 						<span :class="switchOn ? 'translate-x-[18px]' : 'translate-x-0.5'" class="w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md"></span>
 					</button>
 				</div>
 				<div x-data="{ switchOn: false }" class="flex items-center justify-between w-full max-w-sm mx-auto my-5">
-					<label @click="$refs.switchButton.click(); $refs.switchButton.focus()" :id="$id('switch')" 
+					<label
+						@click="$refs.switchButton.click(); $refs.switchButton.focus()"
+						:id="$id('switch')"
 						class="text-sm select-none"
-						x-cloak>
+						x-cloak
+					>
 						Add New Urls:
 					</label>
-					<input id="thisId" type="checkbox" name="switch" class="hidden" :checked="switchOn" />
-					<button 
+					<input id="thisId" type="checkbox" name="switch" class="hidden" :checked="switchOn"/>
+					<button
 						x-ref="switchButton"
-						type="button" 
+						type="button"
 						@click="switchOn = ! switchOn"
-						:class="switchOn ? 'bg-red-800' : 'bg-neutral-200'" 
+						:class="switchOn ? 'bg-red-800' : 'bg-neutral-200'"
 						class="relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10"
-						x-cloak>
+						x-cloak
+					>
 						<span :class="switchOn ? 'translate-x-[18px]' : 'translate-x-0.5'" class="w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md"></span>
 					</button>
 				</div>

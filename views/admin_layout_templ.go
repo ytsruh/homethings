@@ -47,7 +47,7 @@ func admin(body templ.Component) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"relative w-full px-8 text-gray-700 bg-white body-font\"><nav class=\"container flex flex-wrap items-center justify-between py-5 mx-auto max-w-7xl\"><a href=\"#_\" class=\"relative z-10 flex items-center w-auto text-lg font-extrabold leading-none text-black select-none\"><span class=\"text-red-800\">Homethings </span> Admin</a> <button type=\"button\" class=\"inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-red-800 transition-colors duration-100 bg-white border-2 border-red-800 rounded-md hover:text-white hover:bg-red-800 \">Logout</button></nav></section>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"relative w-full px-8 text-gray-700 bg-white body-font\"><nav class=\"container flex flex-wrap items-center justify-between py-5 mx-auto max-w-7xl\"><a href=\"#_\" class=\"relative z-10 flex items-center w-auto text-lg font-extrabold leading-none text-black select-none\"><span class=\"text-red-800\">Homethings </span> Admin</a> <button type=\"button\" class=\"inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-red-800 transition-colors duration-100 bg-white border-2 border-red-800 rounded-md hover:text-white hover:bg-red-800\" hx-post=\"/admin/logout\" hx-trigger=\"click\">Logout</button></nav></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

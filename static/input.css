@@ -7,3 +7,13 @@
 * {
   font-family: "Ubuntu", sans-serif;
 }
+
+.htmx-indicator {
+  display: none;
+}
+.htmx-request .htmx-indicator {
+  display: inline;
+}
+.htmx-request.htmx-indicator {
+  display: inline;
+}

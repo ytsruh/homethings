@@ -108,7 +108,12 @@ func setRoutes(e *echo.Echo) {
 
 func setAdminRoutes(e *echo.Echo) {
 	admin := e.Group("/admin")
+	adminHandler := &handlers.AdminHandler{
+		User: models.User{},
+	}
 	// Auth routes
-	admin.GET("/", handlers.HomeHandler)
-	admin.GET("/login", handlers.LoginHandler)
+	admin.GET("/", adminHandler.HomeHandler, adminHandler.AuthMiddleware)
+	admin.GET("/login", adminHandler.LoginHandler)
+	admin.POST("/login", adminHandler.LoginPostHandler)
+	admin.POST("/logout", adminHandler.LogoutHandler)
 }

@@ -1,46 +1,61 @@
 package views
 
+import "homethings.ytsruh.com/views/components"
 
-templ LoginPage(){
+templ LoginPage() {
 	@Layout("Login | Homethings Admin", login())
 }
 
-
-templ login(){
-<section class="min-h-screen w-full bg-white">
-    <div class="h-full mx-auto max-w-7xl flex items-center justify-center">
-        <div class="flex flex-col lg:flex-row">
-            <div class="relative w-full bg-cover lg:w-6/12 xl:w-7/12 hidden lg:flex bg-gradient-to-r from-white via-white to-gray-100">
-                <div class="relative flex flex-col items-center justify-center w-full h-full px-10 my-20 lg:px-16 lg:my-0">
-                    <div class="flex flex-col items-start space-y-8 tracking-tight lg:max-w-3xl">
-                        <div class="relative">
-                            <p class="mb-2 font-medium text-gray-700 uppercase">Login</p>
-                            <h2 class="text-5xl font-bold text-gray-900 xl:text-6xl"><span class="text-red-800">Homethings</span> Admin Panel</h2>
-                        </div>
-                        <p class="text-2xl text-gray-700">Configure Search Engine settings</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full bg-white lg:w-6/12 xl:w-5/12">
-                <div class="flex flex-col items-start justify-start w-full h-full p-10 lg:p-16 xl:p-24">
-                    <h4 class="w-full text-3xl font-bold">Login</h4>
-                    <div class="relative w-full mt-10 space-y-8">
-                        <div class="relative">
-                            <label class="font-medium text-gray-900">Email</label>
-                            <input type="text" class="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-800 focus:ring-opacity-50" data-primary="red-800" data-rounded="rounded-lg" placeholder="Email Address" />
-                        </div>
-                        <div class="relative">
-                            <label class="font-medium text-gray-900">Password</label>
-                            <input type="password" class="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-800 focus:ring-opacity-50" data-primary="red-800" data-rounded="rounded-lg" placeholder="Password" />
-                        </div>
-                        <div class="relative">
-                            <a href="#_" class="inline-block w-full px-5 py-4 text-lg font-medium text-center text-white transition duration-200 bg-red-800 rounded-lg hover:bg-red-800 ease" data-primary="red-800" data-rounded="rounded-lg">Login</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+templ login() {
+	<section class="min-h-screen w-full bg-white">
+		<div class="h-full mx-auto max-w-7xl flex items-center justify-center">
+			<div class="flex flex-col lg:flex-row">
+				<div class="relative w-full bg-cover lg:w-6/12 xl:w-7/12 hidden lg:flex bg-gradient-to-r from-white via-white to-gray-100">
+					<div class="relative flex flex-col items-center justify-center w-full h-full px-10 my-20 lg:px-16 lg:my-0">
+						<div class="flex flex-col items-start space-y-8 tracking-tight lg:max-w-3xl">
+							<div class="relative">
+								<p class="mb-2 font-medium text-gray-700 uppercase">Login</p>
+								<h2 class="text-5xl font-bold text-gray-900 xl:text-6xl"><span class="text-red-800">Homethings</span> Admin Panel</h2>
+							</div>
+							<p class="text-2xl text-gray-700">Configure Search Engine settings</p>
+						</div>
+					</div>
+				</div>
+				<div class="w-full bg-white lg:w-6/12 xl:w-5/12">
+					<div
+						class="flex flex-col items-start justify-start w-full h-full p-10 lg:p-16 xl:p-24"
+						hx-ext="response-targets"
+					>
+						<h4 class="w-full text-3xl font-bold">Login</h4>
+						<form
+							hx-post="/admin/login"
+							hx-trigger="submit"
+							hx-target-error="#auth-errors"
+							hx-indicator="#indicator"
+							hx-disabled-elt="this"
+							class="relative w-full mt-10 space-y-8"
+						>
+							<div class="relative">
+								<label class="font-medium text-gray-900">Email</label>
+								<input type="text" name="email" class="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-800 focus:ring-opacity-50" data-primary="red-800" data-rounded="rounded-lg" placeholder="Email Address"/>
+							</div>
+							<div class="relative">
+								<label class="font-medium text-gray-900">Password</label>
+								<input type="password" name="password" class="block w-full px-4 py-4 mt-2 text-xl placeholder-gray-400 bg-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-red-800 focus:ring-opacity-50" data-primary="red-800" data-rounded="rounded-lg" placeholder="Password"/>
+							</div>
+							<div class="relative">
+								<button hx-disabled-elt="this" type="submit" class="inline-block w-full px-5 py-4 text-lg font-medium text-center text-red-800 hover:text-white border-2 border-red-800 transition duration-200 bg-white rounded-lg hover:bg-red-800 ease" data-primary="red-800" data-rounded="rounded-lg">
+									Login
+								</button>
+							</div>
+						</form>
+						<div id="auth-errors" class="w-full"></div>
+						<div id="indicator" class="htmx-indicator w-full flex items-center justify-center">
+							@components.Loading()
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 }
