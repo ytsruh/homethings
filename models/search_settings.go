@@ -13,12 +13,12 @@ type SearchSettings struct {
 }
 
 func (s *SearchSettings) Get() error {
-	err := DBConn.Where("id = ?", s.ID).First(s).Error
+	err := DBConn.Where("id = 1").First(s).Error
 	return err
 }
 
 func (s *SearchSettings) Update() error {
-	tx := DBConn.Select("search_on", "add_new", "amount", "updated_at").Where("id = ?", s.ID).Updates(&s)
+	tx := DBConn.Select("search_on", "add_new", "amount", "updated_at").Where("id = 1").Updates(&s)
 	if tx.Error != nil {
 		return tx.Error
 	}

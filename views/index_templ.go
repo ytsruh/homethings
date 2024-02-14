@@ -10,7 +10,9 @@ import "context"
 import "io"
 import "bytes"
 
-func AdminPage() templ.Component {
+import "homethings.ytsruh.com/views/components"
+
+func AdminPage(amount string, searchOn bool, addNew bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -23,7 +25,7 @@ func AdminPage() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = AdminLayout("Home", home()).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = AdminLayout("Home", home(amount, searchOn, addNew)).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -34,7 +36,7 @@ func AdminPage() templ.Component {
 	})
 }
 
-func home() templ.Component {
+func home(amount string, searchOn bool, addNew bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -47,7 +49,53 @@ func home() templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"w-full h-full flex justify-center py-20 px-5\"><div class=\"w-full md:w-1/2\"><h1 class=\"text-center text-2xl py-5\">Search Settings</h1><form><div class=\"w-full max-w-sm mx-auto my-5\"><label>Urls per hour:</label> <input type=\"number\" min=\"0\" placeholder=\"0\" class=\"flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50\"></div><div x-data=\"{ switchOn: false }\" class=\"flex items-center justify-between w-full max-w-sm mx-auto my-5\"><label @click=\"$refs.switchButton.click(); $refs.switchButton.focus()\" :id=\"$id(&#39;switch&#39;)\" class=\"text-sm select-none\" x-cloak>Search On:</label> <input id=\"thisId\" type=\"checkbox\" name=\"switch\" class=\"hidden\" :checked=\"switchOn\"> <button x-ref=\"switchButton\" type=\"button\" @click=\"switchOn = ! switchOn\" :class=\"switchOn ? &#39;bg-red-800&#39; : &#39;bg-neutral-200&#39;\" class=\"relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10\" x-cloak><span :class=\"switchOn ? &#39;translate-x-[18px]&#39; : &#39;translate-x-0.5&#39;\" class=\"w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md\"></span></button></div><div x-data=\"{ switchOn: false }\" class=\"flex items-center justify-between w-full max-w-sm mx-auto my-5\"><label @click=\"$refs.switchButton.click(); $refs.switchButton.focus()\" :id=\"$id(&#39;switch&#39;)\" class=\"text-sm select-none\" x-cloak>Add New Urls:</label> <input id=\"thisId\" type=\"checkbox\" name=\"switch\" class=\"hidden\" :checked=\"switchOn\"> <button x-ref=\"switchButton\" type=\"button\" @click=\"switchOn = ! switchOn\" :class=\"switchOn ? &#39;bg-red-800&#39; : &#39;bg-neutral-200&#39;\" class=\"relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10\" x-cloak><span :class=\"switchOn ? &#39;translate-x-[18px]&#39; : &#39;translate-x-0.5&#39;\" class=\"w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md\"></span></button></div><div class=\"w-full max-w-sm mx-auto my-10\"><button type=\"button\" class=\"inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-red-800 transition-colors duration-100 bg-white border-2 border-red-800 rounded-md hover:text-white hover:bg-red-800 w-full\">Update</button></div></form></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"w-full h-full flex justify-center py-20 px-5\" hx-ext=\"response-targets\"><div class=\"w-full md:w-1/2\"><div><h1 class=\"text-center text-2xl py-5\">Search Settings</h1><form hx-post=\"/admin/\" hx-trigger=\"submit\" hx-target=\"#response\" hx-target-error=\"#response\" hx-indicator=\"#indicator\" hx-disabled-elt=\"this\"><div class=\"w-full max-w-sm mx-auto my-5\"><label>Urls per hour:</label> <input type=\"number\" min=\"0\" value=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(amount))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" name=\"amount\" class=\"flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50\"></div><div")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if searchOn {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" x-data=\"{ switchOn: true }\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" x-data=\"{ switchOn: false }\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"flex items-center justify-between w-full max-w-sm mx-auto my-5\"><label @click=\"$refs.switchButton.click(); $refs.switchButton.focus()\" :id=\"$id(&#39;switch&#39;)\" class=\"text-sm select-none\" x-cloak>Search On:</label> <input type=\"checkbox\" name=\"searchOn\" class=\"hidden\" :checked=\"switchOn\"> <button x-ref=\"switchButton\" type=\"button\" @click=\"switchOn = ! switchOn\" :class=\"switchOn ? &#39;bg-red-800&#39; : &#39;bg-neutral-200&#39;\" class=\"relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10\" x-cloak><span :class=\"switchOn ? &#39;translate-x-[18px]&#39; : &#39;translate-x-0.5&#39;\" class=\"w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md\"></span></button></div><div")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		if addNew {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" x-data=\"{ switchOn: true }\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		} else {
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" x-data=\"{ switchOn: false }\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(" class=\"flex items-center justify-between w-full max-w-sm mx-auto my-5\"><label @click=\"$refs.switchButton.click(); $refs.switchButton.focus()\" :id=\"$id(&#39;switch&#39;)\" class=\"text-sm select-none\" x-cloak>Add New Urls:</label> <input type=\"checkbox\" name=\"addNew\" class=\"hidden\" :checked=\"switchOn\"> <button x-ref=\"switchButton\" type=\"button\" @click=\"switchOn = ! switchOn\" :class=\"switchOn ? &#39;bg-red-800&#39; : &#39;bg-neutral-200&#39;\" class=\"relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10\" x-cloak><span :class=\"switchOn ? &#39;translate-x-[18px]&#39; : &#39;translate-x-0.5&#39;\" class=\"w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md\"></span></button></div><div class=\"w-full max-w-sm mx-auto my-10\"><button type=\"submit\" class=\"inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-red-800 transition-colors duration-100 bg-white border-2 border-red-800 rounded-md hover:text-white hover:bg-red-800 w-full\">Update</button></div></form></div><div><div id=\"response\" class=\"max-w-sm mx-auto\"></div><div id=\"indicator\" class=\"htmx-indicator border\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = components.Loading().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

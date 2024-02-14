@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/a-h/templ"
@@ -20,12 +22,19 @@ type AdminClaims struct {
 }
 
 type AdminHandler struct {
-	User models.User
+	User     models.User
+	Settings models.SearchSettings
 }
 
 type loginInput struct {
 	Email    string `form:"email"`
 	Password string `form:"password"`
+}
+
+type settingsInput struct {
+	Amount   uint   `form:"amount"`
+	SearchOn string `form:"searchOn"`
+	AddNew   string `form:"addNew"`
 }
 
 // This custom Render replaces Echo's echo.Context.Render() with templ's templ.Component.Render().
@@ -35,8 +44,40 @@ func (h *AdminHandler) Render(ctx echo.Context, statusCode int, t templ.Componen
 	return t.Render(ctx.Request().Context(), ctx.Response().Writer)
 }
 
-func (h *AdminHandler) HomeHandler(c echo.Context) error {
-	return h.Render(c, http.StatusOK, views.AdminPage())
+func (h *AdminHandler) DashboardHandler(c echo.Context) error {
+	err := h.Settings.Get()
+	if err != nil {
+		return h.Render(c, http.StatusInternalServerError, views.ErrorPage())
+	}
+	amount := strconv.FormatUint(uint64(h.Settings.Amount), 10)
+	return h.Render(c, http.StatusOK, views.AdminPage(amount, h.Settings.SearchOn, h.Settings.AddNew))
+}
+
+func (h *AdminHandler) DashboardPostHandler(c echo.Context) error {
+	input := new(settingsInput)
+	if err := c.Bind(input); err != nil {
+		fmt.Println(err)
+		return h.Render(c, http.StatusBadRequest, components.Alert("Error", "Something went wrong"))
+	}
+	// Convert checkbox 'on' values to boolean
+	addNew := false
+	if input.AddNew == "on" {
+		addNew = true
+	}
+	searchOn := false
+	if input.SearchOn == "on" {
+		searchOn = true
+	}
+	fmt.Println(input.Amount, searchOn, addNew)
+	h.Settings.Amount = input.Amount
+	h.Settings.SearchOn = searchOn
+	h.Settings.AddNew = addNew
+	err := h.Settings.Update()
+	if err != nil {
+		fmt.Println(err)
+		return h.Render(c, http.StatusBadRequest, components.Alert("Error", "Something went wrong saving the settings"))
+	}
+	return h.Render(c, http.StatusOK, components.Alert("Success", "Settings Updated"))
 }
 
 func (h *AdminHandler) LoginHandler(c echo.Context) error {
@@ -44,7 +85,6 @@ func (h *AdminHandler) LoginHandler(c echo.Context) error {
 }
 
 func (h *AdminHandler) LoginPostHandler(c echo.Context) error {
-	time.Sleep(5 * time.Second)
 	u := new(loginInput)
 	if err := c.Bind(u); err != nil {
 		return h.Render(c, http.StatusBadRequest, components.Alert("Error", "Something went wrong"))

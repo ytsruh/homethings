@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-func AdminLayout(title string, body templ.Component) templ.Component {
+func ErrorPage() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -23,7 +23,7 @@ func AdminLayout(title string, body templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = Layout("Admin | "+title, admin(body)).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Layout("500", errorpage()).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -34,7 +34,7 @@ func AdminLayout(title string, body templ.Component) templ.Component {
 	})
 }
 
-func admin(body templ.Component) templ.Component {
+func errorpage() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -47,11 +47,7 @@ func admin(body templ.Component) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<section class=\"relative w-full px-8 text-gray-700 bg-white body-font\"><nav class=\"container flex flex-wrap items-center justify-between py-5 mx-auto max-w-7xl\"><a href=\"/admin/\" class=\"relative z-10 flex items-center w-auto text-lg font-extrabold leading-none text-black select-none\"><span class=\"text-red-800\">Homethings </span> Admin</a> <button type=\"button\" class=\"inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-red-800 transition-colors duration-100 bg-white border-2 border-red-800 rounded-md hover:text-white hover:bg-red-800\" hx-post=\"/admin/logout\" hx-trigger=\"click\">Logout</button></nav></section>")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = body.Render(ctx, templ_7745c5c3_Buffer)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div><h1>Oops! Something went wrong</h1><p>Please try again</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

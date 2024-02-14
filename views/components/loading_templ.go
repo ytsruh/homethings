@@ -23,7 +23,7 @@ func Loading() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"w-full h-full flex justify-center items-center\"><div class=\"border-gray-300 h-12 w-12 animate-spin rounded-full border-8 border-t-red-800\"></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div class=\"flex justify-center items-center\"><div class=\"border-gray-300 h-12 w-12 animate-spin rounded-full border-8 border-t-red-800\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
