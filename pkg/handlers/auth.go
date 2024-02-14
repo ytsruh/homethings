@@ -9,7 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type LoginInput struct {
@@ -17,7 +17,7 @@ type LoginInput struct {
 	Password string `json:"password" validate:"required"`
 }
 
-func Login(user models.UserModel) echo.HandlerFunc {
+func Login(user storage.UserModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := new(LoginInput)
 		if err := c.Bind(input); err != nil {

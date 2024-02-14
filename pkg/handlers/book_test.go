@@ -11,7 +11,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type MockBook struct {
@@ -29,7 +29,7 @@ type MockBook struct {
 	UpdatedAt time.Time  `json:"updatedAt"`
 }
 
-var books = []models.Book{
+var books = []storage.Book{
 	{
 		ID:   "1",
 		Name: "Book 1",
@@ -41,7 +41,7 @@ var books = []models.Book{
 	},
 }
 
-func (b *MockBook) GetAllBooks(userId string) ([]models.Book, error) {
+func (b *MockBook) GetAllBooks(userId string) ([]storage.Book, error) {
 	return books, nil
 }
 func (b *MockBook) GetBookById(id string, userId string) error {
@@ -51,10 +51,10 @@ func (b *MockBook) GetBookById(id string, userId string) error {
 	b.UserId = userId
 	return nil
 }
-func (b *MockBook) Create(book *models.Book) error {
+func (b *MockBook) Create(book *storage.Book) error {
 	return nil
 }
-func (b *MockBook) Update(book *models.Book) error {
+func (b *MockBook) Update(book *storage.Book) error {
 	b.Name = book.Name
 	b.Isbn = book.Isbn
 	return nil
@@ -62,13 +62,13 @@ func (b *MockBook) Update(book *models.Book) error {
 func (b *MockBook) Delete(id string, userId string) error {
 	return nil
 }
-func (b *MockBook) GetRead(userId string) ([]models.Book, error) {
+func (b *MockBook) GetRead(userId string) ([]storage.Book, error) {
 	return books, nil
 }
-func (b *MockBook) GetUnread(userId string) ([]models.Book, error) {
+func (b *MockBook) GetUnread(userId string) ([]storage.Book, error) {
 	return books, nil
 }
-func (b *MockBook) GetWishlist(userId string) ([]models.Book, error) {
+func (b *MockBook) GetWishlist(userId string) ([]storage.Book, error) {
 	return books, nil
 }
 

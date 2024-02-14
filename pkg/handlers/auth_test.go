@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type MockUser struct {
@@ -26,12 +26,12 @@ type MockUser struct {
 	UpdatedAt     time.Time  `json:"updatedAt"`
 }
 
-func (u *MockUser) Login(email string, password string) (*models.User, error) {
+func (u *MockUser) Login(email string, password string) (*storage.User, error) {
 	// Find User
 	if email != "testing@gmail.com" || password != "testing" {
 		return nil, errors.New("Invalid email or password")
 	}
-	return &models.User{
+	return &storage.User{
 		ID:       "1",
 		Name:     "Test User",
 		Email:    "testing@gmail.com",
@@ -39,9 +39,9 @@ func (u *MockUser) Login(email string, password string) (*models.User, error) {
 	}, nil
 }
 
-func (u *MockUser) GetUserById(id string) (*models.User, error) {
+func (u *MockUser) GetUserById(id string) (*storage.User, error) {
 
-	return &models.User{
+	return &storage.User{
 		ID:       id,
 		Name:     "Test User",
 		Email:    "testing@gmail.com",
@@ -49,7 +49,7 @@ func (u *MockUser) GetUserById(id string) (*models.User, error) {
 	}, nil
 }
 
-func (u *MockUser) Update(user models.User) error {
+func (u *MockUser) Update(user storage.User) error {
 	return nil
 }
 

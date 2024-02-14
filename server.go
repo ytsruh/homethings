@@ -11,8 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"homethings.ytsruh.com/handlers"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/cronjobs"
+	"homethings.ytsruh.com/pkg/handlers"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 func main() {
@@ -35,7 +36,9 @@ func main() {
 	e.Static("/static", "static")
 	setRoutes(e)
 	setAdminRoutes(e)
-	database := models.InitDB()
+	database := storage.InitDB()
+	// Start cronjobs
+	cronjobs.Start()
 	// Start server
 	go func() {
 		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
@@ -70,7 +73,7 @@ func main() {
 func setRoutes(e *echo.Echo) {
 	group := e.Group("/v1")
 	// Auth routes
-	user := &models.User{}
+	user := &storage.User{}
 	group.POST("/login", handlers.Login(user))
 
 	// Configure JWT middleware for Authentication
@@ -81,11 +84,11 @@ func setRoutes(e *echo.Echo) {
 	group.PATCH("/profile", handlers.PatchProfile(user))
 
 	// Feedback route
-	feedback := &models.Feedback{}
+	feedback := &storage.Feedback{}
 	group.POST("/feedback", handlers.CreateFeedback(feedback))
 
 	// Document routes
-	document := &models.Document{}
+	document := &storage.Document{}
 	group.GET("/documents", handlers.GetDocuments(document))
 	group.POST("/documents", handlers.CreateDocument(document))
 	group.GET("/documents/:id", handlers.GetSingleDocument(document))
@@ -95,7 +98,7 @@ func setRoutes(e *echo.Echo) {
 	group.PUT("/documents/url", handlers.CreatePutPresignedUrl(document))
 
 	// Book routes
-	book := &models.Book{}
+	book := &storage.Book{}
 	group.GET("/books", handlers.GetBooks(book))
 	group.POST("/books", handlers.CreateBook(book))
 	group.GET("/books/:id", handlers.GetSingleBook(book))

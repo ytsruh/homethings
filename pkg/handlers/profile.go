@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type UpdateProfileInput struct {
@@ -16,7 +16,7 @@ type UpdateProfileInput struct {
 	ShowDocuments bool   `json:"showDocuments"`
 }
 
-func GetProfile(u models.UserModel) echo.HandlerFunc {
+func GetProfile(u storage.UserModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -43,7 +43,7 @@ func GetProfile(u models.UserModel) echo.HandlerFunc {
 	}
 }
 
-func PatchProfile(u models.UserModel) echo.HandlerFunc {
+func PatchProfile(u storage.UserModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := new(UpdateProfileInput)
 		if err := c.Bind(input); err != nil {
@@ -58,7 +58,7 @@ func PatchProfile(u models.UserModel) echo.HandlerFunc {
 			})
 		}
 
-		updatedUser := models.User{
+		updatedUser := storage.User{
 			ID:            claims.Id,
 			Name:          input.Name,
 			Email:         input.Email,

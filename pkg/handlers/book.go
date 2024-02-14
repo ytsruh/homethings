@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type CreateBookInput struct {
@@ -30,7 +30,7 @@ type UpdateBookInput struct {
 	Image    string `json:"image"`
 }
 
-func GetBooks(b models.BookModel) echo.HandlerFunc {
+func GetBooks(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -50,7 +50,7 @@ func GetBooks(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func CreateBook(b models.BookModel) echo.HandlerFunc {
+func CreateBook(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := CreateBookInput{}
 		if err := c.Bind(&input); err != nil {
@@ -72,7 +72,7 @@ func CreateBook(b models.BookModel) echo.HandlerFunc {
 				"message": "failed to get user",
 			})
 		}
-		newBook := &models.Book{
+		newBook := &storage.Book{
 			Name:     input.Name,
 			Isbn:     input.Isbn,
 			Author:   &input.Author,
@@ -95,7 +95,7 @@ func CreateBook(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetSingleBook(b models.BookModel) echo.HandlerFunc {
+func GetSingleBook(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
 		claims, err := GetUser(c)
@@ -116,7 +116,7 @@ func GetSingleBook(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func UpdateSingleBook(b models.BookModel) echo.HandlerFunc {
+func UpdateSingleBook(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
 		input := UpdateBookInput{}
@@ -131,7 +131,7 @@ func UpdateSingleBook(b models.BookModel) echo.HandlerFunc {
 				"message": "failed to get user",
 			})
 		}
-		book := &models.Book{
+		book := &storage.Book{
 			ID:       id,
 			Name:     input.Name,
 			Isbn:     input.Isbn,
@@ -155,7 +155,7 @@ func UpdateSingleBook(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func DeleteSingleBook(b models.BookModel) echo.HandlerFunc {
+func DeleteSingleBook(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
 		claims, err := GetUser(c)
@@ -176,7 +176,7 @@ func DeleteSingleBook(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetWishlist(b models.BookModel) echo.HandlerFunc {
+func GetWishlist(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -196,7 +196,7 @@ func GetWishlist(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetRead(b models.BookModel) echo.HandlerFunc {
+func GetRead(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -216,7 +216,7 @@ func GetRead(b models.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetUnread(b models.BookModel) echo.HandlerFunc {
+func GetUnread(b storage.BookModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {

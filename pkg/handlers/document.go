@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
 	"homethings.ytsruh.com/pkg/storage"
 )
 
@@ -21,7 +20,7 @@ type UpdateDocumentInput struct {
 	Description string `json:"description"`
 }
 
-func GetDocuments(d models.DocumentModel) echo.HandlerFunc {
+func GetDocuments(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -40,7 +39,7 @@ func GetDocuments(d models.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func CreateDocument(d models.DocumentModel) echo.HandlerFunc {
+func CreateDocument(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -62,7 +61,7 @@ func CreateDocument(d models.DocumentModel) echo.HandlerFunc {
 				"message": "bad request",
 			})
 		}
-		document := &models.Document{
+		document := &storage.Document{
 			Title:       input.Title,
 			Description: &input.Description,
 			FileName:    input.FileName,
@@ -80,7 +79,7 @@ func CreateDocument(d models.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func GetSingleDocument(d models.DocumentModel) echo.HandlerFunc {
+func GetSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -100,7 +99,7 @@ func GetSingleDocument(d models.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func UpdateSingleDocument(d models.DocumentModel) echo.HandlerFunc {
+func UpdateSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -115,7 +114,7 @@ func UpdateSingleDocument(d models.DocumentModel) echo.HandlerFunc {
 				"message": "failed to bind document",
 			})
 		}
-		document := &models.Document{
+		document := &storage.Document{
 			ID:          id,
 			Title:       input.Title,
 			Description: &input.Description,
@@ -133,7 +132,7 @@ func UpdateSingleDocument(d models.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func DeleteSingleDocument(d models.DocumentModel) echo.HandlerFunc {
+func DeleteSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		claims, err := GetUser(c)
 		if err != nil {
@@ -160,7 +159,7 @@ func DeleteSingleDocument(d models.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func CreateGetPresignedUrl(d models.DocumentModel) echo.HandlerFunc {
+func CreateGetPresignedUrl(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		key := c.QueryParam("fileName")
 		if key == "" {
@@ -181,7 +180,7 @@ func CreateGetPresignedUrl(d models.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func CreatePutPresignedUrl(d models.DocumentModel) echo.HandlerFunc {
+func CreatePutPresignedUrl(d storage.DocumentModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		key := c.QueryParam("fileName")
 		if key == "" {

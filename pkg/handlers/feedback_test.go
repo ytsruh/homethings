@@ -11,20 +11,20 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type MockFeedback struct {
 	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
 	Title     string
 	Body      *string
-	UserId    string      `gorm:"type:uuid"`
-	User      models.User `gorm:"foreignKey:UserId;references:ID"`
+	UserId    string       `gorm:"type:uuid"`
+	User      storage.User `gorm:"foreignKey:UserId;references:ID"`
 	CreatedAt *time.Time
 	UpdatedAt time.Time
 }
 
-func (f *MockFeedback) Create(feedback *models.Feedback) error {
+func (f *MockFeedback) Create(feedback *storage.Feedback) error {
 	return nil
 }
 

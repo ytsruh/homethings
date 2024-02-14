@@ -10,7 +10,7 @@ import (
 	"github.com/a-h/templ"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 	"homethings.ytsruh.com/views"
 	"homethings.ytsruh.com/views/components"
 )
@@ -22,8 +22,8 @@ type AdminClaims struct {
 }
 
 type AdminHandler struct {
-	User     models.User
-	Settings models.SearchSettings
+	User     storage.User
+	Settings storage.SearchSettings
 }
 
 type loginInput struct {

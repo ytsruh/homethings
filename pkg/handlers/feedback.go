@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type UpdateFeedbackInput struct {
@@ -13,7 +13,7 @@ type UpdateFeedbackInput struct {
 	Body  string `json:"body"`
 }
 
-func CreateFeedback(f models.FeedbackModel) echo.HandlerFunc {
+func CreateFeedback(f storage.FeedbackModel) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := new(UpdateFeedbackInput)
 		if err := c.Bind(input); err != nil {
@@ -35,7 +35,7 @@ func CreateFeedback(f models.FeedbackModel) echo.HandlerFunc {
 				"message": "failed to get user",
 			})
 		}
-		feedback := &models.Feedback{
+		feedback := &storage.Feedback{
 			Title:  input.Title,
 			Body:   &input.Body,
 			UserId: claims.Id,

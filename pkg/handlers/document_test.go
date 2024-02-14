@@ -11,22 +11,22 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type MockDocument struct {
-	ID          string         `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	Title       string         `json:"title"`
-	Description *string        `json:"description"`
-	FileName    string         `json:"fileName"`
-	AccountId   string         `gorm:"type:uuid" json:"accountId"`
-	Account     models.Account `gorm:"foreignKey:AccountId;references:ID" json:"account"`
-	CreatedAt   *time.Time     `json:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt"`
+	ID          string          `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	Title       string          `json:"title"`
+	Description *string         `json:"description"`
+	FileName    string          `json:"fileName"`
+	AccountId   string          `gorm:"type:uuid" json:"accountId"`
+	Account     storage.Account `gorm:"foreignKey:AccountId;references:ID" json:"account"`
+	CreatedAt   *time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time       `json:"updatedAt"`
 }
 
 var mockDescription string = "lorem ipsum"
-var docs = []models.Document{
+var docs = []storage.Document{
 	{
 		ID:          "1",
 		Title:       "Doc 1",
@@ -41,7 +41,7 @@ var docs = []models.Document{
 	},
 }
 
-func (d *MockDocument) GetAllDocuments(accountId string) ([]models.Document, error) {
+func (d *MockDocument) GetAllDocuments(accountId string) ([]storage.Document, error) {
 	return docs, nil
 }
 
@@ -49,15 +49,15 @@ func (d *MockDocument) GetDocumentById(accountId string, id string) error {
 	return nil
 }
 
-func (d *MockDocument) Create(doc *models.Document) error {
+func (d *MockDocument) Create(doc *storage.Document) error {
 	return nil
 }
 
-func (d *MockDocument) Update(doc *models.Document) error {
+func (d *MockDocument) Update(doc *storage.Document) error {
 	return nil
 }
 
-func (d *MockDocument) Delete(accountId string, id string) (*models.Document, error) {
+func (d *MockDocument) Delete(accountId string, id string) (*storage.Document, error) {
 	return &docs[0], nil
 }
 
