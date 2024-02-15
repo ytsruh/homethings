@@ -31,7 +31,7 @@ type Links struct {
 	External []string
 }
 
-func RunCrawl(inputUrl string) CrawlData {
+func runCrawl(inputUrl string) CrawlData {
 	resp, err := http.Get(inputUrl)
 	baseUrl, _ := url.Parse(inputUrl)
 	// Check for error or if response is empty

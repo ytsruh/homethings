@@ -17,6 +17,7 @@ type CrawledUrl struct {
 	PageDescription string         `json:"pageDescription"`
 	Headings        string         `json:"headings"`
 	LastTested      *time.Time     `json:"lastTested"` // Use pointer so this value can be nil
+	Indexed         bool           `json:"indexed" gorm:"default:false"`
 	CreatedAt       time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt       time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt       gorm.DeletedAt `gorm:"index"`
@@ -46,6 +47,28 @@ func (crawled *CrawledUrl) Save() error {
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return tx.Error
+	}
+	return nil
+}
+
+func (crawled *CrawledUrl) GetNotIndexed() ([]CrawledUrl, error) {
+	var urls []CrawledUrl
+	tx := DBConn.Where("indexed IS false").Find(&urls)
+	if tx.Error != nil {
+		fmt.Print(tx.Error)
+		return []CrawledUrl{}, tx.Error
+	}
+	return urls, nil
+}
+
+func (crawled *CrawledUrl) SetIndexedTrue(urls []CrawledUrl) error {
+	for _, url := range urls {
+		url.Indexed = true
+		tx := DBConn.Save(&url)
+		if tx.Error != nil {
+			fmt.Print(tx.Error)
+			return tx.Error
+		}
 	}
 	return nil
 }

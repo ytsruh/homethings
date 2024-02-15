@@ -7,7 +7,7 @@ import (
 	"homethings.ytsruh.com/pkg/storage"
 )
 
-func Run() {
+func RunEngine() {
 	fmt.Println("started search engine crawl...")
 	defer fmt.Println("search engine crawl has finished")
 	// Get crawl settings from DB
@@ -33,7 +33,7 @@ func Run() {
 		testedTime := time.Now()
 		// Loop over the slice and run crawl on each url
 		for _, next := range nextUrls {
-			result := RunCrawl(next.Url)
+			result := runCrawl(next.Url)
 			// Check if the crawl was not successul
 			if !result.Success {
 				// Update row in database with the failed crawl
@@ -88,4 +88,24 @@ func Run() {
 		}
 	}
 
+}
+
+func RunIndex() {
+	fmt.Println("started search indexing...")
+	defer fmt.Println("search indexing has finished")
+	// Get index settings from DB
+	crawled := &storage.CrawledUrl{}
+	// Get all urls that are not indexed
+	notIndexed, err := crawled.GetNotIndexed()
+	if err != nil {
+		fmt.Println("something went wrong getting the not indexed urls")
+		return
+	}
+	// Create a new index
+	idx := make(Index)
+	// Add the not indexed urls to the index
+	idx.Add(notIndexed)
+	// Print the index
+	idx.Print()
+	fmt.Printf("Indexed %d urls \n", len(notIndexed))
 }
