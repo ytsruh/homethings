@@ -76,6 +76,10 @@ func setRoutes(e *echo.Echo) {
 	user := &storage.User{}
 	group.POST("/login", handlers.Login(user))
 
+	// Search route
+	searchHandler := handlers.SearchHandler{}
+	group.POST("/search", searchHandler.Search)
+
 	// Configure JWT middleware for Authentication
 	group.Use(handlers.SetJWTAuth())
 

@@ -53,7 +53,7 @@ func (crawled *CrawledUrl) Save() error {
 
 func (crawled *CrawledUrl) GetNotIndexed() ([]CrawledUrl, error) {
 	var urls []CrawledUrl
-	tx := DBConn.Where("indexed IS false").Find(&urls)
+	tx := DBConn.Where("indexed = ? AND last_tested IS NOT NULL", false).Find(&urls)
 	if tx.Error != nil {
 		fmt.Print(tx.Error)
 		return []CrawledUrl{}, tx.Error

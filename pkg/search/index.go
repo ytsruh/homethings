@@ -1,8 +1,6 @@
 package search
 
 import (
-	"fmt"
-
 	"homethings.ytsruh.com/pkg/storage"
 )
 
@@ -19,16 +17,6 @@ func (idx Index) Add(docs []storage.CrawledUrl) {
 				continue
 			}
 			idx[token] = append(ids, doc.ID)
-		}
-	}
-}
-
-// Pretty print the Index.
-func (idx Index) Print() {
-	for token, ids := range idx {
-		fmt.Printf("Token: %s\n", token)
-		for _, id := range ids {
-			fmt.Printf("\tID: %s\n", id)
 		}
 	}
 }

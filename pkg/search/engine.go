@@ -87,7 +87,6 @@ func RunEngine() {
 			fmt.Printf("\nAdded %d new urls to database \n", len(newUrls))
 		}
 	}
-
 }
 
 func RunIndex() {
@@ -97,6 +96,7 @@ func RunIndex() {
 	crawled := &storage.CrawledUrl{}
 	// Get all urls that are not indexed
 	notIndexed, err := crawled.GetNotIndexed()
+	fmt.Println("not indexed urls: ", len(notIndexed))
 	if err != nil {
 		fmt.Println("something went wrong getting the not indexed urls")
 		return
@@ -105,7 +105,19 @@ func RunIndex() {
 	idx := make(Index)
 	// Add the not indexed urls to the index
 	idx.Add(notIndexed)
-	// Print the index
-	idx.Print()
-	fmt.Printf("Indexed %d urls \n", len(notIndexed))
+	// Save the index to the database
+	searchIndex := &storage.SearchIndex{}
+	err = searchIndex.Save(idx, notIndexed)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("something went wrong saving the index")
+		return
+	}
+	// Update the urls to be indexed=true
+	err = crawled.SetIndexedTrue(notIndexed)
+	if err != nil {
+		fmt.Println("something went wrong updating the indexed urls")
+		return
+	}
+
 }
