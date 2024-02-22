@@ -11,8 +11,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"homethings.ytsruh.com/controllers"
-	"homethings.ytsruh.com/models"
+	"homethings.ytsruh.com/pkg/cronjobs"
+	"homethings.ytsruh.com/pkg/handlers"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 func main() {
@@ -32,8 +33,12 @@ func main() {
 	// Initialize Echo, set routes & database
 	e := echo.New()
 	e.Use(echo.MiddlewareFunc(middleware.CORS()))
+	e.Static("/static", "static")
 	setRoutes(e)
-	database := models.InitDB()
+	setAdminRoutes(e)
+	database := storage.InitDB()
+	// Start cronjobs
+	cronjobs.Start()
 	// Start server
 	go func() {
 		if err := e.Start(port); err != nil && err != http.ErrServerClosed {
@@ -51,11 +56,11 @@ func main() {
 	d, err := database.DB()
 	if err != nil {
 		log.Println(err)
-		log.Println("Error disconnecting from database")
+		panic("Error disconnecting from database")
 	}
 	if err := d.Close(); err != nil {
 		log.Println(err)
-		log.Println("Error disconnecting from database")
+		panic("Error disconnecting from database")
 	}
 	log.Println("Database successfully disconnected")
 	// Shutdown server
@@ -68,38 +73,53 @@ func main() {
 func setRoutes(e *echo.Echo) {
 	group := e.Group("/v1")
 	// Auth routes
-	user := &models.User{}
-	group.POST("/login", controllers.Login(user))
+	user := &storage.User{}
+	group.POST("/login", handlers.Login(user))
+
+	// Search route
+	searchHandler := handlers.SearchHandler{}
+	group.POST("/search", searchHandler.Search)
 
 	// Configure JWT middleware for Authentication
-	group.Use(controllers.SetJWTAuth())
+	group.Use(handlers.SetJWTAuth())
 
 	// Profile routes
-	group.GET("/profile", controllers.GetProfile(user))
-	group.PATCH("/profile", controllers.PatchProfile(user))
+	group.GET("/profile", handlers.GetProfile(user))
+	group.PATCH("/profile", handlers.PatchProfile(user))
 
 	// Feedback route
-	feedback := &models.Feedback{}
-	group.POST("/feedback", controllers.CreateFeedback(feedback))
+	feedback := &storage.Feedback{}
+	group.POST("/feedback", handlers.CreateFeedback(feedback))
 
 	// Document routes
-	document := &models.Document{}
-	group.GET("/documents", controllers.GetDocuments(document))
-	group.POST("/documents", controllers.CreateDocument(document))
-	group.GET("/documents/:id", controllers.GetSingleDocument(document))
-	group.PATCH("/documents/:id", controllers.UpdateSingleDocument(document))
-	group.DELETE("/documents/:id", controllers.DeleteSingleDocument(document))
-	group.GET("/documents/url", controllers.CreateGetPresignedUrl(document))
-	group.PUT("/documents/url", controllers.CreatePutPresignedUrl(document))
+	document := &storage.Document{}
+	group.GET("/documents", handlers.GetDocuments(document))
+	group.POST("/documents", handlers.CreateDocument(document))
+	group.GET("/documents/:id", handlers.GetSingleDocument(document))
+	group.PATCH("/documents/:id", handlers.UpdateSingleDocument(document))
+	group.DELETE("/documents/:id", handlers.DeleteSingleDocument(document))
+	group.GET("/documents/url", handlers.CreateGetPresignedUrl(document))
+	group.PUT("/documents/url", handlers.CreatePutPresignedUrl(document))
 
 	// Book routes
-	book := &models.Book{}
-	group.GET("/books", controllers.GetBooks(book))
-	group.POST("/books", controllers.CreateBook(book))
-	group.GET("/books/:id", controllers.GetSingleBook(book))
-	group.PATCH("/books/:id", controllers.UpdateSingleBook(book))
-	group.DELETE("/books/:id", controllers.DeleteSingleBook(book))
-	group.GET("/books/wishlist", controllers.GetWishlist(book))
-	group.GET("/books/read", controllers.GetRead(book))
-	group.GET("/books/unread", controllers.GetUnread(book))
+	book := &storage.Book{}
+	group.GET("/books", handlers.GetBooks(book))
+	group.POST("/books", handlers.CreateBook(book))
+	group.GET("/books/:id", handlers.GetSingleBook(book))
+	group.PATCH("/books/:id", handlers.UpdateSingleBook(book))
+	group.DELETE("/books/:id", handlers.DeleteSingleBook(book))
+	group.GET("/books/wishlist", handlers.GetWishlist(book))
+	group.GET("/books/read", handlers.GetRead(book))
+	group.GET("/books/unread", handlers.GetUnread(book))
+}
+
+func setAdminRoutes(e *echo.Echo) {
+	admin := e.Group("/admin")
+	adminHandler := &handlers.AdminHandler{}
+	// Auth routes
+	admin.GET("/", adminHandler.DashboardHandler, adminHandler.AuthMiddleware)
+	admin.POST("/", adminHandler.DashboardPostHandler, adminHandler.AuthMiddleware)
+	admin.GET("/login", adminHandler.LoginHandler)
+	admin.POST("/login", adminHandler.LoginPostHandler)
+	admin.POST("/logout", adminHandler.LogoutHandler)
 }

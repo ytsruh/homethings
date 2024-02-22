@@ -1,0 +1,103 @@
+package views
+
+import "homethings.ytsruh.com/views/components"
+
+templ AdminPage(amount string, searchOn bool, addNew bool) {
+	@AdminLayout("Home", home(amount, searchOn, addNew))
+}
+
+templ home(amount string, searchOn bool, addNew bool) {
+	<div class="w-full h-full flex justify-center py-20 px-5" hx-ext="response-targets">
+		<div class="w-full md:w-1/2">
+			<div>
+				<h1 class="text-center text-2xl py-5">Search Settings</h1>
+				<form
+					hx-post="/admin/"
+					hx-trigger="submit"
+					hx-target="#response"
+					hx-target-error="#response"
+					hx-indicator="#indicator"
+					hx-disabled-elt="this"
+				>
+					<div class="w-full max-w-sm mx-auto my-5">
+						<label>Urls per hour:</label>
+						<input
+							type="number"
+							min="0"
+							value={ amount }
+							name="amount"
+							class="flex w-full h-10 px-3 py-2 text-sm bg-white border rounded-md border-neutral-300 ring-offset-background placeholder:text-neutral-500 focus:border-neutral-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neutral-400 disabled:cursor-not-allowed disabled:opacity-50"
+						/>
+					</div>
+					<div
+						if searchOn {
+							x-data="{ switchOn: true }"
+						} else {
+							x-data="{ switchOn: false }"
+						}
+						class="flex items-center justify-between w-full max-w-sm mx-auto my-5"
+					>
+						<label
+							@click="$refs.switchButton.click(); $refs.switchButton.focus()"
+							:id="$id('switch')"
+							class="text-sm select-none"
+							x-cloak
+						>
+							Search On:
+						</label>
+						<input type="checkbox" name="searchOn" class="hidden" :checked="switchOn"/>
+						<button
+							x-ref="switchButton"
+							type="button"
+							@click="switchOn = ! switchOn"
+							:class="switchOn ? 'bg-red-800' : 'bg-neutral-200'"
+							class="relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10"
+							x-cloak
+						>
+							<span :class="switchOn ? 'translate-x-[18px]' : 'translate-x-0.5'" class="w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md"></span>
+						</button>
+					</div>
+					<div
+						if addNew {
+							x-data="{ switchOn: true }"
+						} else {
+							x-data="{ switchOn: false }"
+						}
+						class="flex items-center justify-between w-full max-w-sm mx-auto my-5"
+					>
+						<label
+							@click="$refs.switchButton.click(); $refs.switchButton.focus()"
+							:id="$id('switch')"
+							class="text-sm select-none"
+							x-cloak
+						>
+							Add New Urls:
+						</label>
+						<input type="checkbox" name="addNew" class="hidden" :checked="switchOn"/>
+						<button
+							x-ref="switchButton"
+							type="button"
+							@click="switchOn = ! switchOn"
+							:class="switchOn ? 'bg-red-800' : 'bg-neutral-200'"
+							class="relative inline-flex h-6 py-0.5 focus:outline-none rounded-full w-10"
+							x-cloak
+						>
+							<span :class="switchOn ? 'translate-x-[18px]' : 'translate-x-0.5'" class="w-5 h-5 duration-200 ease-in-out bg-white rounded-full shadow-md"></span>
+						</button>
+					</div>
+					<div class="w-full max-w-sm mx-auto my-10">
+						<button type="submit" class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium tracking-wide text-red-800 transition-colors duration-100 bg-white border-2 border-red-800 rounded-md hover:text-white hover:bg-red-800 w-full">
+							Update
+						</button>
+					</div>
+				</form>
+			</div>
+			<div>
+				<div id="response" class="max-w-sm mx-auto"></div>
+				<div id="indicator" class="htmx-indicator border">
+					@components.Loading()
+				</div>
+			</div>
+		</div>
+	</div>
+}
