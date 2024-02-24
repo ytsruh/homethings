@@ -4,10 +4,6 @@ import (
 	"time"
 )
 
-type FeedbackModel interface {
-	Create(feedback *Feedback) error
-}
-
 type Feedback struct {
 	ID        string `gorm:"type:uuid;default:uuid_generate_v4()"`
 	Title     string

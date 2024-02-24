@@ -8,12 +8,16 @@ import (
 	"homethings.ytsruh.com/pkg/storage"
 )
 
+type FeedbackModel interface {
+	Create(feedback *storage.Feedback) error
+}
+
 type UpdateFeedbackInput struct {
 	Title string `json:"title" validate:"required"`
 	Body  string `json:"body"`
 }
 
-func CreateFeedback(f storage.FeedbackModel) echo.HandlerFunc {
+func (h *APIHandler) CreateFeedback() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := new(UpdateFeedbackInput)
 		if err := c.Bind(input); err != nil {
@@ -29,7 +33,7 @@ func CreateFeedback(f storage.FeedbackModel) echo.HandlerFunc {
 				"message": "bad request",
 			})
 		}
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
@@ -40,7 +44,7 @@ func CreateFeedback(f storage.FeedbackModel) echo.HandlerFunc {
 			Body:   &input.Body,
 			UserId: claims.Id,
 		}
-		err = f.Create(feedback)
+		err = h.Feedback.Create(feedback)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to create feedback",

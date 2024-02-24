@@ -21,6 +21,13 @@ var mockClaims = &CustomClaims{
 	},
 }
 
+var api = &APIHandler{
+	User:     &MockUser{},
+	Book:     &MockBook{},
+	Feedback: &MockFeedback{},
+	Document: &MockDocument{},
+}
+
 func TestGetUser(t *testing.T) {
 	t.Run("Get user from context", func(t *testing.T) {
 		e := echo.New()
@@ -30,13 +37,13 @@ func TestGetUser(t *testing.T) {
 		// Create user token & set user context
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 		c.Set("user", token)
-		got, err := GetUser(c)
+		got, err := getUser(c)
 		if err != nil {
-			t.Errorf("GetUser() error = %v", err)
+			t.Errorf("getUser() error = %v", err)
 			return
 		}
 		if !reflect.DeepEqual(got, mockClaims) {
-			t.Errorf("GetUser() = %v, want %v", got, mockClaims)
+			t.Errorf("getUser() = %v, want %v", got, mockClaims)
 		}
 	})
 }

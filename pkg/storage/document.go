@@ -6,14 +6,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type DocumentModel interface {
-	GetAllDocuments(accountId string) ([]Document, error)
-	GetDocumentById(accountId string, id string) error
-	Create(doc *Document) error
-	Update(doc *Document) error
-	Delete(accountId string, id string) (*Document, error)
-}
-
 type Document struct {
 	ID          string     `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
 	Title       string     `json:"title"`

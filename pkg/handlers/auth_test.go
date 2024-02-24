@@ -98,7 +98,7 @@ func TestLogin(t *testing.T) {
 			c := e.NewContext(req, rec)
 			c.SetPath("/v1/login")
 			// Assertions
-			err := Login(&MockUser{})(c)
+			err := api.Login()(c)
 			if err != nil {
 				t.Errorf("gave error : %v", err)
 				return

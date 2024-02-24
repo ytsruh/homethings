@@ -7,12 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type UserModel interface {
-	Login(email string, password string) (*User, error)
-	GetUserById(id string) (*User, error)
-	Update(user User) error
-}
-
 type User struct {
 	ID            string     `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
 	Name          string     `gorm:"default:'User Name'" json:"name"`

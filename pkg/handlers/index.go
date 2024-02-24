@@ -7,6 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
+	"homethings.ytsruh.com/pkg/storage"
 )
 
 type CustomClaims struct {
@@ -16,7 +17,20 @@ type CustomClaims struct {
 	jwt.RegisteredClaims `json:"claims"`
 }
 
-func GetUser(c echo.Context) (*CustomClaims, error) {
+type UserModel interface {
+	Login(email string, password string) (*storage.User, error)
+	GetUserById(id string) (*storage.User, error)
+	Update(user storage.User) error
+}
+
+type APIHandler struct {
+	User     UserModel
+	Feedback FeedbackModel
+	Document DocumentModel
+	Book     BookModel
+}
+
+func getUser(c echo.Context) (*CustomClaims, error) {
 	token, ok := c.Get("user").(*jwt.Token)
 	if !ok {
 		return nil, errors.New("JWT token missing or invalid")
@@ -28,7 +42,7 @@ func GetUser(c echo.Context) (*CustomClaims, error) {
 	return claims, nil
 }
 
-func SetJWTAuth() echo.MiddlewareFunc {
+func (h *APIHandler) SetJWTAuth() echo.MiddlewareFunc {
 	return echojwt.WithConfig(echojwt.Config{
 		NewClaimsFunc: func(c echo.Context) jwt.Claims {
 			return new(CustomClaims)

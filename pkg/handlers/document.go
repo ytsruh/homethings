@@ -9,6 +9,14 @@ import (
 	"homethings.ytsruh.com/pkg/storage"
 )
 
+type DocumentModel interface {
+	GetAllDocuments(accountId string) ([]storage.Document, error)
+	GetDocumentById(accountId string, id string) error
+	Create(doc *storage.Document) error
+	Update(doc *storage.Document) error
+	Delete(accountId string, id string) (*storage.Document, error)
+}
+
 type CreateDocumentInput struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`
@@ -20,15 +28,15 @@ type UpdateDocumentInput struct {
 	Description string `json:"description"`
 }
 
-func GetDocuments(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) GetDocuments() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		docs, err := d.GetAllDocuments(claims.AccountId)
+		docs, err := h.Document.GetAllDocuments(claims.AccountId)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get documents",
@@ -39,9 +47,9 @@ func GetDocuments(d storage.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func CreateDocument(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) CreateDocument() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
@@ -67,7 +75,7 @@ func CreateDocument(d storage.DocumentModel) echo.HandlerFunc {
 			FileName:    input.FileName,
 			AccountId:   claims.AccountId,
 		}
-		err = d.Create(document)
+		err = h.Document.Create(document)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to create document",
@@ -79,29 +87,29 @@ func CreateDocument(d storage.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func GetSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) GetSingleDocument() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
 		id := c.Param("id")
-		err = d.GetDocumentById(claims.AccountId, id)
+		err = h.Document.GetDocumentById(claims.AccountId, id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get documents",
 			})
 		}
 
-		return c.JSON(200, d)
+		return c.JSON(200, h.Document)
 	}
 }
 
-func UpdateSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) UpdateSingleDocument() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
@@ -120,7 +128,7 @@ func UpdateSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
 			Description: &input.Description,
 			AccountId:   claims.AccountId,
 		}
-		err = d.Update(document)
+		err = h.Document.Update(document)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to update document",
@@ -132,16 +140,16 @@ func UpdateSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func DeleteSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) DeleteSingleDocument() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
 		id := c.Param("id")
-		deleted, err := d.Delete(claims.AccountId, id)
+		deleted, err := h.Document.Delete(claims.AccountId, id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to delete document",
@@ -159,7 +167,7 @@ func DeleteSingleDocument(d storage.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func CreateGetPresignedUrl(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) CreateGetPresignedUrl() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		key := c.QueryParam("fileName")
 		if key == "" {
@@ -180,7 +188,7 @@ func CreateGetPresignedUrl(d storage.DocumentModel) echo.HandlerFunc {
 	}
 }
 
-func CreatePutPresignedUrl(d storage.DocumentModel) echo.HandlerFunc {
+func (h *APIHandler) CreatePutPresignedUrl() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		key := c.QueryParam("fileName")
 		if key == "" {

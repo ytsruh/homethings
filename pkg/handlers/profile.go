@@ -16,16 +16,16 @@ type UpdateProfileInput struct {
 	ShowDocuments bool   `json:"showDocuments"`
 }
 
-func GetProfile(u storage.UserModel) echo.HandlerFunc {
+func (h *APIHandler) GetProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
 
-		user, err := u.GetUserById(claims.Id)
+		user, err := h.User.GetUserById(claims.Id)
 		if err != nil {
 			fmt.Println(err)
 			return c.JSON(http.StatusInternalServerError, echo.Map{
@@ -43,7 +43,7 @@ func GetProfile(u storage.UserModel) echo.HandlerFunc {
 	}
 }
 
-func PatchProfile(u storage.UserModel) echo.HandlerFunc {
+func (h *APIHandler) PatchProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := new(UpdateProfileInput)
 		if err := c.Bind(input); err != nil {
@@ -51,7 +51,7 @@ func PatchProfile(u storage.UserModel) echo.HandlerFunc {
 				"message": "bad request",
 			})
 		}
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
@@ -67,7 +67,7 @@ func PatchProfile(u storage.UserModel) echo.HandlerFunc {
 			ShowDocuments: input.ShowDocuments,
 		}
 
-		err = u.Update(updatedUser)
+		err = h.User.Update(updatedUser)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to update user",

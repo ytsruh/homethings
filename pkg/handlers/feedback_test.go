@@ -48,13 +48,12 @@ func TestCreateFeedback(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockfeedback := MockFeedback{}
 	c.SetPath("/v1/feedback")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err = CreateFeedback(&mockfeedback)(c)
+	err = api.CreateFeedback()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
