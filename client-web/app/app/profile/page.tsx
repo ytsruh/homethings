@@ -70,7 +70,7 @@ export default function Profile() {
         showDocuments: profile.showDocuments,
         showBooks: profile.showBooks,
       });
-      router.push("/");
+      router.push("/app");
       setLoading(false);
     } catch (error: any) {
       if (error.message === "unauthorized") {
@@ -91,8 +91,7 @@ export default function Profile() {
         <div className="py-4">
           <h1 className="text-2xl">Profile & Settings</h1>
           <h2 className="text-sm italic text-zinc-500 dark:text-zinc-300">
-            Change your profile picture or show/hide features to personalise
-            your experience.
+            Change your profile picture or show/hide features to personalise your experience.
           </h2>
         </div>
         <div className="flex w-full justify-center py-2">
@@ -101,8 +100,7 @@ export default function Profile() {
           ) : (
             <form
               onSubmit={(e) => submit(e)}
-              className="flex w-full flex-col items-center justify-center gap-2"
-            >
+              className="flex w-full flex-col items-center justify-center gap-2">
               <div className="w-full">
                 <Label>Name:</Label>
                 <Input
@@ -110,19 +108,12 @@ export default function Profile() {
                   type="text"
                   placeholder="Filename"
                   value={profile.name}
-                  onChange={(e) =>
-                    setProfile({ ...profile, name: e.target.value })
-                  }
+                  onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                 />
               </div>
               <div className="w-full">
                 <Label>Email:</Label>
-                <Input
-                  className="my-2"
-                  type="text"
-                  value={profile.email}
-                  disabled
-                />
+                <Input className="my-2" type="text" value={profile.email} disabled />
               </div>
               <div className="grid w-full grid-cols-1 gap-5 md:grid-cols-2 md:gap-10">
                 <div className="flex w-full items-center justify-between">
@@ -131,9 +122,7 @@ export default function Profile() {
                   </div>
                   <Switch
                     checked={profile.showDocuments || false}
-                    onCheckedChange={(bool) =>
-                      setProfile({ ...profile, showDocuments: bool })
-                    }
+                    onCheckedChange={(bool) => setProfile({ ...profile, showDocuments: bool })}
                   />
                 </div>
                 <div className="flex w-full items-center justify-between">
@@ -142,9 +131,7 @@ export default function Profile() {
                   </div>
                   <Switch
                     checked={profile.showBooks}
-                    onCheckedChange={(bool) =>
-                      setProfile({ ...profile, showBooks: bool })
-                    }
+                    onCheckedChange={(bool) => setProfile({ ...profile, showBooks: bool })}
                   />
                 </div>
               </div>

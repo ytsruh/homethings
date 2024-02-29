@@ -36,7 +36,7 @@ export default function MainNav(props: any) {
     <div className="border-b">
       <Sheet>
         <div className="flex h-16 items-center px-6">
-          <a className="text-accent flex justify-center items-center gap-2" href="/">
+          <a className="text-accent flex justify-center items-center gap-2" href="/app">
             <HomeIcon className="hidden lg:block h-[1.4rem] w-[1.4rem]" />
             <p className="hidden lg:block">Homethings</p>
           </a>

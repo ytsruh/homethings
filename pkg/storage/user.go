@@ -53,7 +53,11 @@ func (u *User) GetUserById(id string) (*User, error) {
 }
 
 func (u *User) Update(user User) error {
-	tx := DBConn.Model(&u).Where("id = ?", user.ID).Updates(user)
+	tx := DBConn.Model(u).Where("id = ?", user.ID)
+	// Explicitly set the columns to update boolean values.  If you're trying to update the ShowBooks field to false, GORM's Updates method will not consider it because it treats false as a zero value and ignores it.
+	tx.UpdateColumn("show_books", user.ShowBooks)
+	tx.UpdateColumn("show_documents", user.ShowDocuments)
+	tx.Updates(user)
 	if tx.Error != nil {
 		return tx.Error
 	}

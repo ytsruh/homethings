@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useRouter } from "next/navigation";
 import Loading from "./Loading";
-import MainNav from "./MainNav";
+import MainNav from "./AppNav";
 import { getLocalUser } from "@/lib/utils";
 
 export default function PageFrame(props: { title: string; children: React.ReactNode }) {
