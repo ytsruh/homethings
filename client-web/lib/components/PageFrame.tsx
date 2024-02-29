@@ -41,10 +41,10 @@ export default function PageFrame(props: { title: string; children: React.ReactN
           <div className="grid grid-cols-1 lg:grid-cols-12">
             <div className="hidden lg:grid lg:col-span-2 p-2">
               <div className="flex flex-col mt-2 space-y-3">
-                <SideLink text="Home" link="/" />
-                {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
-                {preferences.showBooks && <SideLink text="Books" link="/books" />}
-                <SideLink text="Profile" link="/profile" />
+                <SideLink text="Home" link="/app" />
+                {preferences.showDocuments && <SideLink text="Documents" link="/app/documents" />}
+                {preferences.showBooks && <SideLink text="Books" link="/app/books" />}
+                <SideLink text="Profile" link="/app/profile" />
               </div>
             </div>
             <div className="col-span-12 lg:col-span-10 p-2">{props.children}</div>

@@ -22,7 +22,7 @@ func (s *SearchHandler) Search(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, "something went wrong performing search")
 	}
-	return c.JSON(http.StatusBadRequest, echo.Map{
+	return c.JSON(http.StatusOK, echo.Map{
 		"results":   urls,
 		"query":     query,
 		"amount":    len(urls),
