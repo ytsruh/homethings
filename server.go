@@ -83,7 +83,7 @@ func setRoutes(e *echo.Echo) {
 
 	// Search route
 	searchHandler := handlers.SearchHandler{}
-	group.POST("/search", searchHandler.Search)
+	group.POST("/search", searchHandler.Search, searchHandler.QueryMiddleware)
 
 	// Configure JWT middleware for Authentication
 	group.Use(api.SetJWTAuth())
