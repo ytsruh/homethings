@@ -35,7 +35,7 @@ func InitDB() *gorm.DB {
 	}
 
 	err = DBConn.AutoMigrate(&Account{}, &User{}, &Feedback{}, &Document{}, &Book{}, &SearchSettings{},
-		&CrawledUrl{}, &SearchIndex{}, &SearchQuery{})
+		&CrawledUrl{}, &SearchIndex{}, &SearchQuery{}, &PasswordReset{})
 	if err != nil {
 		fmt.Println("Failed to migrate")
 		panic(err)

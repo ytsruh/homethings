@@ -20,6 +20,7 @@ type CustomClaims struct {
 type UserModel interface {
 	Login(email string, password string) (*storage.User, error)
 	GetUserById(id string) (*storage.User, error)
+	GetUserByEmail(email string) (*storage.User, error)
 	Update(user storage.User) error
 }
 

@@ -80,6 +80,8 @@ func setRoutes(e *echo.Echo) {
 	}
 	// Auth routes
 	group.POST("/login", api.Login())
+	group.POST("/requestreset", api.RequestPasswordReset())
+	group.POST("/passwordreset", api.PasswordReset())
 
 	// Search route
 	searchHandler := handlers.SearchHandler{}

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -52,6 +53,14 @@ func (u *User) GetUserById(id string) (*User, error) {
 	return u, nil
 }
 
+func (u *User) GetUserByEmail(email string) (*User, error) {
+	fmt.Println(email)
+	if err := DBConn.Where("email = ?", email).First(&u).Error; err != nil {
+		return nil, err
+	}
+	return u, nil
+}
+
 func (u *User) Update(user User) error {
 	tx := DBConn.Model(u).Where("id = ?", user.ID)
 	// Explicitly set the columns to update boolean values.  If you're trying to update the ShowBooks field to false, GORM's Updates method will not consider it because it treats false as a zero value and ignores it.
@@ -60,6 +69,43 @@ func (u *User) Update(user User) error {
 	tx.Updates(user)
 	if tx.Error != nil {
 		return tx.Error
+	}
+	return nil
+}
+
+func (u *User) UpdatePassword() error {
+	// Update the password column
+	tx := DBConn.Model(u).Where("id = ?", u.ID).UpdateColumn("password", u.Password)
+	if tx.Error != nil {
+		return tx.Error
+	}
+	return nil
+}
+
+type PasswordReset struct {
+	ID        string    `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	Email     string    `json:"email"`
+	UserID    string    `json:"userId"`
+	ExpiresAt time.Time `json:"expiresAt"`
+}
+
+func (p *PasswordReset) GetResetById() error {
+	if err := DBConn.Where("id = ?", p.ID).First(&p).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PasswordReset) Create() error {
+	if err := DBConn.Create(p).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *PasswordReset) Delete() error {
+	if err := DBConn.Delete(p).Error; err != nil {
+		return err
 	}
 	return nil
 }
