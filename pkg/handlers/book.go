@@ -8,6 +8,17 @@ import (
 	"homethings.ytsruh.com/pkg/storage"
 )
 
+type BookModel interface {
+	GetAllBooks(userId string) ([]storage.Book, error)
+	GetBookById(id string, userId string) error
+	Create(book *storage.Book) error
+	Update(book *storage.Book) error
+	Delete(id string, userId string) error
+	GetRead(userId string) ([]storage.Book, error)
+	GetUnread(userId string) ([]storage.Book, error)
+	GetWishlist(userId string) ([]storage.Book, error)
+}
+
 type CreateBookInput struct {
 	Name     string `json:"name" validate:"required"`
 	Isbn     string `json:"isbn" validate:"required"`
@@ -30,15 +41,15 @@ type UpdateBookInput struct {
 	Image    string `json:"image"`
 }
 
-func GetBooks(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) GetBooks() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		books, err := b.GetAllBooks(claims.Id)
+		books, err := h.Book.GetAllBooks(claims.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get books",
@@ -50,7 +61,7 @@ func GetBooks(b storage.BookModel) echo.HandlerFunc {
 	}
 }
 
-func CreateBook(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) CreateBook() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		input := CreateBookInput{}
 		if err := c.Bind(&input); err != nil {
@@ -66,7 +77,7 @@ func CreateBook(b storage.BookModel) echo.HandlerFunc {
 				"message": "bad request",
 			})
 		}
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
@@ -83,7 +94,7 @@ func CreateBook(b storage.BookModel) echo.HandlerFunc {
 			Wishlist: input.Wishlist,
 			UserId:   claims.Id,
 		}
-		err = b.Create(newBook)
+		err = h.Book.Create(newBook)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to create book",
@@ -95,28 +106,28 @@ func CreateBook(b storage.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetSingleBook(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) GetSingleBook() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		err = b.GetBookById(id, claims.Id)
+		err = h.Book.GetBookById(id, claims.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get book",
 			})
 		}
 		return c.JSON(200, echo.Map{
-			"book": b,
+			"book": h.Book,
 		})
 	}
 }
 
-func UpdateSingleBook(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) UpdateSingleBook() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
 		input := UpdateBookInput{}
@@ -125,7 +136,7 @@ func UpdateSingleBook(b storage.BookModel) echo.HandlerFunc {
 				"message": "failed to bind book",
 			})
 		}
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
@@ -143,7 +154,7 @@ func UpdateSingleBook(b storage.BookModel) echo.HandlerFunc {
 			Wishlist: input.Wishlist,
 			UserId:   claims.Id,
 		}
-		err = b.Update(book)
+		err = h.Book.Update(book)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to create document",
@@ -155,16 +166,16 @@ func UpdateSingleBook(b storage.BookModel) echo.HandlerFunc {
 	}
 }
 
-func DeleteSingleBook(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) DeleteSingleBook() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		err = b.Delete(id, claims.Id)
+		err = h.Book.Delete(id, claims.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to delete book",
@@ -176,15 +187,15 @@ func DeleteSingleBook(b storage.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetWishlist(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) GetWishlist() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		books, err := b.GetWishlist(claims.Id)
+		books, err := h.Book.GetWishlist(claims.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get books",
@@ -196,15 +207,15 @@ func GetWishlist(b storage.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetRead(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) GetRead() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		books, err := b.GetRead(claims.Id)
+		books, err := h.Book.GetRead(claims.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get books",
@@ -216,15 +227,15 @@ func GetRead(b storage.BookModel) echo.HandlerFunc {
 	}
 }
 
-func GetUnread(b storage.BookModel) echo.HandlerFunc {
+func (h *APIHandler) GetUnread() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		claims, err := GetUser(c)
+		claims, err := getUser(c)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get user",
 			})
 		}
-		books, err := b.GetUnread(claims.Id)
+		books, err := h.Book.GetUnread(claims.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"message": "failed to get books",

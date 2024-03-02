@@ -72,45 +72,49 @@ func main() {
 
 func setRoutes(e *echo.Echo) {
 	group := e.Group("/v1")
+	api := &handlers.APIHandler{
+		User:     &storage.User{},
+		Feedback: &storage.Feedback{},
+		Document: &storage.Document{},
+		Book:     &storage.Book{},
+	}
 	// Auth routes
-	user := &storage.User{}
-	group.POST("/login", handlers.Login(user))
+	group.POST("/login", api.Login())
+	group.POST("/requestreset", api.RequestPasswordReset())
+	group.POST("/passwordreset", api.PasswordReset())
 
 	// Search route
 	searchHandler := handlers.SearchHandler{}
-	group.POST("/search", searchHandler.Search)
+	group.POST("/search", searchHandler.Search, searchHandler.QueryMiddleware)
 
 	// Configure JWT middleware for Authentication
-	group.Use(handlers.SetJWTAuth())
+	group.Use(api.SetJWTAuth())
 
 	// Profile routes
-	group.GET("/profile", handlers.GetProfile(user))
-	group.PATCH("/profile", handlers.PatchProfile(user))
+	group.GET("/profile", api.GetProfile())
+	group.PATCH("/profile", api.PatchProfile())
 
 	// Feedback route
-	feedback := &storage.Feedback{}
-	group.POST("/feedback", handlers.CreateFeedback(feedback))
+	group.POST("/feedback", api.CreateFeedback())
 
 	// Document routes
-	document := &storage.Document{}
-	group.GET("/documents", handlers.GetDocuments(document))
-	group.POST("/documents", handlers.CreateDocument(document))
-	group.GET("/documents/:id", handlers.GetSingleDocument(document))
-	group.PATCH("/documents/:id", handlers.UpdateSingleDocument(document))
-	group.DELETE("/documents/:id", handlers.DeleteSingleDocument(document))
-	group.GET("/documents/url", handlers.CreateGetPresignedUrl(document))
-	group.PUT("/documents/url", handlers.CreatePutPresignedUrl(document))
+	group.GET("/documents", api.GetDocuments())
+	group.POST("/documents", api.CreateDocument())
+	group.GET("/documents/:id", api.GetSingleDocument())
+	group.PATCH("/documents/:id", api.UpdateSingleDocument())
+	group.DELETE("/documents/:id", api.DeleteSingleDocument())
+	group.GET("/documents/url", api.CreateGetPresignedUrl())
+	group.PUT("/documents/url", api.CreatePutPresignedUrl())
 
 	// Book routes
-	book := &storage.Book{}
-	group.GET("/books", handlers.GetBooks(book))
-	group.POST("/books", handlers.CreateBook(book))
-	group.GET("/books/:id", handlers.GetSingleBook(book))
-	group.PATCH("/books/:id", handlers.UpdateSingleBook(book))
-	group.DELETE("/books/:id", handlers.DeleteSingleBook(book))
-	group.GET("/books/wishlist", handlers.GetWishlist(book))
-	group.GET("/books/read", handlers.GetRead(book))
-	group.GET("/books/unread", handlers.GetUnread(book))
+	group.GET("/books", api.GetBooks())
+	group.POST("/books", api.CreateBook())
+	group.GET("/books/:id", api.GetSingleBook())
+	group.PATCH("/books/:id", api.UpdateSingleBook())
+	group.DELETE("/books/:id", api.DeleteSingleBook())
+	group.GET("/books/wishlist", api.GetWishlist())
+	group.GET("/books/read", api.GetRead())
+	group.GET("/books/unread", api.GetUnread())
 }
 
 func setAdminRoutes(e *echo.Echo) {

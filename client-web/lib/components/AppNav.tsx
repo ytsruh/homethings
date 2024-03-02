@@ -36,7 +36,7 @@ export default function MainNav(props: any) {
     <div className="border-b">
       <Sheet>
         <div className="flex h-16 items-center px-6">
-          <a className="text-accent flex justify-center items-center gap-2" href="/">
+          <a className="text-accent flex justify-center items-center gap-2" href="/app">
             <HomeIcon className="hidden lg:block h-[1.4rem] w-[1.4rem]" />
             <p className="hidden lg:block">Homethings</p>
           </a>
@@ -67,10 +67,10 @@ export default function MainNav(props: any) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <a href="/profile">
+                  <a href="/app/profile">
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                   </a>
-                  <a href="/feedback">
+                  <a href="/app/feedback">
                     <DropdownMenuItem>Feedback</DropdownMenuItem>
                   </a>
                 </DropdownMenuGroup>
@@ -86,19 +86,19 @@ export default function MainNav(props: any) {
             <SheetTitle>What do you want to do?</SheetTitle>
             <div className="py-2">
               <div className="mt-5 flex flex-col space-y-5">
-                <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
+                <Link href="/app" className="text-sm font-medium transition-colors hover:text-primary">
                   Home
                 </Link>
                 {preferences.showDocuments && (
                   <Link
-                    href="/documents"
+                    href="/app/documents"
                     className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                     Documents
                   </Link>
                 )}
                 {preferences.showBooks && (
                   <Link
-                    href="/books"
+                    href="/app/books"
                     className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
                     Books
                   </Link>

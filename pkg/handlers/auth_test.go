@@ -40,13 +40,24 @@ func (u *MockUser) Login(email string, password string) (*storage.User, error) {
 }
 
 func (u *MockUser) GetUserById(id string) (*storage.User, error) {
-
 	return &storage.User{
 		ID:       id,
 		Name:     "Test User",
 		Email:    "testing@gmail.com",
 		Password: "testing",
 	}, nil
+}
+
+func (u *MockUser) GetUserByEmail(email string) (*storage.User, error) {
+	if email == "testting@gmail.com" {
+		return &storage.User{
+			ID:       "123456789",
+			Name:     "Test User",
+			Email:    "testing@gmail.com",
+			Password: "testing",
+		}, nil
+	}
+	return &storage.User{}, nil
 }
 
 func (u *MockUser) Update(user storage.User) error {
@@ -98,7 +109,7 @@ func TestLogin(t *testing.T) {
 			c := e.NewContext(req, rec)
 			c.SetPath("/v1/login")
 			// Assertions
-			err := Login(&MockUser{})(c)
+			err := api.Login()(c)
 			if err != nil {
 				t.Errorf("gave error : %v", err)
 				return

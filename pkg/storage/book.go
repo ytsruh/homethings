@@ -6,17 +6,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-type BookModel interface {
-	GetAllBooks(userId string) ([]Book, error)
-	GetBookById(id string, userId string) error
-	Create(book *Book) error
-	Update(book *Book) error
-	Delete(id string, userId string) error
-	GetRead(userId string) ([]Book, error)
-	GetUnread(userId string) ([]Book, error)
-	GetWishlist(userId string) ([]Book, error)
-}
-
 type Book struct {
 	ID        string     `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
 	Name      string     `json:"name"`

@@ -86,13 +86,12 @@ func TestCreateDocument(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockDocument := MockDocument{}
 	c.SetPath("/v1/documents")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err = CreateDocument(&mockDocument)(c)
+	err = api.CreateDocument()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -112,13 +111,12 @@ func TestGetAllDocuments(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockDocument := MockDocument{}
 	c.SetPath("/v1/documents")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetDocuments(&mockDocument)(c)
+	err := api.GetDocuments()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -138,13 +136,12 @@ func TestGetSingleDocument(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockDocument := MockDocument{}
 	c.SetPath("/v1/documents/1")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetSingleDocument(&mockDocument)(c)
+	err := api.GetSingleDocument()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -180,13 +177,12 @@ func TestUpdateDocument(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockdocument := MockDocument{}
 	c.SetPath("/v1/books/1")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err = UpdateSingleDocument(&mockdocument)(c)
+	err = api.UpdateSingleDocument()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)

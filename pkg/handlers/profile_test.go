@@ -33,7 +33,7 @@ func TestGetProfile(t *testing.T) {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 			c.Set("user", token)
 			// Assertions
-			err := GetProfile(&MockUser{})(c)
+			err := api.GetProfile()(c)
 			if err != nil {
 				t.Errorf("gave error : %v", err)
 				return
@@ -94,7 +94,7 @@ func TestPatchProfile(t *testing.T) {
 			token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 			c.Set("user", token)
 			// Assertions
-			err = PatchProfile(&MockUser{})(c)
+			err = api.PatchProfile()(c)
 			if err != nil {
 				t.Errorf("gave error : %v", err)
 				return

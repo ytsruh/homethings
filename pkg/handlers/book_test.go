@@ -81,13 +81,12 @@ func TestGetAllBooks(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetBooks(&mockbook)(c)
+	err := api.GetBooks()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -117,13 +116,12 @@ func TestCreateBook(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err = CreateBook(&mockbook)(c)
+	err = api.CreateBook()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -143,13 +141,12 @@ func TestGetSingleBook(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books/1")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetSingleBook(&mockbook)(c)
+	err := api.GetSingleBook()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -179,13 +176,12 @@ func TestUpdateBook(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books/1")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err = UpdateSingleBook(&mockbook)(c)
+	err = api.UpdateSingleBook()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -205,13 +201,12 @@ func TestDeleteBook(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books/1")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := DeleteSingleBook(&mockbook)(c)
+	err := api.DeleteSingleBook()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -231,13 +226,12 @@ func TestGetWishlist(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books/wishlist")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetWishlist(&mockbook)(c)
+	err := api.GetWishlist()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -257,13 +251,12 @@ func TestGetRead(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books/read")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetRead(&mockbook)(c)
+	err := api.GetRead()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
@@ -283,13 +276,12 @@ func TestGetUnread(t *testing.T) {
 	rec := httptest.NewRecorder()
 	// Create a new echo context with the request and response recorder
 	c := e.NewContext(req, rec)
-	mockbook := MockBook{}
 	c.SetPath("/v1/books/unread")
 	// Create user token & set user context
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, mockClaims)
 	c.Set("user", token)
 	// Assertions
-	err := GetUnread(&mockbook)(c)
+	err := api.GetUnread()(c)
 	if err != nil {
 		fmt.Println(err)
 		t.Errorf("gave error : %v", err)
