@@ -57,6 +57,7 @@ export default function Page() {
               type="search"
               className="w-full rounded-md border bg-transparent px-6 py-3 focus:outline-none"
               placeholder="Search"
+              autoComplete="off"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />

@@ -89,7 +89,7 @@ export default async function Page(props: PageProps) {
         </div>
         <div className="flex">
           <div className="flex flex-col space-y-5 w-full md:w-2/3">
-            {data.results.length === 0 ? (
+            {data.amount === 0 ? (
               <NoResults />
             ) : (
               data.results.map((item: Result, i: number) => <Result key={i} data={item} />)
@@ -119,7 +119,7 @@ function Result(props: ResultProps) {
 
 function NoResults() {
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-start justify-center px-2 md:px-10">
       <h2 className="text-2xl py-2">No results found</h2>
       <p>Try searching for something else</p>
     </div>
