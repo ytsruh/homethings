@@ -89,9 +89,11 @@ export default async function Page(props: PageProps) {
         </div>
         <div className="flex">
           <div className="flex flex-col space-y-5 w-full md:w-2/3">
-            {data.results.map((item: Result, i: number) => (
-              <Result key={i} data={item} />
-            ))}
+            {data.results.length === 0 ? (
+              <NoResults />
+            ) : (
+              data.results.map((item: Result, i: number) => <Result key={i} data={item} />)
+            )}
           </div>
           <div className="md:flex md:flex-col hidden md:w-1/3"></div>
         </div>
@@ -102,7 +104,6 @@ export default async function Page(props: PageProps) {
 
 function Result(props: ResultProps) {
   const data = props.data;
-
   return (
     <a
       href={data.url}
@@ -113,5 +114,14 @@ function Result(props: ResultProps) {
       <p className="py-2 italic">{data.url}</p>
       <p className="flex justify-end px-2">Last tested : {dayjs(data.lastTested).format("D-MM-YYYY")}</p>
     </a>
+  );
+}
+
+function NoResults() {
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <h2 className="text-2xl py-2">No results found</h2>
+      <p>Try searching for something else</p>
+    </div>
   );
 }
