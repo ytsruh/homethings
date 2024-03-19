@@ -130,7 +130,7 @@ export default function SingleBook({ params }: { params: { id: string } }) {
                     <Label>Read:</Label>
                   </div>
                   <Switch
-                    checked={bookData.read}
+                    checked={bookData.read as boolean}
                     onCheckedChange={(bool) => setBookData({ ...bookData, read: bool })}
                   />
                 </div>
@@ -139,7 +139,7 @@ export default function SingleBook({ params }: { params: { id: string } }) {
                     <Label>Wishlist:</Label>
                   </div>
                   <Switch
-                    checked={bookData.wishlist}
+                    checked={bookData.wishlist as boolean}
                     onCheckedChange={(bool) => setBookData({ ...bookData, wishlist: bool })}
                   />
                 </div>

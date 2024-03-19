@@ -54,7 +54,7 @@ function BookItem(props: { data: Book }) {
       <img
         className="object-contain h-64 w-full "
         src={props.data.image || "https://fakeimg.pl/72x128?text=?&font=noto"}
-        alt={props.data.name}
+        alt={props.data.name as string}
       />
     </a>
   );

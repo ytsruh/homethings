@@ -90,13 +90,13 @@ export default function Profile() {
                   className="my-2"
                   type="text"
                   placeholder="Filename"
-                  value={profile.name}
+                  value={profile.name as string}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                 />
               </div>
               <div className="w-full">
                 <Label>Email:</Label>
-                <Input className="my-2" type="text" value={profile.email} disabled />
+                <Input className="my-2" type="text" value={profile.email as string} disabled />
               </div>
               <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
                 <div className="w-full flex justify-between items-center">
@@ -113,7 +113,7 @@ export default function Profile() {
                     <Label>Show Books:</Label>
                   </div>
                   <Switch
-                    checked={profile.showBooks}
+                    checked={profile.showBooks as boolean}
                     onCheckedChange={(bool) => setProfile({ ...profile, showBooks: bool })}
                   />
                 </div>

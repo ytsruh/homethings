@@ -49,7 +49,11 @@ export default function BooksRead() {
 function BookItem(props: { data: Book }) {
   return (
     <a href={`/books/${props.data.id}`} className="p-2 hover:border-zinc-500 hover:border hover:rounded-lg">
-      <img className="object-contain h-64 w-full " src={props.data.image as string} alt={props.data.name} />
+      <img
+        className="object-contain h-64 w-full "
+        src={props.data.image as string}
+        alt={props.data.name as string}
+      />
     </a>
   );
 }

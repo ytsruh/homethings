@@ -82,7 +82,7 @@ export default function SingleDocument({ params }: { params: { id: string } }) {
                   className="my-2"
                   type="text"
                   placeholder="Filename"
-                  value={document.title}
+                  value={document.title as string}
                   onChange={(e) => setDocument({ ...document, title: e.target.value })}
                 />
               </div>
