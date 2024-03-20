@@ -1,36 +1,16 @@
-import {
-  pgTable,
-  unique,
-  uuid,
-  text,
-  timestamp,
-  boolean,
-  index,
-  bigint,
-  bigserial,
-  smallint,
-  numeric,
-  primaryKey,
-} from "drizzle-orm/pg-core";
-import { sql, InferSelectModel, InferInsertModel } from "drizzle-orm";
+import { pgTable, unique, uuid, text, timestamp, boolean, bigint } from "drizzle-orm/pg-core";
+import { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
-const client = new Client({
+import { Pool } from "pg";
+const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
-async function connect() {
-  await client.connect();
-}
-connect();
-export const db = drizzle(client);
+export const db = drizzle(pool);
 
 export const users = pgTable(
   "users",
   {
-    id: uuid("id")
-      .default(sql`uuid_generate_v4()`)
-      .primaryKey()
-      .notNull(),
+    id: uuid("id").defaultRandom().primaryKey().notNull(),
     name: text("name").default("User Name"),
     email: text("email"),
     password: text("password"),
@@ -52,10 +32,7 @@ export type User = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
 
 export const feedback = pgTable("feedback", {
-  id: uuid("id")
-    .default(sql`uuid_generate_v4()`)
-    .primaryKey()
-    .notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   title: text("title"),
   body: text("body"),
   userId: uuid("user_id").references(() => users.id),
@@ -66,10 +43,7 @@ export type Feedback = InferSelectModel<typeof feedback>;
 export type NewFeedback = InferInsertModel<typeof feedback>;
 
 export const books = pgTable("books", {
-  id: uuid("id")
-    .default(sql`uuid_generate_v4()`)
-    .primaryKey()
-    .notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   name: text("name"),
   isbn: text("isbn"),
   author: text("author"),
@@ -89,10 +63,7 @@ export type Book = InferSelectModel<typeof books>;
 export type NewBook = InferInsertModel<typeof books>;
 
 export const accounts = pgTable("accounts", {
-  id: uuid("id")
-    .default(sql`uuid_generate_v4()`)
-    .primaryKey()
-    .notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   name: text("name"),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
@@ -101,10 +72,7 @@ export type Account = InferSelectModel<typeof accounts>;
 export type NewAccount = InferInsertModel<typeof accounts>;
 
 export const documents = pgTable("documents", {
-  id: uuid("id")
-    .default(sql`uuid_generate_v4()`)
-    .primaryKey()
-    .notNull(),
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
   title: text("title"),
   description: text("description"),
   accountId: uuid("account_id")
