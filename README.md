@@ -4,12 +4,6 @@ The Homethings Apps & API
 
 ## Versions
 
-### v1.2
-
-- Built Go/Echo API server
-- Refactored NextJS app to use Go Server
-- Refactored mobile app to use Go Server
-
 ### v1.1
 
 - Updated Next to use App Directory
