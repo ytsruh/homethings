@@ -25,23 +25,22 @@ export default function PageFrame(props: { title: string; children: React.ReactN
   }
   if (status === "authenticated") {
     return (
-      <div>
+      <div className="min-h-screen flex flex-col h-screen">
         <MainNav preferences={preferences} />
-        <div className="mx-5 my-2">
-          <div className="py-2">
+        <div className="px-5 py-2 flex flex-col h-full">
+          <div>
             <h2 className="text-3xl font-bold tracking-tight py-2">{props.title}</h2>
             <Separator />
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12">
-            <div className="hidden lg:grid lg:col-span-2 p-2">
-              <div className="flex flex-col mt-2 space-y-3">
-                <SideLink text="Home" link="/" />
-                {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
-                {preferences.showBooks && <SideLink text="Books" link="/books" />}
-                <SideLink text="Profile" link="/profile" />
-              </div>
+          <div id="app" className="flex-1 flex">
+            <div className="hidden lg:flex lg:flex-col lg:p-2 lg:w-56 lg:space-y-3">
+              <SideLink text="Home" link="/" />
+              <SideLink text="Chat" link="/chat" />
+              {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
+              {preferences.showBooks && <SideLink text="Books" link="/books" />}
+              <SideLink text="Profile" link="/profile" />
             </div>
-            <div className="col-span-12 lg:col-span-10 p-2">{props.children}</div>
+            <div className="p-2 w-full">{props.children}</div>
           </div>
         </div>
       </div>

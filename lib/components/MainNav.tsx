@@ -94,6 +94,9 @@ export default function MainNav(props: any) {
                 <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
                   Home
                 </Link>
+                <Link href="/chat" className="text-sm font-medium transition-colors hover:text-primary">
+                  Chat
+                </Link>
                 {preferences.showDocuments && (
                   <Link
                     href="/documents"
