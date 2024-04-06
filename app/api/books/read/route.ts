@@ -1,11 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
-import { combinedDecodeToken } from "@/lib/helpers";
+import { decodeToken } from "@/lib/helpers";
 import { db, books } from "@/db/schema";
 import type { Book } from "@/db/schema";
 import { eq, asc, and } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
-  const token: any = await combinedDecodeToken(req);
+  const token: any = await decodeToken(req);
   if (!token) {
     return NextResponse.json({ error: "You are not authorised" }, { status: 401 });
   }

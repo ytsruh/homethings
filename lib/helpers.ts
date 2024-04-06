@@ -1,41 +1,18 @@
 import { getToken } from "next-auth/jwt";
 import { User } from "@/db/schema";
 import { NextRequest } from "next/server";
-import { headers } from "next/headers";
-import jsonwebtoken from "jsonwebtoken";
 
-export const combinedDecodeToken = async (req: NextRequest) => {
-  // Check if Secret is set in ENV variables
-  if (!process.env.NEXTAUTH_SECRET) {
-    throw new Error("JWT_KEY must be defined");
+export const decodeToken = async (req: NextRequest) => {
+  const token = await getToken({ req });
+  if (!token) {
+    return null;
   }
-  try {
-    // First try to get token in cookie from Next Auth
-    const token = await getToken({ req });
-    if (token) {
-      // If token is found then return the user id
-      return { id: token.sub, accountId: token.accountId };
-    } else {
-      // If token is not found then check if a token from custom auth can be found in the headers
-      const headersList = headers();
-      const token = headersList.get("token");
-      if (!token) {
-        throw new Error("Unauthorised: Token not found");
-      }
-      // If token is found then verify it using custom auth
-      const decoded: any = await jsonwebtoken.verify(token, process.env.NEXTAUTH_SECRET);
-      if (decoded) {
-        // If token is verified then return it
-        return { id: decoded.data.id, accountId: decoded.data.accountId };
-      }
-      // If logic gets to this stage we must assume that the token is invalid so throw error
-      throw new Error("Unauthorised: Token not found");
-    }
-  } catch (error) {
-    console.log(error);
-    // Token cannot be found or validated to return unauthorised
-    return false;
-  }
+  return {
+    id: token.sub,
+    name: token.name,
+    email: token.email,
+    accountId: token.accountId,
+  };
 };
 
 export const filterUserData = async (data: User) => {

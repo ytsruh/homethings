@@ -1,11 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
-import { filterUserData, combinedDecodeToken } from "@/lib/helpers";
+import { filterUserData, decodeToken } from "@/lib/helpers";
 import { db, users } from "@/db/schema";
 import type { User } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
-  const token: any = await combinedDecodeToken(req);
+  const token: any = await decodeToken(req);
   if (!token) {
     return NextResponse.json({ error: "You are not authorised" }, { status: 401 });
   }
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const token: any = await combinedDecodeToken(req);
+  const token: any = await decodeToken(req);
   if (!token) {
     return NextResponse.json({ error: "You are not authorised" }, { status: 401 });
   }

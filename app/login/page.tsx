@@ -61,8 +61,8 @@ export default function Page() {
   }
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="relative flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0 dark:bg-zinc-900">
+    <div className="flex flex-col items-center justify-center max-h-screen">
+      <div className="flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0 dark:bg-zinc-900">
         <div className="p-6 md:p-20">
           <div className="text-center py-5">
             <h1 className="text-5xl py-2">
