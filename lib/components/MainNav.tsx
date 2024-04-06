@@ -89,30 +89,31 @@ export default function MainNav(props: any) {
         <SheetContent side="left">
           <SheetHeader>
             <SheetTitle>What do you want to do?</SheetTitle>
-            <SheetDescription>
-              <nav className="mt-5 flex flex-col space-y-5">
-                <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
-                  Home
+            <nav className="py-10 flex flex-col space-y-5">
+              <Link href="/" className="text-sm font-medium transition-colors hover:text-primary">
+                Home
+              </Link>
+              <Link href="/chat" className="text-sm font-medium transition-colors hover:text-primary">
+                Chat
+              </Link>
+              <Link href="/notes" className="text-sm font-medium transition-colors hover:text-primary">
+                Notes
+              </Link>
+              {preferences.showDocuments && (
+                <Link
+                  href="/documents"
+                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                  Documents
                 </Link>
-                <Link href="/chat" className="text-sm font-medium transition-colors hover:text-primary">
-                  Chat
+              )}
+              {preferences.showBooks && (
+                <Link
+                  href="/books"
+                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                  Books
                 </Link>
-                {preferences.showDocuments && (
-                  <Link
-                    href="/documents"
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                    Documents
-                  </Link>
-                )}
-                {preferences.showBooks && (
-                  <Link
-                    href="/books"
-                    className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                    Books
-                  </Link>
-                )}
-              </nav>
-            </SheetDescription>
+              )}
+            </nav>
           </SheetHeader>
         </SheetContent>
       </Sheet>

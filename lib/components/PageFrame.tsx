@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import Loading from "./Loading";
 import MainNav from "./MainNav";
 import { getLocalUser } from "@/lib/utils";
+import { Toaster } from "./ui/toaster";
 
 export default function PageFrame(props: { title: string; children: React.ReactNode }) {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function PageFrame(props: { title: string; children: React.ReactN
             <div className="hidden lg:flex lg:flex-col lg:p-2 lg:w-56 lg:space-y-3">
               <SideLink text="Home" link="/" />
               <SideLink text="Chat" link="/chat" />
+              <SideLink text="Notes" link="/notes" />
               {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
               {preferences.showBooks && <SideLink text="Books" link="/books" />}
               <SideLink text="Profile" link="/profile" />
@@ -43,6 +45,7 @@ export default function PageFrame(props: { title: string; children: React.ReactN
             <div className="p-2 w-full">{props.children}</div>
           </div>
         </div>
+        <Toaster />
       </div>
     );
   }
