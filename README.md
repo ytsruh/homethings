@@ -7,6 +7,8 @@ The Homethings Apps & API
 ### v1.1
 
 - Updated Next to use App Directory
+- Added custom chatbot
+- Removed mobile app
 
 ### v1
 
