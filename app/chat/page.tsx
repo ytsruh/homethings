@@ -26,7 +26,9 @@ export default function Chat() {
             </div>
           ))}
         </div>
-        <form onSubmit={handleSubmit} className="flex space-x-5">
+        <form
+          onSubmit={handleSubmit}
+          className="flex space-y-2 md:space-x-5 md:space-y-0 flex-col md:flex-row">
           <Input
             type="text"
             value={input}
