@@ -1,10 +1,10 @@
 import { NextResponse, NextRequest } from "next/server";
-import { combinedDecodeToken } from "@/lib/helpers";
+import { decodeToken } from "@/lib/helpers";
 import { db, feedback } from "@/db/schema";
 import type { Feedback, NewFeedback } from "@/db/schema";
 
 export async function PATCH(req: NextRequest) {
-  const token: any = await combinedDecodeToken(req);
+  const token: any = await decodeToken(req);
   if (!token) {
     return NextResponse.json({ error: "You are not authorised" }, { status: 401 });
   }
