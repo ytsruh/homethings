@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { decodeToken } from "@/lib/utils";
-import { db, documents } from "@/db/schema";
-import type { Document, NewDocument } from "@/db/schema";
+import { db, notes } from "@/db/schema";
+import type { Note, NewNote } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(req: NextRequest) {
@@ -10,14 +10,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "You are not authorised" }, { status: 401 });
   }
   try {
-    const data: Document[] = await db
-      .select()
-      .from(documents)
-      .where(eq(documents.accountId, token.accountId));
-    return NextResponse.json({ count: data.length, data: data });
-  } catch (error) {
-    // For errors, log to console and send a 500 response back
-    console.log(error);
+    const data: Note[] = await db.select().from(notes).where(eq(notes.userId, token.id));
+    if (data) {
+      return NextResponse.json(data);
+    }
+  } catch (err) {
+    console.log(err);
     return NextResponse.json({ error: "Something went wrong" }, { status: 500 });
   }
 }
@@ -29,13 +27,12 @@ export async function POST(req: NextRequest) {
   }
   try {
     const body = await req.json();
-    const newDocument: NewDocument = {
+    const newNote: NewNote = {
       title: body.title,
-      description: body.description,
-      fileName: body.fileName,
-      accountId: token.accountId,
+      body: body.body,
+      userId: token.id,
     };
-    const data: Document[] = await db.insert(documents).values(newDocument).returning();
+    const data: Note[] = await db.insert(notes).values(newNote).returning();
     return NextResponse.json({ message: "success", data: data });
   } catch (error) {
     // For errors, log to console and send a 500 response back

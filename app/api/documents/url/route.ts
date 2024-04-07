@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createS3GetUrl, createS3PutUrl } from "@/lib/storage";
-import { decodeToken } from "@/lib/helpers";
+import { decodeToken } from "@/lib/utils";
 
 export async function GET(req: NextRequest) {
   const token: any = await decodeToken(req);

@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { filterUserData, decodeToken } from "@/lib/helpers";
+import { filterUserData, decodeToken } from "@/lib/utils";
 import { db, users } from "@/db/schema";
 import type { User } from "@/db/schema";
 import { eq } from "drizzle-orm";

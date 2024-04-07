@@ -84,3 +84,14 @@ export const documents = pgTable("documents", {
 });
 export type Document = InferSelectModel<typeof documents>;
 export type NewDocument = InferInsertModel<typeof documents>;
+
+export const notes = pgTable("notes", {
+  id: uuid("id").defaultRandom().primaryKey().notNull(),
+  title: text("title"),
+  body: text("body"),
+  userId: uuid("user_id").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+export type Note = InferSelectModel<typeof notes>;
+export type NewNote = InferInsertModel<typeof notes>;

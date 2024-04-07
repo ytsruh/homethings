@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { decodeToken } from "@/lib/utils";
-import { deleteFile } from "@/lib/storage";
-import { db, documents } from "@/db/schema";
-import type { Document } from "@/db/schema";
+import { db, notes } from "@/db/schema";
+import type { Note } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
@@ -12,11 +11,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
   const queryParam = params.id;
   try {
-    const data: Document[] = await db
+    const data: Note[] = await db
       .select()
-      .from(documents)
-      .where(and(eq(documents.id, queryParam), eq(documents.accountId, token.accountId)));
-    return NextResponse.json({ data: data[0] });
+      .from(notes)
+      .where(and(eq(notes.id, queryParam), eq(notes.userId, token.id)));
+    return NextResponse.json(data[0]);
   } catch (error) {
     // For errors, log to console and send a 500 response back
     console.log(error);
@@ -32,12 +31,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const queryParam = params.id;
   try {
     const body = await req.json();
-    const data: Document[] = await db
-      .update(documents)
-      .set({ title: body.title, description: body.description })
-      .where(and(eq(documents.id, queryParam), eq(documents.accountId, token.accountId)))
+    const data: Note[] = await db
+      .update(notes)
+      .set({ title: body.title, body: body.body })
+      .where(and(eq(notes.id, queryParam), eq(notes.userId, token.id)))
       .returning();
-    return NextResponse.json({ message: "success", data: data[0] });
+    return NextResponse.json(data[0]);
   } catch (error) {
     // For errors, log to console and send a 500 response back
     console.log(error);
@@ -52,12 +51,12 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   }
   const queryParam = params.id;
   try {
-    const results: Document[] = await db.delete(documents).where(eq(documents.id, queryParam)).returning();
-    const deletedDoc = results[0];
-    // Delete the file from storage
-    const result = await deleteFile(deletedDoc.fileName as string);
-    if (!result.success) {
-      throw new Error(result.error as string);
+    const results: Note[] = await db
+      .delete(notes)
+      .where(and(eq(notes.id, queryParam), eq(notes.userId, token.id)))
+      .returning();
+    if (results.length === 0) {
+      return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
     return NextResponse.json({ deleted: "success" });
   } catch (error) {
