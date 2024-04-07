@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { decodeToken } from "@/lib/helpers";
+import { decodeToken } from "@/lib/utils";
 import { deleteFile } from "@/lib/storage";
 import { db, documents } from "@/db/schema";
 import type { Document } from "@/db/schema";

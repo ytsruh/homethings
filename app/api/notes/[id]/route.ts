@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { decodeToken } from "@/lib/helpers";
+import { decodeToken } from "@/lib/utils";
 import { db, notes } from "@/db/schema";
 import type { Note } from "@/db/schema";
 import { eq, and } from "drizzle-orm";

@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { decodeToken } from "@/lib/helpers";
+import { decodeToken } from "@/lib/utils";
 import { db, feedback } from "@/db/schema";
 import type { Feedback, NewFeedback } from "@/db/schema";
 
