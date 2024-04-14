@@ -20,8 +20,8 @@ export default function Chat() {
       <div className="flex flex-col h-full max-h-[calc(100vh-150px)]">
         <div id="chat" className="overflow-auto flex-grow p-4">
           {messages.map((m) => (
-            <div key={m.id} className="whitespace-pre-wrap">
-              {m.role === "user" ? "User: " : "AI: "}
+            <div key={m.id} className="whitespace-pre-wrap py-1">
+              <span className="text-accent">{m.role === "user" ? "User: " : "AI: "}</span>
               {m.content}
             </div>
           ))}

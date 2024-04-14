@@ -36,8 +36,8 @@ export const feedback = pgTable("feedback", {
   title: text("title"),
   body: text("body"),
   userId: uuid("user_id").references(() => users.id),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 export type Feedback = InferSelectModel<typeof feedback>;
 export type NewFeedback = InferInsertModel<typeof feedback>;
@@ -56,8 +56,8 @@ export const books = pgTable("books", {
   userId: uuid("user_id")
     .references(() => users.id)
     .references(() => users.id),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 export type Book = InferSelectModel<typeof books>;
 export type NewBook = InferInsertModel<typeof books>;
@@ -79,8 +79,8 @@ export const documents = pgTable("documents", {
     .references(() => accounts.id)
     .references(() => accounts.id),
   fileName: text("file_name"),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
 });
 export type Document = InferSelectModel<typeof documents>;
 export type NewDocument = InferInsertModel<typeof documents>;
