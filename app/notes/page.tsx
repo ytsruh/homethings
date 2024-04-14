@@ -26,6 +26,15 @@ export default function Notes() {
   const { loading } = useLoadingContext();
   const [loaded, setLoaded] = useState(loading);
   const [notes, setNotes] = useState<Note[]>();
+  const [filtered, setFiltered] = useState<Note[]>();
+
+  function search(e: React.ChangeEvent<HTMLInputElement>) {
+    const search = e.target.value.toLowerCase();
+    const filteredData = notes?.filter((note) => {
+      return note.title?.toLowerCase().includes(search) || note.body?.toLowerCase().includes(search);
+    });
+    setFiltered(filteredData);
+  }
 
   useEffect(() => {
     async function getData() {
@@ -35,6 +44,7 @@ export default function Notes() {
       }
       const data: Note[] = await res.json();
       setNotes(data);
+      setFiltered(data);
       setLoaded(true);
     }
     getData();
@@ -53,7 +63,7 @@ export default function Notes() {
         </h2>
       </div>
       <div className="w-full flex justify-between items-center gap-5 py-5">
-        <Input placeholder="Filter notes..." className="" />
+        <Input placeholder="Filter notes..." className="" onChange={search} />
         <CreateModal />
       </div>
       {notes?.length === 0 ? (
@@ -62,7 +72,7 @@ export default function Notes() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {notes?.map((note: Note) => (
+          {filtered?.map((note: Note) => (
             <NoteCard key={note.id} data={note} />
           ))}
         </div>
@@ -78,7 +88,9 @@ function NoteCard(props: { data: Note }) {
         <CardTitle>{props.data.title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <CardDescription>{props.data.body}</CardDescription>
+        <CardDescription className="min-h-12 sm:min-h-24 lg:min-h-32">
+          {props.data.body!.length > 150 ? props.data.body?.substring(0, 150) + "..." : props.data.body}
+        </CardDescription>
       </CardContent>
       <CardFooter>
         <Link href={`/notes/${props.data.id}`} className={buttonVariants({ variant: "default" })}>
@@ -147,6 +159,7 @@ function CreateModal() {
             <Textarea
               onChange={(e) => setBody(e.target.value)}
               id="body"
+              rows={10}
               placeholder="Type your note here....."
             />
           </div>

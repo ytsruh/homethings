@@ -113,7 +113,7 @@ export default function SingleNote(props: { params: { id: string } }) {
           <div className="grid w-full gap-1.5">
             <Label htmlFor="body">Note body</Label>
             <Textarea
-              rows={5}
+              rows={15}
               value={body}
               onChange={(e) => setBody(e.target.value)}
               id="body"
