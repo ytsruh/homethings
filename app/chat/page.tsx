@@ -1,5 +1,5 @@
 "use client";
-
+export const runtime = "edge";
 import { useChat } from "ai/react";
 import { useState } from "react";
 import PageFrame from "@/components/PageFrame";

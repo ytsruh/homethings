@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { ToggleTheme } from "@/components/ToggleTheme";

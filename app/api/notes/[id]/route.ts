@@ -1,3 +1,4 @@
+export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeToken } from "@/lib/utils";
 import { db, notes } from "@/db/schema";

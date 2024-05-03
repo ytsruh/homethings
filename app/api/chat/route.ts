@@ -1,3 +1,5 @@
+export const runtime = "edge";
+
 import OpenAI from "openai";
 import { OpenAIStream, StreamingTextResponse } from "ai";
 import { NextRequest } from "next/server";

@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 import PageFrame from "@/components/PageFrame";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { TrashIcon, ArrowLeftIcon } from "@radix-ui/react-icons";

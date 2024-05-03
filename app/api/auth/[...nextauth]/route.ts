@@ -1,4 +1,5 @@
 // @ts-nocheck
+export const runtime = "edge";
 import NextAuth, { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";

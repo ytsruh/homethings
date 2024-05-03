@@ -1,4 +1,5 @@
 "use client";
+export const runtime = "edge";
 import { useState } from "react";
 import PageFrame from "@/components/PageFrame";
 import { Input } from "@/components/ui/input";

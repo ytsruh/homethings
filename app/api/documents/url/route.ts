@@ -1,3 +1,4 @@
+export const runtime = "edge";
 import { NextRequest, NextResponse } from "next/server";
 import { createS3GetUrl, createS3PutUrl } from "@/lib/storage";
 import { decodeToken } from "@/lib/utils";
