@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu&display=swap");
+
+:root {
+    --accent: 6, 88%, 45%;
+    --accent-foreground: 6, 88%, 45%;
+}
+
+.dark {
+    --accent: 6, 88%, 45%;
+    --accent-foreground: 6, 88%, 45%;
+}
