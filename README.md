@@ -7,6 +7,7 @@ The Homethings Apps & API
 ### v1.2
 
 - Switch Authentication to Lucia
+- Added React Server Components
 
 ### v1.1
 

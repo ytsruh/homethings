@@ -7,10 +7,11 @@ export const userTable = sqliteTable("user", {
     .notNull()
     .primaryKey()
     .$defaultFn(() => generateIdFromEntropySize(10)),
-  profileImage: text("profile_image"),
   email: text("email").unique().notNull(),
   name: text("name").notNull(),
   accountId: text("account_id").notNull(),
+  profileImage: text("profile_image"),
+  password: text("password").notNull(),
   showDocuments: integer("show_documents", { mode: "boolean" }).notNull().default(false),
   showBooks: integer("show_books", { mode: "boolean" }).notNull().default(false),
   createdAt: text("created_at")
