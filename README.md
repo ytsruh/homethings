@@ -1,11 +1,12 @@
 # Homethings
 
-The Homethings App. A personal homelab.
+The Homethings Apps & API
 
 ## Versions
 
 ### v1.2
-- Remix rebuild
+
+- Switch Authentication to Lucia
 
 ### v1.1
 
