@@ -1,97 +1,34 @@
-import { pgTable, unique, uuid, text, timestamp, boolean, bigint } from "drizzle-orm/pg-core";
-import { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
-export const db = drizzle(pool);
+import { sql } from "drizzle-orm";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { generateIdFromEntropySize } from "lucia";
 
-export const users = pgTable(
-  "users",
-  {
-    id: uuid("id").defaultRandom().primaryKey().notNull(),
-    name: text("name").default("User Name"),
-    email: text("email"),
-    password: text("password"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
-    profileImage: text("profile_image"),
-    showBooks: boolean("show_books").default(true),
-    showDocuments: boolean("show_documents").default(true),
-    accountId: uuid("account_id").references(() => accounts.id),
-    isAdmin: boolean("is_admin").default(false),
-  },
-  (table) => {
-    return {
-      usersEmailKey: unique("users_email_key").on(table.email),
-    };
-  }
-);
-export type User = InferSelectModel<typeof users>;
-export type NewUser = InferInsertModel<typeof users>;
-
-export const feedback = pgTable("feedback", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  title: text("title"),
-  body: text("body"),
-  userId: uuid("user_id").references(() => users.id),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
+export const userTable = sqliteTable("user", {
+  id: text("id")
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => generateIdFromEntropySize(10)),
+  profileImage: text("profile_image"),
+  email: text("email").unique().notNull(),
+  name: text("name").notNull(),
+  accountId: text("account_id").notNull(),
+  showDocuments: integer("show_documents", { mode: "boolean" }).notNull().default(false),
+  showBooks: integer("show_books", { mode: "boolean" }).notNull().default(false),
+  createdAt: text("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
 });
-export type Feedback = InferSelectModel<typeof feedback>;
-export type NewFeedback = InferInsertModel<typeof feedback>;
 
-export const books = pgTable("books", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name"),
-  isbn: text("isbn"),
-  author: text("author"),
-  genre: text("genre"),
-  // You can use { mode: "bigint" } if numbers are exceeding js number limitations
-  rating: bigint("rating", { mode: "number" }),
-  image: text("image"),
-  read: boolean("read").default(false),
-  wishlist: boolean("wishlist").default(false),
-  userId: uuid("user_id")
-    .references(() => users.id)
-    .references(() => users.id),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
-});
-export type Book = InferSelectModel<typeof books>;
-export type NewBook = InferInsertModel<typeof books>;
+export type InsertUser = typeof userTable.$inferInsert;
+export type SelectUser = typeof userTable.$inferSelect;
 
-export const accounts = pgTable("accounts", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  name: text("name"),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }),
+export const sessionTable = sqliteTable("session", {
+  id: text("id").notNull().primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  expiresAt: integer("expires_at").notNull(),
 });
-export type Account = InferSelectModel<typeof accounts>;
-export type NewAccount = InferInsertModel<typeof accounts>;
 
-export const documents = pgTable("documents", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  title: text("title"),
-  description: text("description"),
-  accountId: uuid("account_id")
-    .references(() => accounts.id)
-    .references(() => accounts.id),
-  fileName: text("file_name"),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).defaultNow(),
-});
-export type Document = InferSelectModel<typeof documents>;
-export type NewDocument = InferInsertModel<typeof documents>;
-
-export const notes = pgTable("notes", {
-  id: uuid("id").defaultRandom().primaryKey().notNull(),
-  title: text("title"),
-  body: text("body"),
-  userId: uuid("user_id").references(() => users.id),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-export type Note = InferSelectModel<typeof notes>;
-export type NewNote = InferInsertModel<typeof notes>;
+export type InsertSession = typeof sessionTable.$inferInsert;
+export type SelectSession = typeof sessionTable.$inferSelect;

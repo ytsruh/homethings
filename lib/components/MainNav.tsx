@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import Link from "next/link";
 import {
@@ -10,33 +9,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { signOut } from "next-auth/react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "./ui/button";
 import { ToggleTheme } from "./ToggleTheme";
 import { HomeIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { removeLocalUser } from "../utils";
 
-function getInitials(name: string) {
-  return name.split(" ").map((n) => n[0]);
-}
-
-export default function MainNav(props: any) {
-  const { preferences } = props;
-
-  function handleLogout() {
-    removeLocalUser();
-    signOut({ callbackUrl: "/login" });
-  }
-
+export default function MainNav() {
   return (
     <div className="border-b">
       <Sheet>
@@ -54,8 +34,8 @@ export default function MainNav(props: any) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={preferences.profileImage} alt="User" />
-                    <AvatarFallback>{preferences.name ? getInitials(preferences.name) : "--"}</AvatarFallback>
+                    <AvatarImage src="" alt="User" />
+                    <AvatarFallback>--</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -63,11 +43,9 @@ export default function MainNav(props: any) {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {preferences.name ? preferences.name : <span className="italic">Name</span>}
+                      <span className="italic">Name</span>
                     </p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {preferences.email ? preferences.email : ""}
-                    </p>
+                    <p className="text-xs leading-none text-muted-foreground">""</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -80,7 +58,7 @@ export default function MainNav(props: any) {
                   </a>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>Log out</DropdownMenuItem>
+                <DropdownMenuItem>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -99,20 +77,16 @@ export default function MainNav(props: any) {
               <Link href="/notes" className="text-sm font-medium transition-colors hover:text-primary">
                 Notes
               </Link>
-              {preferences.showDocuments && (
-                <Link
-                  href="/documents"
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                  Documents
-                </Link>
-              )}
-              {preferences.showBooks && (
-                <Link
-                  href="/books"
-                  className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-                  Books
-                </Link>
-              )}
+              <Link
+                href="/documents"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                Documents
+              </Link>
+              <Link
+                href="/books"
+                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+                Books
+              </Link>
             </nav>
           </SheetHeader>
         </SheetContent>

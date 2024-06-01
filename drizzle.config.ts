@@ -1,15 +1,13 @@
 import type { Config } from "drizzle-kit";
-import "dotenv/config";
-
-if (!process.env.DATABASE_URL) {
-  throw new Error("DATABASE_URL is missing");
-}
+import * as dotenv from "dotenv";
+dotenv.config();
 
 export default {
   schema: "./db/schema.ts",
-  out: "./db",
-  driver: "pg",
+  out: "./db/migrations",
+  driver: "turso",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL,
+    url: process.env.TURSO_DATABASE_URL!,
+    authToken: process.env.TURSO_AUTH_TOKEN,
   },
 } satisfies Config;

@@ -1,44 +1,20 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import type { User } from "@/db/schema";
-import { getToken } from "next-auth/jwt";
-import { NextRequest } from "next/server";
+import type { SelectUser } from "@/db/schema";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function setLocalUser(data: User) {
+export async function setLocalUser(data: SelectUser) {
   await localStorage.setItem("user", JSON.stringify(data));
-}
-
-export async function getLocalUser() {
-  const data = await localStorage.getItem("user");
-  if (data) {
-    const formatted: User = JSON.parse(data);
-    return formatted;
-  }
-  return {};
 }
 
 export async function removeLocalUser() {
   await localStorage.removeItem("user");
 }
 
-export const decodeToken = async (req: NextRequest) => {
-  const token = await getToken({ req });
-  if (!token) {
-    return null;
-  }
-  return {
-    id: token.sub,
-    name: token.name,
-    email: token.email,
-    accountId: token.accountId,
-  };
-};
-
-export const filterUserData = async (data: User) => {
+export const filterUserData = async (data: SelectUser) => {
   return {
     name: data.name,
     email: data.email,
@@ -48,8 +24,8 @@ export const filterUserData = async (data: User) => {
   };
 };
 
-export const filterOutPassword = (array: Array<User>) => {
-  const filtered = array.map((data: User) => {
+export const filterOutPassword = (array: Array<SelectUser>) => {
+  const filtered = array.map((data: SelectUser) => {
     return {
       id: data.id,
       name: data.name,

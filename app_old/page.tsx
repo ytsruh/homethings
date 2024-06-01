@@ -1,3 +1,4 @@
+"use client";
 export const runtime = "edge";
 import PageFrame from "@/components/PageFrame";
 

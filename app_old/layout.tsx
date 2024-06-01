@@ -1,5 +1,4 @@
 export const runtime = "edge";
-
 import { Providers } from "@/components/Providers";
 import "@/lib/styles.css";
 import { Metadata } from "next";
