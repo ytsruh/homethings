@@ -49,7 +49,7 @@ async function signup(_: unknown, formData: FormData): Promise<ActionResult> {
   try {
     const user = await db
       .insert(userTable)
-      .values({ password: hashedPassword, accountId: "111", email: username, name: "name" })
+      .values({ password: hashedPassword, email: username, name: "User Name" })
       .returning();
     const session = await lucia.createSession(user[0].id, {});
     const sessionCookie = lucia.createSessionCookie(session.id);

@@ -10,8 +10,10 @@ export default async function Page() {
   }
 
   return (
-    <PageFrame title="Dashboard" subtitle="Welcome to your account">
-      <h1>Home</h1>
+    <PageFrame
+      title="Profile & Settings"
+      subtitle="Change your profile picture or show/hide features to personalise your experience.">
+      <h1>Profile</h1>
     </PageFrame>
   );
 }

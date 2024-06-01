@@ -2,14 +2,16 @@ import { sql } from "drizzle-orm";
 import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { generateIdFromEntropySize } from "lucia";
 
-export const userTable = sqliteTable("user", {
+export const userTable = sqliteTable("users", {
   id: text("id")
     .notNull()
     .primaryKey()
     .$defaultFn(() => generateIdFromEntropySize(10)),
   email: text("email").unique().notNull(),
   name: text("name").notNull(),
-  accountId: text("account_id").notNull(),
+  accountId: text("account_id")
+    .notNull()
+    .$defaultFn(() => generateIdFromEntropySize(10)),
   profileImage: text("profile_image"),
   password: text("password").notNull(),
   showDocuments: integer("show_documents", { mode: "boolean" }).notNull().default(false),
@@ -23,7 +25,7 @@ export const userTable = sqliteTable("user", {
 export type InsertUser = typeof userTable.$inferInsert;
 export type SelectUser = typeof userTable.$inferSelect;
 
-export const sessionTable = sqliteTable("session", {
+export const sessionTable = sqliteTable("sessions", {
   id: text("id").notNull().primaryKey(),
   userId: text("user_id")
     .notNull()

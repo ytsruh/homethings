@@ -1,16 +1,15 @@
 import { Separator } from "@/components/ui/separator";
 import MainNav from "./MainNav";
 import { Toaster } from "./ui/toaster";
+import BreadcrumbNav from "@/components/Breadcrumb";
 
-export default function PageFrame(props: { title: string; children: React.ReactNode }) {
+export default function PageFrame(props: { title: string; subtitle: string; children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col h-screen">
       <MainNav />
       <div className="px-5 py-2 flex flex-col h-full">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight py-2">{props.title}</h2>
-          <Separator />
-        </div>
+        <BreadcrumbNav />
+        <Separator />
         <div id="app" className="flex-1 flex">
           <div className="hidden lg:flex lg:flex-col lg:p-2 lg:w-56 lg:space-y-3">
             <SideLink text="Home" link="/" />
@@ -20,7 +19,13 @@ export default function PageFrame(props: { title: string; children: React.ReactN
             <SideLink text="Books" link="/books" />
             <SideLink text="Profile" link="/profile" />
           </div>
-          <div className="p-2 w-full">{props.children}</div>
+          <div className="p-2 w-full">
+            <div className="py-4">
+              <h1 className="text-2xl">{props.title}</h1>
+              <h2 className="text-sm text-zinc-500 dark:text-zinc-300 italic">{props.subtitle}</h2>
+            </div>
+            {props.children}
+          </div>
         </div>
       </div>
       <Toaster />
