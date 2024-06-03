@@ -6,8 +6,7 @@ The Homethings Apps & API
 
 ### v1.2
 
-- Switch Authentication to Lucia
-- Added React Server Components
+- Rebuild as Hono & React Router app
 
 ### v1.1
 
