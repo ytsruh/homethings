@@ -19,7 +19,7 @@ export const userTable = sqliteTable("users", {
   createdAt: text("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+  updatedAt: integer("updated_at", { mode: "timestamp" }),
 });
 
 export type InsertUser = typeof userTable.$inferInsert;

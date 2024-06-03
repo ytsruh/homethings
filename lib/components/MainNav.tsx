@@ -15,11 +15,11 @@ import { Button } from "./ui/button";
 import { ToggleTheme } from "./ToggleTheme";
 import { HomeIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { lucia, validateRequest } from "@/lib/auth";
-import { Form } from "@/lib/form";
+import { Form } from "@/lib/components/AuthForm";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-import type { ActionResult } from "@/lib/form";
+import type { ActionResult } from "@/lib/components/AuthForm";
 
 export default function MainNav() {
   return (
