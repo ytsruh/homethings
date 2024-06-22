@@ -1,0 +1,24 @@
+{
+  "name": "homethings",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --mode client && vite build",
+    "preview": "wrangler pages dev dist",
+    "deploy": "npm run build && wrangler pages deploy dist"
+  },
+  "dependencies": {
+    "hono": "^4.3.11",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "@hono/vite-cloudflare-pages": "^0.4.0",
+    "@hono/vite-dev-server": "^0.12.1",
+    "@types/react": "^18.2.60",
+    "@types/react-dom": "^18.2.19",
+    "vite": "^5.2.11",
+    "wrangler": "^3.57.1"
+  }
+}
