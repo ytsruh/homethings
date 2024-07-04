@@ -1,12 +1,8 @@
 {
-  "name": "homethings",
-  "type": "module",
+  "name": "my-app",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build --mode client && vite build",
-    "preview": "wrangler pages dev dist --compatibility-date=2024-07-04",
-    "deploy": "npm run build && wrangler pages deploy dist",
-    "migrate": "node ./src/db/migrate.js"
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.7.0",

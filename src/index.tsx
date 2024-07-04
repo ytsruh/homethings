@@ -3,9 +3,7 @@ import { renderToString } from "react-dom/server";
 import api from "./api";
 
 type Env = {
-  Bindings: {
-    MY_VAR: string;
-  };
+  Bindings: {};
 };
 
 const app = new Hono<Env>();
@@ -19,10 +17,6 @@ app.get("*", (c) => {
         <head>
           <meta charSet="utf-8" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
-          <link
-            rel="stylesheet"
-            href="https://cdn.simplecss.org/simple.min.css"
-          />
           {import.meta.env.PROD ? (
             <script type="module" src="/static/client.js"></script>
           ) : (
@@ -32,8 +26,8 @@ app.get("*", (c) => {
         <body>
           <div id="root"></div>
         </body>
-      </html>,
-    ),
+      </html>
+    )
   );
 });
 
