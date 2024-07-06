@@ -1,11 +1,8 @@
 {
   "name": "homethings",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build --mode client && vite build",
-    "preview": "wrangler pages dev dist --compatibility-date=2024-07-04",
-    "deploy": "npm run build && wrangler pages deploy dist",
+    "dev": "wrangler dev src/index.ts",
+    "deploy": "wrangler deploy --minify src/index.ts",
     "migrate": "node ./src/db/migrate.js"
   },
   "dependencies": {
@@ -14,20 +11,13 @@
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",
     "bcrypt-edge": "^0.0.6",
     "drizzle-orm": "^0.31.2",
-    "hono": "^4.3.11",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "hono": "^4.3.11"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
-    "@hono/vite-cloudflare-pages": "^0.4.0",
-    "@hono/vite-dev-server": "^0.12.1",
-    "@types/react": "^18.2.60",
-    "@types/react-dom": "^18.2.19",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.22.8",
     "pg": "^8.12.0",
-    "vite": "^5.2.11",
     "wrangler": "^3.57.1"
   }
 }

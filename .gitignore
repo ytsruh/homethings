@@ -1,18 +1,9 @@
-# dependencies
-node_modules
-
-# production
-/build
-dist/
-
-# env
+# deps
+node_modules/
+.wrangler
 .env
 .env.production
 .dev.vars
-.wrangler
 
 # misc
-package-lock.json
 .DS_Store
-_nextjs
-my-app

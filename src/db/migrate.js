@@ -3,7 +3,7 @@ File to migrate data from old database to new database
 The following can be deleted when finished:
 - this file
 - npm script to run this file aka 'migrate'
-- pg node module
+- pg & dotenv node modules
 */
 import pg from "pg";
 import { config } from "dotenv";
@@ -53,7 +53,7 @@ async function migrateAccounts() {
         createdAt: created.getTime(),
         updatedAt: updated.getTime(),
       };
-    }),
+    })
   );
 }
 
@@ -95,7 +95,7 @@ async function migrateUsers() {
         createdAt: created.getTime(),
         updatedAt: updated.getTime(),
       };
-    }),
+    })
   );
 }
 
@@ -141,7 +141,7 @@ async function migrateBooks() {
         createdAt: created.getTime(),
         updatedAt: updated.getTime(),
       };
-    }),
+    })
   );
 }
 
@@ -177,7 +177,7 @@ async function migrateDocs() {
         createdAt: created.getTime(),
         updatedAt: updated.getTime(),
       };
-    }),
+    })
   );
 }
 
@@ -211,7 +211,7 @@ async function migrateNotes() {
         createdAt: created.getTime(),
         updatedAt: updated.getTime(),
       };
-    }),
+    })
   );
 }
 

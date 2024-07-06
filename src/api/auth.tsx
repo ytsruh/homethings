@@ -1,16 +1,21 @@
 import { Hono } from "hono";
-import { db } from "../db";
+import { createDBClient } from "../db";
 import { usersTable } from "../db/schema";
 import type { SelectUser } from "../db/schema";
 import { eq } from "drizzle-orm";
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import { compareSync } from "bcrypt-edge";
 
-const app = new Hono();
+type Bindings = {
+  TURSO_DATABASE_URL: string;
+  TURSO_AUTH_TOKEN: string;
+};
+
+const app = new Hono<{ Bindings: Bindings }>();
 
 app.post("/login", async (c) => {
   const body = await c.req.json();
-
+  const db = createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
   try {
     // Look up a user in the database based on the email field sumitted in the body
     const data: SelectUser[] = await db.select().from(usersTable).where(eq(usersTable.email, body.email));

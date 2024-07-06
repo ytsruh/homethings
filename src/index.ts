@@ -10,7 +10,7 @@ const app = new Hono<Env>();
 app.route("/api", api);
 
 app.get("*", (c) => {
-  return c.json({ message: "Hello, World!" });
+  return c.json({ message: "Hello, Homethings!" });
 });
 
 export default app;

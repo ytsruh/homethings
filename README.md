@@ -1,6 +1,6 @@
 # Homethings
 
-The Homethings Apps & API
+The Homethings API & App
 
 ## Versions
 
