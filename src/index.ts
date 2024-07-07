@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import api from "./api";
+import auth from "./auth";
 
 type Env = {
   Bindings: {};
@@ -7,9 +8,10 @@ type Env = {
 
 const app = new Hono<Env>();
 
+app.route("/auth", auth);
 app.route("/api", api);
 
-app.get("*", (c) => {
+app.get("/", (c) => {
   return c.json({ message: "Hello, Homethings!" });
 });
 

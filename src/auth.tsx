@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { createDBClient } from "../db";
-import { usersTable } from "../db/schema";
-import type { SelectUser } from "../db/schema";
+import { createDBClient } from "./db";
+import { usersTable } from "./db/schema";
+import type { SelectUser } from "./db/schema";
 import { eq } from "drizzle-orm";
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import { compareSync } from "bcrypt-edge";
@@ -9,6 +9,7 @@ import { compareSync } from "bcrypt-edge";
 type Bindings = {
   TURSO_DATABASE_URL: string;
   TURSO_AUTH_TOKEN: string;
+  AUTH_SECRET: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -37,7 +38,7 @@ app.post("/login", async (c) => {
         name: foundUser.name,
         exp: Math.floor(Date.now() / 1000) + 24 * (60 * 60), // Expires: Now + 24h
       },
-      "secret"
+      c.env.AUTH_SECRET
     );
 
     return c.json({
