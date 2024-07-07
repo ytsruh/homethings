@@ -5,8 +5,9 @@ import type { SelectUser } from "../db/schema";
 import { eq } from "drizzle-orm";
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import { compareSync } from "bcrypt-edge";
+import type { GlobalBindings } from "../types";
 
-const app = new Hono();
+const app = new Hono<{ Bindings: GlobalBindings }>();
 
 app.post("/login", async (c) => {
   const body = await c.req.json();
@@ -32,7 +33,7 @@ app.post("/login", async (c) => {
         name: foundUser.name,
         exp: Math.floor(Date.now() / 1000) + 24 * (60 * 60), // Expires: Now + 24h
       },
-      "secret"
+      c.env.VITE_AUTH_SECRET
     );
 
     return c.json({

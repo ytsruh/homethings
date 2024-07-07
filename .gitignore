@@ -6,13 +6,9 @@ node_modules
 dist/
 
 # env
-.env
-.env.production
 .dev.vars
 .wrangler
 
 # misc
 package-lock.json
 .DS_Store
-_nextjs
-my-app
