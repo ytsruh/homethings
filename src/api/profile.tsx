@@ -1,16 +1,17 @@
 import { Hono } from "hono";
-import { db } from "../db";
+import { createDBClient } from "../db";
 import { usersTable } from "../db/schema";
 import type { SelectUser } from "../db/schema";
 import { eq } from "drizzle-orm";
-import type { UserToken, GlobalVariables } from "../types";
+import type { UserToken, GlobalVariables, GlobalBindings } from "../types";
 
-const app = new Hono<{ Variables: GlobalVariables }>();
+const app = new Hono<{ Bindings: GlobalBindings; Variables: GlobalVariables }>();
 
 app.get("/", async (c) => {
   try {
     const storedUser = c.get("user");
     const user: UserToken = JSON.parse(storedUser);
+    const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
 
     const data: SelectUser[] = await db.select().from(usersTable).where(eq(usersTable.id, user.id));
 
@@ -36,6 +37,7 @@ app.post("/", async (c) => {
   try {
     const storedUser = c.get("user");
     const user: UserToken = JSON.parse(storedUser);
+    const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
 
     const body = await c.req.json();
     if (!body) {

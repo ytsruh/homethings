@@ -1,5 +1,7 @@
 export type GlobalBindings = {
-  VITE_AUTH_SECRET: string;
+  AUTH_SECRET: string;
+  TURSO_DATABASE_URL: string;
+  TURSO_AUTH_TOKEN: string;
 };
 
 export type GlobalVariables = {

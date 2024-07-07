@@ -4,7 +4,7 @@ import auth from "./auth";
 import profile from "./profile";
 
 type Bindings = {
-  VITE_AUTH_SECRET: string;
+  AUTH_SECRET: string;
 };
 
 type Variables = {
@@ -24,7 +24,7 @@ app.use(async (c, next) => {
     return c.json({ message: "Unauthorized" });
   }
   // Verify token
-  const isValid = await jwt.verify(authToken, c.env.VITE_AUTH_SECRET);
+  const isValid = await jwt.verify(authToken, c.env.AUTH_SECRET);
   // Check for validity
   if (!isValid) {
     c.status(401);
