@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { db } from "../db";
+import { createDBClient } from "../db";
 import { usersTable } from "../db/schema";
 import type { SelectUser } from "../db/schema";
 import { eq } from "drizzle-orm";
@@ -11,7 +11,7 @@ const app = new Hono<{ Bindings: GlobalBindings }>();
 
 app.post("/login", async (c) => {
   const body = await c.req.json();
-
+  const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
   try {
     // Look up a user in the database based on the email field sumitted in the body
     const data: SelectUser[] = await db.select().from(usersTable).where(eq(usersTable.email, body.email));
@@ -33,7 +33,7 @@ app.post("/login", async (c) => {
         name: foundUser.name,
         exp: Math.floor(Date.now() / 1000) + 24 * (60 * 60), // Expires: Now + 24h
       },
-      c.env.VITE_AUTH_SECRET
+      c.env.AUTH_SECRET
     );
 
     return c.json({
