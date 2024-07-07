@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import auth from "./auth";
 import profile from "./profile";
+import feedback from "./feedback";
+import notes from "./notes";
+import documents from "./documents";
 
 type Bindings = {
   AUTH_SECRET: string;
@@ -36,6 +39,9 @@ app.use(async (c, next) => {
   await next();
 });
 
+app.route("/documents", documents);
+app.route("/notes", notes);
+app.route("/feedback", feedback);
 app.route("/profile", profile);
 app.get("/", (c) => c.json("Hello Homethings"));
 

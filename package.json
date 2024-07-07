@@ -9,6 +9,8 @@
     "migrate": "node ./src/db/migrate.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.609.0",
+    "@aws-sdk/s3-request-presigner": "^3.609.0",
     "@libsql/client": "^0.7.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@tsndr/cloudflare-worker-jwt": "^2.5.3",

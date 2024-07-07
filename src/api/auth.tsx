@@ -31,6 +31,7 @@ app.post("/login", async (c) => {
       {
         id: foundUser.id,
         name: foundUser.name,
+        accountId: foundUser.accountId,
         exp: Math.floor(Date.now() / 1000) + 24 * (60 * 60), // Expires: Now + 24h
       },
       c.env.AUTH_SECRET

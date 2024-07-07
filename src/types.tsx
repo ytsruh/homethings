@@ -11,6 +11,7 @@ export type GlobalVariables = {
 export type UserToken = {
   id: string;
   name: string;
+  accountId: string;
   exp: number;
   iat: number;
 };
