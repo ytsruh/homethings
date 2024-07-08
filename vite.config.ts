@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => {
           input: "./src/client.tsx",
           output: {
             entryFileNames: "static/client.js",
+            assetFileNames: `assets/[name].[ext]`,
           },
         },
       },
