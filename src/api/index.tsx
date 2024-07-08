@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import jwt from "@tsndr/cloudflare-worker-jwt";
+import { decode, sign, verify } from "hono/jwt";
 import auth from "./auth";
 import profile from "./profile";
 import feedback from "./feedback";
@@ -29,14 +29,14 @@ app.use(async (c, next) => {
     return c.json({ message: "Unauthorized" });
   }
   // Verify token
-  const isValid = await jwt.verify(authToken, c.env.AUTH_SECRET);
+  const isValid = await verify(authToken, c.env.AUTH_SECRET);
   // Check for validity
   if (!isValid) {
     c.status(401);
     return c.json({ message: "Unauthorized" });
   }
   // Decode token
-  const { payload } = jwt.decode(authToken);
+  const { payload } = decode(authToken);
   c.set("user", JSON.stringify(payload));
   await next();
 });

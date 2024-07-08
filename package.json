@@ -13,7 +13,6 @@
     "@aws-sdk/s3-request-presigner": "^3.609.0",
     "@libsql/client": "^0.7.0",
     "@paralleldrive/cuid2": "^2.2.2",
-    "@tsndr/cloudflare-worker-jwt": "^2.5.3",
     "bcrypt-edge": "^0.0.6",
     "drizzle-orm": "^0.31.2",
     "hono": "^4.3.11",

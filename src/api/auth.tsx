@@ -3,7 +3,7 @@ import { createDBClient } from "../db";
 import { usersTable } from "../db/schema";
 import type { SelectUser } from "../db/schema";
 import { eq } from "drizzle-orm";
-import jwt from "@tsndr/cloudflare-worker-jwt";
+import { decode, sign, verify } from "hono/jwt";
 import { compareSync } from "bcrypt-edge";
 import type { GlobalBindings } from "../types";
 
@@ -27,7 +27,7 @@ app.post("/login", async (c) => {
     }
 
     // Create a JWT token
-    const token = await jwt.sign(
+    const token = await sign(
       {
         id: foundUser.id,
         name: foundUser.name,
@@ -55,12 +55,12 @@ app.post("/verify", async (c) => {
 
   try {
     // Verifing token
-    const isValid = await jwt.verify(authToken, "secret"); // false
+    const isValid = await verify(authToken, c.env.AUTH_SECRET);
     if (!isValid) {
       return c.json({ message: "error: invalid token" }, 401);
     }
     // Decoding token
-    const { payload } = jwt.decode(authToken);
+    const { payload } = decode(authToken);
     return c.json({
       message: "authenticated",
       payload,
