@@ -4,7 +4,7 @@ import { documentsTable } from "../db/schema";
 import { eq, and } from "drizzle-orm";
 import type { InsertDocument, SelectDocument } from "../db/schema";
 import type { UserToken, GlobalVariables, GlobalBindings } from "../types";
-import { deleteFile } from "../lib/storage";
+import { deleteFile, createS3GetUrl, createS3PutUrl } from "../lib/storage";
 
 const app = new Hono<{ Bindings: GlobalBindings; Variables: GlobalVariables }>();
 
@@ -41,6 +41,30 @@ app.post("/", async (c) => {
     };
     const data: SelectDocument[] = await db.insert(documentsTable).values(newDocument).returning();
     return c.json({ message: "success", data: data });
+  } catch (error) {
+    // For errors, log to console and send a 500 response back
+    console.log(error);
+    return c.json({ error: "Something went wrong" }, { status: 500 });
+  }
+});
+
+app.get("/url", async (c) => {
+  const { fileName } = c.req.query();
+  try {
+    const url = await createS3GetUrl(c, fileName);
+    return c.json({ url: url });
+  } catch (error) {
+    // For errors, log to console and send a 500 response back
+    console.log(error);
+    return c.json({ error: "Something went wrong" }, { status: 500 });
+  }
+});
+
+app.put("/url", async (c) => {
+  const { fileName } = c.req.query();
+  try {
+    const url = await createS3PutUrl(c, fileName);
+    return c.json({ url: url });
   } catch (error) {
     // For errors, log to console and send a 500 response back
     console.log(error);

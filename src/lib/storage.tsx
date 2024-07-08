@@ -24,7 +24,7 @@ const getClient = (c: Context) => {
 
 export const createS3GetUrl = async (c: Context, fileName: string, expiry: number = 3600) => {
   const command = new GetObjectCommand({
-    Bucket: process.env.STORAGE_BUCKET,
+    Bucket: c.env.STORAGE_BUCKET,
     Key: `docs/${fileName}`,
   });
   const s3 = await getClient(c);
@@ -33,7 +33,7 @@ export const createS3GetUrl = async (c: Context, fileName: string, expiry: numbe
 
 export const createS3PutUrl = async (c: Context, fileName: string, expiry: number = 3600) => {
   const command = new PutObjectCommand({
-    Bucket: process.env.STORAGE_BUCKET,
+    Bucket: c.env.STORAGE_BUCKET,
     Key: `docs/${fileName}`,
     ACL: "public-read",
     ContentType: "multipart/form-data",
