@@ -1,8 +1,6 @@
 name = "homethings"
 pages_build_output_dir = "./dist"
-
-[vars]
-MY_VAR = "hello"
+compatibility_date = "2023-12-01"
 
 # [[kv_namespaces]]
 # binding = "MY_KV_NAMESPACE"

@@ -1,29 +1,22 @@
-import { Hono } from 'hono'
-import { renderToString } from 'react-dom/server'
+import { Hono } from "hono";
+import { renderToString } from "react-dom/server";
+import api from "./api";
 
 type Env = {
-  Bindings: {
-    MY_VAR: string
-  }
-}
+  Bindings: {};
+};
 
-const app = new Hono<Env>()
+const app = new Hono<Env>();
 
-app.get('/api/clock', (c) => {
-  return c.json({
-    var: c.env.MY_VAR, // Cloudflare Bindings
-    time: new Date().toLocaleTimeString()
-  })
-})
+app.route("/api", api);
 
-app.get('*', (c) => {
+app.get("*", (c) => {
   return c.html(
     renderToString(
       <html>
         <head>
           <meta charSet="utf-8" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
-          <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css" />
           {import.meta.env.PROD ? (
             <script type="module" src="/static/client.js"></script>
           ) : (
@@ -35,7 +28,7 @@ app.get('*', (c) => {
         </body>
       </html>
     )
-  )
-})
+  );
+});
 
-export default app
+export default app;
