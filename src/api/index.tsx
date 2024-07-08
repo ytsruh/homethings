@@ -1,5 +1,10 @@
 import { Hono } from "hono";
-import { decode, sign, verify } from "hono/jwt";
+import { decode, verify } from "hono/jwt";
+import { logger } from "hono/logger";
+import { etag } from "hono/etag";
+import { secureHeaders } from "hono/secure-headers";
+import { timeout } from "hono/timeout";
+import { trimTrailingSlash } from "hono/trailing-slash";
 import auth from "./auth";
 import profile from "./profile";
 import feedback from "./feedback";
@@ -17,6 +22,13 @@ type Variables = {
 };
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+
+// Setup middleware
+app.use(logger());
+app.use(etag());
+app.use(secureHeaders());
+app.use(timeout(7000));
+app.use(trimTrailingSlash());
 
 // Set auth route before checking auth in middleware
 app.route("/auth", auth);
