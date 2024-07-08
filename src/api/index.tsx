@@ -6,6 +6,7 @@ import feedback from "./feedback";
 import notes from "./notes";
 import documents from "./documents";
 import chat from "./chat";
+import book from "./books";
 
 type Bindings = {
   AUTH_SECRET: string;
@@ -40,6 +41,7 @@ app.use(async (c, next) => {
   await next();
 });
 
+app.route("/books", book);
 app.route("/chat", chat);
 app.route("/documents", documents);
 app.route("/notes", notes);
