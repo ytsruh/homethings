@@ -5,6 +5,7 @@ import profile from "./profile";
 import feedback from "./feedback";
 import notes from "./notes";
 import documents from "./documents";
+import chat from "./chat";
 
 type Bindings = {
   AUTH_SECRET: string;
@@ -39,6 +40,7 @@ app.use(async (c, next) => {
   await next();
 });
 
+app.route("/chat", chat);
 app.route("/documents", documents);
 app.route("/notes", notes);
 app.route("/feedback", feedback);

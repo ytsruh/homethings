@@ -17,6 +17,7 @@
     "bcrypt-edge": "^0.0.6",
     "drizzle-orm": "^0.31.2",
     "hono": "^4.3.11",
+    "openai": "^4.52.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
