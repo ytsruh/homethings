@@ -1,0 +1,22 @@
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@components/Auth";
+import { Button } from "@ui/button";
+
+const Logout = () => {
+  const { updateToken } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    updateToken(null);
+    navigate("/login", { replace: true });
+  };
+
+  return (
+    <div>
+      <h1>Logout Page</h1>
+      <Button onClick={handleLogout}>Logout</Button>
+    </div>
+  );
+};
+
+export default Logout;

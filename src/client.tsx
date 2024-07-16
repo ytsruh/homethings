@@ -1,25 +1,46 @@
-import { createRoot } from "react-dom/client";
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./lib/styles.css";
+import { ProtectedRoute, AuthProvider } from "./components/Auth";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Logout from "./pages/Logout";
 
-import { Button } from "./lib/components/ui/button";
-
-function Home() {
-  return (
-    <div>
-      <Button>Click me</Button>
-    </div>
-  );
-}
+const routes = [
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/",
+    element: <ProtectedRoute />,
+    children: [
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/profile",
+        element: <div>User Profile</div>,
+      },
+      {
+        path: "/logout",
+        element: <Logout />,
+      },
+    ],
+  },
+];
 
 function App() {
+  const router = createBrowserRouter(routes);
   return (
-    <>
-      <h1>Hello, Hono with React!</h1>
-      <Home />
-    </>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   );
 }
 
 const domNode = document.getElementById("root")!;
-const root = createRoot(domNode);
+const root = ReactDOM.createRoot(domNode);
 root.render(<App />);
