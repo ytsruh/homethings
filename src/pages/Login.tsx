@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@components/Auth";
-import { Button } from "@ui/button";
+import { useAuth } from "../components/Auth";
+import { Button } from "../components/ui/button";
 
 export default function Login() {
   const { updateToken } = useAuth();

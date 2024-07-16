@@ -7,11 +7,6 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "types": ["@cloudflare/workers-types", "vite/client"],
     "jsx": "react-jsx",
-    "jsxImportSource": "react",
-    "paths": {
-      "@lib/*": ["./src/lib/*"],
-      "@components/*": ["./src/components/*"],
-      "@ui/*": ["./src/components/ui/*"]
-    }
+    "jsxImportSource": "react"
   }
 }
