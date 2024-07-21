@@ -1,9 +1,10 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../components/Auth";
 import { Button } from "../components/ui/button";
 import Loading from "../components/Loading";
+import { Toaster } from "../components/ui/toaster";
+import { useToast } from "../components/ui/use-toast";
 
 interface LoginResponse {
   message: string;
@@ -11,11 +12,9 @@ interface LoginResponse {
 }
 
 export default function Login() {
-  const [error, setError] = useState<string | null>(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const mutation = useMutation<LoginResponse, Error, { email: string; password: string }>({
     mutationFn: async (credentials: { email: string; password: string }) => {
@@ -32,23 +31,31 @@ export default function Login() {
       signIn(data.token);
       navigate("/", { replace: true });
     },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: "Invalid email or password",
+      });
+    },
   });
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError("Please enter a valid email and password");
+    const fields = Object.fromEntries(new FormData(e.target as HTMLFormElement));
+    if (!fields.email || !fields.password) {
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: "Please fill in all fields",
+      });
       return;
     }
-    mutation.mutate({ email: email, password: password });
+    mutation.mutate({ email: fields.email as string, password: fields.password as string });
   };
 
   if (mutation.isPending) {
     return <Loading />;
-  }
-
-  if (mutation.isError || error !== null) {
-    return <div>Error...</div>;
   }
 
   return (
@@ -64,15 +71,15 @@ export default function Login() {
           <form id="login-form" onSubmit={handleLogin} className="py-5 space-y-5">
             <input
               type="email"
+              name="email"
               className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border"
               placeholder="Email"
-              onChange={(e) => setEmail(e.target.value)}
             />
             <input
               type="password"
+              name="password"
               className="w-full px-6 py-3 rounded-md focus:outline-none bg-transparent border"
               placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
             />
             <div className="flex flex-col items-center justify-between mt-6 space-y-6 md:flex-row md:space-y-0">
               <Button form="login-form" type="submit">
@@ -82,7 +89,7 @@ export default function Login() {
             </div>
           </form>
         </div>
-
+        <Toaster />
         <img src="/static/login.webp" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
       </div>
     </div>
