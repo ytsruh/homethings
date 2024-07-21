@@ -5,6 +5,7 @@ import { Button } from "../components/ui/button";
 import Loading from "../components/Loading";
 import { Toaster } from "../components/ui/toaster";
 import { useToast } from "../components/ui/use-toast";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 interface LoginResponse {
   message: string;
@@ -85,7 +86,7 @@ export default function Login() {
               <Button form="login-form" type="submit">
                 Login
               </Button>
-              {/* <ToggleTheme /> */}
+              <ThemeToggle />
             </div>
           </form>
         </div>

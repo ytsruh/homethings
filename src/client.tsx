@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-d
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./lib/styles.css";
 import { ProtectedRoute, AuthProvider } from "./components/Auth";
+import { ThemeProvider } from "./components/Theme";
 
 const Home = React.lazy(() => import("./pages/Home"));
 const Login = React.lazy(() => import("./pages/Login"));
@@ -41,11 +42,13 @@ function App() {
   const router = createBrowserRouter(routes);
   const queryClient = new QueryClient();
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <RouterProvider router={router} />
-      </AuthProvider>
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <RouterProvider router={router} />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 

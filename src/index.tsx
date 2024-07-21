@@ -27,7 +27,7 @@ app.get("*", (c) => {
           )}
         </head>
         <body>
-          <div id="root"></div>
+          <div id="root" className="text-black dark:text-white bg-white dark:bg-black"></div>
         </body>
       </html>
     )
