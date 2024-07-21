@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../components/Auth";
 import { Button } from "../components/ui/button";
+import Loading from "../components/Loading";
 
 interface LoginResponse {
   message: string;
@@ -15,7 +16,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const { signIn } = useAuth();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const mutation = useMutation<LoginResponse, Error, { email: string; password: string }>({
     mutationFn: async (credentials: { email: string; password: string }) => {
@@ -29,14 +29,13 @@ export default function Login() {
       return await response.json();
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
       signIn(data.token);
       navigate("/", { replace: true });
-      // Invalidate and refetch
     },
   });
 
-  const handleLogin = () => {
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
     if (!email || !password) {
       setError("Please enter a valid email and password");
       return;
@@ -45,7 +44,7 @@ export default function Login() {
   };
 
   if (mutation.isPending) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   if (mutation.isError || error !== null) {

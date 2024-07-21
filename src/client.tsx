@@ -1,24 +1,27 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./lib/styles.css";
 import { ProtectedRoute, AuthProvider } from "./components/Auth";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Logout from "./pages/Logout";
 
-const routes = [
+const Home = React.lazy(() => import("./pages/Home"));
+const Login = React.lazy(() => import("./pages/Login"));
+const Logout = React.lazy(() => import("./pages/Logout"));
+
+const routes: RouteObject[] = [
   {
     path: "/login",
     element: <Login />,
+    errorElement: <div>error</div>,
   },
   {
     path: "/",
     element: <ProtectedRoute />,
+    errorElement: <div>error</div>,
     children: [
       {
-        path: "/",
+        index: true,
         element: <Home />,
       },
       {
@@ -31,6 +34,7 @@ const routes = [
       },
     ],
   },
+  { path: "*", element: <div>Not Found</div> },
 ];
 
 function App() {
