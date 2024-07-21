@@ -34,7 +34,7 @@
     "@cloudflare/workers-types": "^4.20240208.0",
     "@hono/vite-cloudflare-pages": "^0.4.0",
     "@hono/vite-dev-server": "^0.12.2",
-    "@types/node": "^20.14.10",
+    "@types/node": "^20.14.11",
     "@types/react": "^18.2.60",
     "@types/react-dom": "^18.2.19",
     "autoprefixer": "^10.4.19",

@@ -2,13 +2,13 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import "./lib/styles.css";
-import { ProtectedRoute, AuthProvider } from "./components/Auth";
-import { ThemeProvider } from "./components/Theme";
+import "@/lib/styles.css";
+import { ProtectedRoute, AuthProvider } from "@/components/Auth";
+import { ThemeProvider } from "@/components/Theme";
 
-const Home = React.lazy(() => import("./pages/Home"));
-const Login = React.lazy(() => import("./pages/Login"));
-const Logout = React.lazy(() => import("./pages/Logout"));
+const Home = React.lazy(() => import("@/pages/Home"));
+const Login = React.lazy(() => import("@/pages/Login"));
+const Logout = React.lazy(() => import("@/pages/Logout"));
 
 const routes: RouteObject[] = [
   {

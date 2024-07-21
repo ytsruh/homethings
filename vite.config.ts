@@ -1,3 +1,4 @@
+import path from "path";
 import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import adapter from "@hono/vite-dev-server/cloudflare";
@@ -15,6 +16,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      resolve: {
+        alias: {
+          "@": path.resolve(__dirname, "./src"),
+        },
+      },
     };
   } else {
     return {
@@ -28,6 +34,11 @@ export default defineConfig(({ mode }) => {
           entry: "src/index.tsx",
         }),
       ],
+      resolve: {
+        alias: {
+          "@": path.resolve(__dirname, "./src"),
+        },
+      },
     };
   }
 });

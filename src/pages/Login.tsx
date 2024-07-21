@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import { useAuth } from "../components/Auth";
-import { Button } from "../components/ui/button";
-import Loading from "../components/Loading";
-import { Toaster } from "../components/ui/toaster";
-import { useToast } from "../components/ui/use-toast";
-import { ThemeToggle } from "../components/ThemeToggle";
+import { useAuth } from "@/components/Auth";
+import { Button } from "@/components/ui/button";
+import Loading from "@/components/Loading";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface LoginResponse {
   message: string;
