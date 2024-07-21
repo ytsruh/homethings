@@ -3,11 +3,11 @@ import { useAuth } from "../components/Auth";
 import { Button } from "../components/ui/button";
 
 export default function Login() {
-  const { updateToken } = useAuth();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    updateToken("this is a test token");
+    signIn("this is a test token");
     navigate("/", { replace: true });
   };
 

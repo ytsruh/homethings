@@ -3,11 +3,11 @@ import { useAuth } from "../components/Auth";
 import { Button } from "../components/ui/button";
 
 const Logout = () => {
-  const { updateToken } = useAuth();
+  const { signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    updateToken(null);
+    signOut();
     navigate("/login", { replace: true });
   };
 
