@@ -1,25 +1,33 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  RouteObject,
+} from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/utils";
 import "@/lib/styles.css";
 import { ProtectedRoute, AuthProvider } from "@/components/Auth";
 import { ThemeProvider } from "@/components/Theme";
+import { profileLoader } from "@/lib/loaders";
 
 const Home = React.lazy(() => import("@/pages/Home"));
 const Login = React.lazy(() => import("@/pages/Login"));
-const Logout = React.lazy(() => import("@/pages/Logout"));
+const Profile = React.lazy(() => import("@/pages/Profile"));
+const Error = React.lazy(() => import("@/pages/Error"));
+const NotFound = React.lazy(() => import("@/pages/NotFound"));
 
 const routes: RouteObject[] = [
   {
     path: "/login",
     element: <Login />,
-    errorElement: <div>error</div>,
+    errorElement: <Error />,
   },
   {
     path: "/",
     element: <ProtectedRoute />,
-    errorElement: <div>error</div>,
+    errorElement: <Error />,
     children: [
       {
         index: true,
@@ -27,20 +35,16 @@ const routes: RouteObject[] = [
       },
       {
         path: "/profile",
-        element: <div>User Profile</div>,
-      },
-      {
-        path: "/logout",
-        element: <Logout />,
+        loader: profileLoader,
+        element: <Profile />,
       },
     ],
   },
-  { path: "*", element: <div>Not Found</div> },
+  { path: "*", element: <NotFound /> },
 ];
 
 function App() {
   const router = createBrowserRouter(routes);
-  const queryClient = new QueryClient();
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>

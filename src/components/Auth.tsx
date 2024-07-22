@@ -1,6 +1,7 @@
 import { useReducer, useContext, useMemo, createContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import Frame from "@/components/Frame";
+import { removeLocalPreferences } from "@/lib/utils";
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -22,6 +23,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return { isAuthenticated: true, userToken: token };
     case "signOut":
       sessionStorage.removeItem("auth");
+      removeLocalPreferences();
       return { isAuthenticated: false, userToken: null };
     default:
       throw Error("Unknown action");

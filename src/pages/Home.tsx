@@ -1,3 +1,10 @@
+import PageTitle from "@/components/PageTitle";
+
 export default function Home() {
-  return <div>Dashboard</div>;
+  return (
+    <>
+      <PageTitle title="Dashboard | Homethings" />
+      <div>Dashboard</div>
+    </>
+  );
 }

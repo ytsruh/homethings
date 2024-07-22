@@ -8,11 +8,12 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigation, Link } from "react-router-dom";
 import MainNav from "./MainNav";
 import { getLocalPreferences } from "@/lib/utils";
 import { Toaster } from "./ui/toaster";
 import { AppPreferences } from "@/types";
+import Loading from "@/components/Loading";
 
 type PageProps = {
   children: React.ReactNode;
@@ -27,13 +28,14 @@ const defaultPreferences = {
 };
 
 export default function PageFrame(props: PageProps) {
+  const navigation = useNavigation();
   const [preferences, setPreferences] =
     useState<AppPreferences>(defaultPreferences);
 
   useEffect(() => {
     const preferences: AppPreferences = getLocalPreferences();
     setPreferences(preferences);
-  }, []);
+  }, [navigation]);
 
   return (
     <div className="min-h-screen flex flex-col h-screen">
@@ -52,7 +54,9 @@ export default function PageFrame(props: PageProps) {
             {preferences.showBooks && <SideLink text="Books" link="/books" />}
             <SideLink text="Profile" link="/profile" />
           </div>
-          <div className="p-2 w-full">{props.children}</div>
+          <div className="p-2 w-full">
+            {navigation.state === "loading" ? <Loading /> : props.children}
+          </div>
         </div>
       </div>
       <Toaster />
@@ -62,12 +66,12 @@ export default function PageFrame(props: PageProps) {
 
 function SideLink(props: { text: string; link: string }) {
   return (
-    <a
+    <Link
       className="hover:bg-zinc-800 rounded-md px-1 py-2 hover:cursor-pointer hover:text-white"
-      href={props.link}
+      to={props.link}
     >
       {props.text}
-    </a>
+    </Link>
   );
 }
 

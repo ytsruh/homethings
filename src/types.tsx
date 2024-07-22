@@ -32,3 +32,11 @@ export type AppPreferences = {
   name: string | null;
   email: string | null;
 };
+
+export type ProfileData = {
+  name: string;
+  email: string;
+  showDocuments: boolean;
+  showBooks: boolean;
+  profileImage: string | null;
+};
