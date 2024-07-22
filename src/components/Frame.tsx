@@ -5,13 +5,12 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { SlashIcon } from "@radix-ui/react-icons";
+import { ChevronRightIcon } from "@radix-ui/react-icons";
 import { useLocation } from "react-router-dom";
 import MainNav from "./MainNav";
-//import { getLocalUser } from "@/lib/utils";
+import { getLocalPreferences } from "@/lib/utils";
 import { Toaster } from "./ui/toaster";
 import { AppPreferences } from "@/types";
 
@@ -31,13 +30,10 @@ export default function PageFrame(props: PageProps) {
   const [preferences, setPreferences] =
     useState<AppPreferences>(defaultPreferences);
 
-  // useEffect(() => {
-  //   async function updatePreferences() {
-  //     const pref = await getLocalUser();
-  //     setPreferences(pref);
-  //   }
-  //   updatePreferences();
-  // }, []);
+  useEffect(() => {
+    const preferences: AppPreferences = getLocalPreferences();
+    setPreferences(preferences);
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col h-screen">
@@ -78,7 +74,7 @@ function SideLink(props: { text: string; link: string }) {
 function BreadcrumbNavigation() {
   let location = useLocation();
   return (
-    <div className="my-3">
+    <div className="my-3 ml-3">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -87,7 +83,7 @@ function BreadcrumbNavigation() {
           {location.pathname !== "/" && (
             <>
               <BreadcrumbSeparator>
-                <SlashIcon />
+                <ChevronRightIcon />
               </BreadcrumbSeparator>
               <BreadcrumbItem>
                 <BreadcrumbLink href={location.pathname} className="capitalize">

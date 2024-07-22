@@ -6,10 +6,13 @@ import Loading from "@/components/Loading";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { setLocalPreferences } from "@/lib/utils";
+import { AppPreferences } from "@/types";
 
 interface LoginResponse {
   message: string;
   token: string;
+  preferences: AppPreferences;
 }
 
 export default function Login() {
@@ -17,7 +20,11 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const mutation = useMutation<LoginResponse, Error, { email: string; password: string }>({
+  const mutation = useMutation<
+    LoginResponse,
+    Error,
+    { email: string; password: string }
+  >({
     mutationFn: async (credentials: { email: string; password: string }) => {
       const response = await fetch("/api/auth/login", {
         method: "POST",
@@ -30,6 +37,7 @@ export default function Login() {
     },
     onSuccess: (data) => {
       signIn(data.token);
+      setLocalPreferences(data.preferences);
       navigate("/", { replace: true });
     },
     onError: (error) => {
@@ -43,7 +51,9 @@ export default function Login() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const fields = Object.fromEntries(new FormData(e.target as HTMLFormElement));
+    const fields = Object.fromEntries(
+      new FormData(e.target as HTMLFormElement),
+    );
     if (!fields.email || !fields.password) {
       toast({
         variant: "destructive",
@@ -52,7 +62,10 @@ export default function Login() {
       });
       return;
     }
-    mutation.mutate({ email: fields.email as string, password: fields.password as string });
+    mutation.mutate({
+      email: fields.email as string,
+      password: fields.password as string,
+    });
   };
 
   if (mutation.isPending) {
@@ -69,7 +82,11 @@ export default function Login() {
             </h1>
             <h6 className="text-xl py-2">Login to view awesome things</h6>
           </div>
-          <form id="login-form" onSubmit={handleLogin} className="py-5 space-y-5">
+          <form
+            id="login-form"
+            onSubmit={handleLogin}
+            className="py-5 space-y-5"
+          >
             <input
               type="email"
               name="email"
@@ -91,7 +108,11 @@ export default function Login() {
           </form>
         </div>
         <Toaster />
-        <img src="/static/login.webp" alt="" className="w-96 hidden lg:block rounded-r-2xl" />
+        <img
+          src="/static/login.webp"
+          alt=""
+          className="w-96 hidden lg:block rounded-r-2xl"
+        />
       </div>
     </div>
   );
