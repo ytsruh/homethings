@@ -1,5 +1,6 @@
 import { useReducer, useContext, useMemo, createContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import MainNav from "./MainNav";
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -87,5 +88,12 @@ export const ProtectedRoute = () => {
   }
 
   // If authenticated, render the child routes
-  return <Outlet />;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+      <MainNav />
+      <div style={{ flexGrow: 1 }}>
+        <Outlet />
+      </div>
+    </div>
+  );
 };

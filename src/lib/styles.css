@@ -13,3 +13,10 @@
   --accent: 6, 88%, 45%;
   --accent-foreground: 6, 88%, 45%;
 }
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
