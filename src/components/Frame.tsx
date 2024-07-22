@@ -1,13 +1,21 @@
 import { useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import Loading from "./Loading";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { SlashIcon } from "@radix-ui/react-icons";
+import { useLocation } from "react-router-dom";
 import MainNav from "./MainNav";
 //import { getLocalUser } from "@/lib/utils";
 import { Toaster } from "./ui/toaster";
 import { AppPreferences } from "@/types";
 
 type PageProps = {
-  title: string;
   children: React.ReactNode;
 };
 
@@ -35,12 +43,8 @@ export default function PageFrame(props: PageProps) {
     <div className="min-h-screen flex flex-col h-screen">
       <MainNav preferences={preferences} />
       <div className="px-5 py-2 flex flex-col h-full">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight py-2">
-            {props.title}
-          </h2>
-          <Separator />
-        </div>
+        <BreadcrumbNavigation />
+        <Separator />
         <div id="app" className="flex-1 flex">
           <div className="hidden lg:flex lg:flex-col lg:p-2 lg:w-56 lg:space-y-3">
             <SideLink text="Home" link="/" />
@@ -68,5 +72,32 @@ function SideLink(props: { text: string; link: string }) {
     >
       {props.text}
     </a>
+  );
+}
+
+function BreadcrumbNavigation() {
+  let location = useLocation();
+  return (
+    <div className="my-3">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          {location.pathname !== "/" && (
+            <>
+              <BreadcrumbSeparator>
+                <SlashIcon />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink href={location.pathname} className="capitalize">
+                  {location.pathname.slice(1)}
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+            </>
+          )}
+        </BreadcrumbList>
+      </Breadcrumb>
+    </div>
   );
 }

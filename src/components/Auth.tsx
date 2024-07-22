@@ -98,7 +98,7 @@ export const ProtectedRoute = () => {
 
   // If authenticated, render the child routes
   return (
-    <Frame title="<Page Title>">
+    <Frame>
       <Outlet />
     </Frame>
   );
