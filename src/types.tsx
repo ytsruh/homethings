@@ -1,3 +1,7 @@
+/*
+  Server Side
+*/
+
 export type GlobalBindings = {
   AUTH_SECRET: string;
   TURSO_DATABASE_URL: string;
@@ -15,4 +19,16 @@ export type UserToken = {
   accountId: string;
   exp: number;
   iat: number;
+};
+
+/*
+  Client Side
+*/
+
+export type AppPreferences = {
+  showDocuments: boolean;
+  showBooks: boolean;
+  profileImage: string | undefined;
+  name: string | null;
+  email: string | null;
 };

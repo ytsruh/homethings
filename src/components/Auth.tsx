@@ -1,6 +1,6 @@
 import { useReducer, useContext, useMemo, createContext } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import MainNav from "./MainNav";
+import Frame from "@/components/Frame";
 
 type AuthState = {
   isAuthenticated: boolean;
@@ -15,7 +15,10 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       const token = action.payload;
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 30);
-      sessionStorage.setItem("auth", JSON.stringify({ token, expiry: expiryDate }));
+      sessionStorage.setItem(
+        "auth",
+        JSON.stringify({ token, expiry: expiryDate }),
+      );
       return { isAuthenticated: true, userToken: token };
     case "signOut":
       sessionStorage.removeItem("auth");
@@ -47,7 +50,9 @@ export const useAuth = () => {
 
 const initialState: AuthState = {
   isAuthenticated: sessionStorage.getItem("auth") ? true : false,
-  userToken: sessionStorage.getItem("auth") ? JSON.parse(sessionStorage.getItem("auth")!).token : null,
+  userToken: sessionStorage.getItem("auth")
+    ? JSON.parse(sessionStorage.getItem("auth")!).token
+    : null,
 };
 
 export const AuthProvider = (props: AuthProviderProps) => {
@@ -71,11 +76,15 @@ export const AuthProvider = (props: AuthProviderProps) => {
       signIn,
       signOut,
     }),
-    [state]
+    [state],
   );
 
   // Provide the authentication context to the children components
-  return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={contextValue}>
+      {props.children}
+    </AuthContext.Provider>
+  );
 };
 
 export const ProtectedRoute = () => {
@@ -89,11 +98,8 @@ export const ProtectedRoute = () => {
 
   // If authenticated, render the child routes
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <MainNav />
-      <div style={{ flexGrow: 1 }}>
-        <Outlet />
-      </div>
-    </div>
+    <Frame title="<Page Title>">
+      <Outlet />
+    </Frame>
   );
 };
