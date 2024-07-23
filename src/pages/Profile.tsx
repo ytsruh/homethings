@@ -69,6 +69,7 @@ export default function Profile() {
       });
     },
   });
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fields = Object.fromEntries(

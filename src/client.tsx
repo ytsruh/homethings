@@ -12,11 +12,12 @@ import { ProtectedRoute, AuthProvider } from "@/components/Auth";
 import { ThemeProvider } from "@/components/Theme";
 import { profileLoader } from "@/lib/loaders";
 
+const Error = React.lazy(() => import("@/pages/Error"));
+const NotFound = React.lazy(() => import("@/pages/NotFound"));
 const Home = React.lazy(() => import("@/pages/Home"));
 const Login = React.lazy(() => import("@/pages/Login"));
 const Profile = React.lazy(() => import("@/pages/Profile"));
-const Error = React.lazy(() => import("@/pages/Error"));
-const NotFound = React.lazy(() => import("@/pages/NotFound"));
+const Feedback = React.lazy(() => import("@/pages/Feedback"));
 
 const routes: RouteObject[] = [
   {
@@ -37,6 +38,10 @@ const routes: RouteObject[] = [
         path: "/profile",
         loader: profileLoader,
         element: <Profile />,
+      },
+      {
+        path: "/feedback",
+        element: <Feedback />,
       },
     ],
   },

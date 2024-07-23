@@ -17,6 +17,7 @@ app.get("*", (c) => {
         <head>
           <meta charSet="utf-8" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
+          <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
           {import.meta.env.PROD ? (
             <>
               <link rel="stylesheet" href="/assets/client.css" />
@@ -27,10 +28,13 @@ app.get("*", (c) => {
           )}
         </head>
         <body>
-          <div id="root" className="text-black dark:text-white bg-white dark:bg-black"></div>
+          <div
+            id="root"
+            className="text-black dark:text-white bg-white dark:bg-black"
+          ></div>
         </body>
-      </html>
-    )
+      </html>,
+    ),
   );
 });
 
