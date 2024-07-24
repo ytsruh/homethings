@@ -1,10 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  RouteObject,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/utils";
 import "@/lib/styles.css";
@@ -18,6 +14,7 @@ const Home = React.lazy(() => import("@/pages/Home"));
 const Login = React.lazy(() => import("@/pages/Login"));
 const Profile = React.lazy(() => import("@/pages/Profile"));
 const Feedback = React.lazy(() => import("@/pages/Feedback"));
+const Chat = React.lazy(() => import("@/pages/Chat"));
 
 const routes: RouteObject[] = [
   {
@@ -38,6 +35,10 @@ const routes: RouteObject[] = [
         path: "/profile",
         loader: profileLoader,
         element: <Profile />,
+      },
+      {
+        path: "/chat",
+        element: <Chat />,
       },
       {
         path: "/feedback",

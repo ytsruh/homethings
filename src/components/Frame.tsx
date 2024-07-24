@@ -8,7 +8,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { ChevronRightIcon } from "@radix-ui/react-icons";
-import { useLocation, useNavigation, Link } from "react-router-dom";
+import { useLocation, useNavigation } from "react-router-dom";
 import MainNav from "./MainNav";
 import { getLocalPreferences } from "@/lib/utils";
 import { Toaster } from "./ui/toaster";
@@ -29,8 +29,7 @@ const defaultPreferences = {
 
 export default function PageFrame(props: PageProps) {
   const navigation = useNavigation();
-  const [preferences, setPreferences] =
-    useState<AppPreferences>(defaultPreferences);
+  const [preferences, setPreferences] = useState<AppPreferences>(defaultPreferences);
 
   useEffect(() => {
     const preferences: AppPreferences = getLocalPreferences();
@@ -48,15 +47,11 @@ export default function PageFrame(props: PageProps) {
             <SideLink text="Home" link="/" />
             <SideLink text="Chat" link="/chat" />
             <SideLink text="Notes" link="/notes" />
-            {preferences.showDocuments && (
-              <SideLink text="Documents" link="/documents" />
-            )}
+            {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
             {preferences.showBooks && <SideLink text="Books" link="/books" />}
             <SideLink text="Profile" link="/profile" />
           </div>
-          <div className="p-2 w-full">
-            {navigation.state === "loading" ? <Loading /> : props.children}
-          </div>
+          <div className="p-2 w-full">{navigation.state === "loading" ? <Loading /> : props.children}</div>
         </div>
       </div>
       <Toaster />
@@ -66,12 +61,11 @@ export default function PageFrame(props: PageProps) {
 
 function SideLink(props: { text: string; link: string }) {
   return (
-    <Link
+    <a
       className="hover:bg-zinc-800 rounded-md px-1 py-2 hover:cursor-pointer hover:text-white"
-      to={props.link}
-    >
+      href={props.link}>
       {props.text}
-    </Link>
+    </a>
   );
 }
 

@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { Link } from "react-router-dom";
 import {
   Sheet,
   SheetContent,
@@ -39,10 +38,7 @@ export default function MainNav(props: MainNavProps) {
     <div className="border-b">
       <Sheet>
         <div className="flex h-16 items-center px-6">
-          <a
-            className="text-accent flex justify-center items-center gap-2"
-            href="/"
-          >
+          <a className="text-accent flex justify-center items-center gap-2" href="/">
             <HomeIcon className="hidden lg:block h-[1.4rem] w-[1.4rem]" />
             <p className="hidden lg:block">Homethings</p>
           </a>
@@ -53,15 +49,10 @@ export default function MainNav(props: MainNavProps) {
             <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={preferences.profileImage} alt="User" />
-                    <AvatarFallback>
-                      {preferences.name ? getInitials(preferences.name) : "--"}
-                    </AvatarFallback>
+                    <AvatarFallback>{preferences.name ? getInitials(preferences.name) : "--"}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -69,11 +60,7 @@ export default function MainNav(props: MainNavProps) {
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {preferences.name ? (
-                        preferences.name
-                      ) : (
-                        <span className="italic">User Name</span>
-                      )}
+                      {preferences.name ? preferences.name : <span className="italic">User Name</span>}
                     </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {preferences.email ? preferences.email : ""}
@@ -83,21 +70,14 @@ export default function MainNav(props: MainNavProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <a href="/profile">
-                    <DropdownMenuItem className="hover:cursor-pointer">
-                      Profile
-                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:cursor-pointer">Profile</DropdownMenuItem>
                   </a>
                   <a href="/feedback">
-                    <DropdownMenuItem className="hover:cursor-pointer">
-                      Feedback
-                    </DropdownMenuItem>
+                    <DropdownMenuItem className="hover:cursor-pointer">Feedback</DropdownMenuItem>
                   </a>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="hover:cursor-pointer"
-                  onClick={() => signOut()}
-                >
+                <DropdownMenuItem className="hover:cursor-pointer" onClick={() => signOut()}>
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -110,39 +90,26 @@ export default function MainNav(props: MainNavProps) {
             <SheetTitle>What do you want to do?</SheetTitle>
             <SheetDescription></SheetDescription>
             <nav className="py-10 flex flex-col space-y-5">
-              <Link
-                to="/"
-                className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent"
-              >
+              <a href="/" className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent">
                 Home
-              </Link>
-              <Link
-                to="/chat"
-                className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent"
-              >
+              </a>
+              <a href="/chat" className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent">
                 Chat
-              </Link>
-              <Link
-                to="/notes"
-                className="text-sm hover:text-accent dark:text-white dark:hover:text-accent"
-              >
+              </a>
+              <a href="/notes" className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
                 Notes
-              </Link>
+              </a>
               {preferences.showDocuments && (
-                <Link
-                  to="/documents"
-                  className="text-sm hover:text-accent dark:text-white dark:hover:text-accent"
-                >
+                <a
+                  href="/documents"
+                  className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
                   Documents
-                </Link>
+                </a>
               )}
               {preferences.showBooks && (
-                <Link
-                  to="/books"
-                  className="text-sm hover:text-accent dark:text-white dark:hover:text-accent"
-                >
+                <a href="/books" className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
                   Books
-                </Link>
+                </a>
               )}
             </nav>
           </SheetHeader>

@@ -57,9 +57,7 @@ export default function Feedback() {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fields = Object.fromEntries(
-      new FormData(e.target as HTMLFormElement),
-    );
+    const fields = Object.fromEntries(new FormData(e.target as HTMLFormElement));
     if (!fields.title || !fields.body) {
       toast({
         variant: "destructive",
@@ -82,31 +80,16 @@ export default function Feedback() {
   return (
     <>
       <PageTitle title="Feedback | Homethings" />
-      <PageHeader
-        title="Feedback"
-        subtitle="Request changes, provide feedback or report a bug"
-      />
-      <div className="w-full lg:w-2/3 flex justify-center py-2">
-        <form
-          onSubmit={(e) => submit(e)}
-          className="w-full flex flex-col justify-center items-center gap-2"
-        >
+      <PageHeader title="Feedback" subtitle="Request changes, provide feedback or report a bug" />
+      <div className="w-full lg:w-2/3 flex items-center justify-center py-2">
+        <form onSubmit={(e) => submit(e)} className="w-full flex flex-col justify-center items-center gap-2">
           <div className="w-full">
             <Label>Summary:</Label>
-            <Input
-              className="my-2"
-              name="title"
-              type="text"
-              placeholder="Summary / Title"
-            />
+            <Input className="my-2" name="title" type="text" placeholder="Summary / Title" />
           </div>
           <div className="w-full">
             <Label>Details:</Label>
-            <Textarea
-              className="my-2"
-              name="body"
-              placeholder="Provide details..."
-            />
+            <Textarea className="my-2" name="body" placeholder="Provide details..." />
           </div>
           <div className="flex justify-end w-full py-5">
             <Button type="submit">Submit</Button>
