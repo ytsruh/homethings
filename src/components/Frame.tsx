@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
@@ -37,12 +37,12 @@ export default function PageFrame(props: PageProps) {
   }, [navigation]);
 
   return (
-    <div className="min-h-screen flex flex-col h-screen">
+    <div className="min-h-screen flex flex-col">
       <MainNav preferences={preferences} />
       <div className="px-5 py-2 flex flex-col h-full">
         <BreadcrumbNavigation />
         <Separator />
-        <div id="app" className="flex-1 flex">
+        <div className="flex">
           <div className="hidden lg:flex lg:flex-col lg:p-2 lg:w-56 lg:space-y-3">
             <SideLink text="Home" link="/" />
             <SideLink text="Chat" link="/chat" />
@@ -71,6 +71,9 @@ function SideLink(props: { text: string; link: string }) {
 
 function BreadcrumbNavigation() {
   let location = useLocation();
+  const paths = location.pathname.split("/").filter((path) => path !== "");
+  let currentPath = "";
+
   return (
     <div className="my-3 ml-3">
       <Breadcrumb>
@@ -78,18 +81,21 @@ function BreadcrumbNavigation() {
           <BreadcrumbItem>
             <BreadcrumbLink href="/">Home</BreadcrumbLink>
           </BreadcrumbItem>
-          {location.pathname !== "/" && (
-            <>
-              <BreadcrumbSeparator>
-                <ChevronRightIcon />
-              </BreadcrumbSeparator>
-              <BreadcrumbItem>
-                <BreadcrumbLink href={location.pathname} className="capitalize">
-                  {location.pathname.slice(1)}
-                </BreadcrumbLink>
-              </BreadcrumbItem>
-            </>
-          )}
+          {paths.map((path, index) => {
+            currentPath += `/${path}`;
+            return (
+              <Fragment key={index}>
+                <BreadcrumbSeparator>
+                  <ChevronRightIcon />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href={currentPath} className="capitalize">
+                    {path}
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </Fragment>
+            );
+          })}
         </BreadcrumbList>
       </Breadcrumb>
     </div>

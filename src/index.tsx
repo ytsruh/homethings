@@ -28,13 +28,10 @@ app.get("*", (c) => {
           )}
         </head>
         <body>
-          <div
-            id="root"
-            className="text-black dark:text-white bg-white dark:bg-black"
-          ></div>
+          <div id="root"></div>
         </body>
-      </html>,
-    ),
+      </html>
+    )
   );
 });
 
