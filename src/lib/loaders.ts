@@ -66,3 +66,25 @@ export async function notesSingleLoader(id: string) {
     },
   });
 }
+
+export async function documentsLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["notes"],
+    queryFn: async () => {
+      const response = await fetch("/api/documents", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}

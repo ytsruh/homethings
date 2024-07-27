@@ -33,3 +33,7 @@ export function getToken() {
   const parsed = JSON.parse(auth);
   return parsed.token as string;
 }
+
+export function createId() {
+  return Math.random().toString(14);
+}

@@ -6,7 +6,7 @@ import { queryClient } from "@/lib/utils";
 import "@/lib/styles.css";
 import { ProtectedRoute, AuthProvider } from "@/components/Auth";
 import { ThemeProvider } from "@/components/Theme";
-import { profileLoader, notesLoader, notesSingleLoader } from "@/lib/loaders";
+import { profileLoader, notesLoader, notesSingleLoader, documentsLoader } from "@/lib/loaders";
 
 const Error = React.lazy(() => import("@/pages/Error"));
 const NotFound = React.lazy(() => import("@/pages/NotFound"));
@@ -15,6 +15,7 @@ const Login = React.lazy(() => import("@/pages/Login"));
 const Profile = React.lazy(() => import("@/pages/Profile"));
 const Notes = React.lazy(() => import("@/pages/Notes"));
 const SingleNote = React.lazy(() => import("@/pages/NotesSingle"));
+const Documents = React.lazy(() => import("@/pages/Documents"));
 const Feedback = React.lazy(() => import("@/pages/Feedback"));
 const Chat = React.lazy(() => import("@/pages/Chat"));
 
@@ -44,6 +45,11 @@ const routes: RouteObject[] = [
           return notesSingleLoader(params.id as string);
         },
         element: <SingleNote />,
+      },
+      {
+        path: "/documents",
+        loader: documentsLoader,
+        element: <Documents />,
       },
       {
         path: "/profile",

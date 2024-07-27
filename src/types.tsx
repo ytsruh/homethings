@@ -40,3 +40,13 @@ export type ProfileData = {
   showBooks: boolean;
   profileImage: string | null;
 };
+
+export type Document = {
+  id: string;
+  title: string;
+  description: string;
+  accountId: string;
+  fileName: string;
+  createdAt: number;
+  updatedAt: number;
+};
