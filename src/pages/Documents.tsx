@@ -15,7 +15,7 @@ export default function Documents() {
   return (
     <>
       <PageTitle title="Documents | Homethings" />
-      <PageHeader title="Documents" subtitle="Personal document storage" />
+      <PageHeader title="Documents" subtitle="Document storage shared across your account with all members" />
       <div className="w-full xl:w-10/12">
         <DocumentsTable data={LoadedData.data} />
         <div className="py-5">

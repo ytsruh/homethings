@@ -1,5 +1,6 @@
 import { getToken } from "@/lib/utils";
 import { queryClient } from "@/lib/utils";
+import { LoaderFunctionArgs } from "react-router-dom";
 
 export async function profileLoader() {
   return queryClient.fetchQuery({
@@ -45,11 +46,11 @@ export async function notesLoader() {
   });
 }
 
-export async function notesSingleLoader(id: string) {
+export async function notesSingleLoader(req: LoaderFunctionArgs) {
   return queryClient.fetchQuery({
-    queryKey: [`note-${id}`],
+    queryKey: [`note-${req.params.id}`],
     queryFn: async () => {
-      const response = await fetch(`/api/notes/${id}`, {
+      const response = await fetch(`/api/notes/${req.params.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -72,6 +73,28 @@ export async function documentsLoader() {
     queryKey: ["documents"],
     queryFn: async () => {
       const response = await fetch("/api/documents", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
+
+export async function documentsSingleLoader(req: LoaderFunctionArgs) {
+  return queryClient.fetchQuery({
+    queryKey: [`document-${req.params.id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/documents/${req.params.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
