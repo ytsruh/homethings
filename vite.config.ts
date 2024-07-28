@@ -1,3 +1,4 @@
+import path from "path";
 import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import adapter from "@hono/vite-dev-server/cloudflare";
@@ -11,7 +12,13 @@ export default defineConfig(({ mode }) => {
           input: "./src/client.tsx",
           output: {
             entryFileNames: "static/client.js",
+            assetFileNames: `assets/[name].[ext]`,
           },
+        },
+      },
+      resolve: {
+        alias: {
+          "@": path.resolve(__dirname, "./src"),
         },
       },
     };
@@ -27,6 +34,11 @@ export default defineConfig(({ mode }) => {
           entry: "src/index.tsx",
         }),
       ],
+      resolve: {
+        alias: {
+          "@": path.resolve(__dirname, "./src"),
+        },
+      },
     };
   }
 });

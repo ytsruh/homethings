@@ -170,7 +170,7 @@ app.delete("/:id", async (c) => {
       return c.json({ error: "Book not found" }, { status: 404 });
     }
 
-    return c.json({ deleted: "success" });
+    return c.json({ message: "success" });
   } catch (error) {
     // For errors, log to console and send a 500 response back
     console.log(error);

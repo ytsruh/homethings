@@ -17,8 +17,12 @@ app.get("*", (c) => {
         <head>
           <meta charSet="utf-8" />
           <meta content="width=device-width, initial-scale=1" name="viewport" />
+          <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
           {import.meta.env.PROD ? (
-            <script type="module" src="/static/client.js"></script>
+            <>
+              <link rel="stylesheet" href="/assets/client.css" />
+              <script type="module" src="/static/client.js"></script>
+            </>
           ) : (
             <script type="module" src="/src/client.tsx"></script>
           )}
