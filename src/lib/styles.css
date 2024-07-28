@@ -4,16 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --accent: 6, 88%, 45%;
-  --accent-foreground: 6, 88%, 45%;
-}
-
-.dark {
-  --accent: 6, 88%, 45%;
-  --accent-foreground: 6, 88%, 45%;
-}
-
 html,
 body,
 #root {

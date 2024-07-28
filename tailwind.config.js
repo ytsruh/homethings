@@ -13,8 +13,7 @@ module.exports = {
     },
     extend: {
       colors: {
-        accent: "hsl(var(--accent))",
-        "accent-foreground": "hsl(var(--accent-foreground))",
+        accent: "#D5150E",
       },
       keyframes: {
         "accordion-down": {
