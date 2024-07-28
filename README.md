@@ -4,6 +4,11 @@ The Homethings Apps & API
 
 ## Versions
 
+### v1.2
+
+- Rebuild as Hono & React Router app
+- Migrated DB from Neon Postgres to Turso SQLite
+
 ### v1.1
 
 - Updated Next to use App Directory

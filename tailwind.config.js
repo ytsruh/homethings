@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: ["class"],
-  content: ["./app/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}"],
+  prefix: "",
   theme: {
     container: {
       center: true,
@@ -12,17 +13,16 @@ module.exports = {
     },
     extend: {
       colors: {
-        accent: "hsl(var(--accent))",
-        "accent-foreground": "hsl(var(--accent-foreground))",
+        accent: "#D5150E",
       },
       keyframes: {
         "accordion-down": {
-          from: { height: 0 },
+          from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
+          to: { height: "0" },
         },
       },
       animation: {
