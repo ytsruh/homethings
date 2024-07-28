@@ -119,7 +119,7 @@ app.delete("/:id", async (c) => {
 
     const results: SelectDocument[] = await db
       .delete(documentsTable)
-      .where(eq(documentsTable.id, id))
+      .where(and(eq(documentsTable.id, id), eq(documentsTable.accountId, user.accountId)))
       .returning();
     const deletedDoc = results[0];
     // Delete the file from storage
@@ -127,7 +127,7 @@ app.delete("/:id", async (c) => {
     if (!result.success) {
       throw new Error(result.error as string);
     }
-    return c.json({ deleted: "success" });
+    return c.json({ message: "success" });
   } catch (error) {
     // For errors, log to console and send a 500 response back
     console.log(error);

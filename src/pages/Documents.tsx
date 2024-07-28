@@ -12,8 +12,6 @@ type LoadedData = {
 
 export default function Documents() {
   const LoadedData = useLoaderData() as LoadedData;
-  console.log(LoadedData);
-
   return (
     <>
       <PageTitle title="Documents | Homethings" />

@@ -8,7 +8,6 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -34,8 +33,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Document } from "@/types";
-import { getToken } from "@/lib/utils";
-import { get } from "http";
+import { getToken, queryClient } from "@/lib/utils";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 export const columns: ColumnDef<Document>[] = [
   {
@@ -112,26 +113,43 @@ export const columns: ColumnDef<Document>[] = [
   },
 ];
 
+type DeleteDocumentResponse = {
+  message: string;
+};
 function DeleteModal(props: { id: string }) {
-  async function deleteItem() {
-    try {
-      const response = await fetch("/api/documents/" + props.id, {
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const mutation = useMutation<DeleteDocumentResponse, Error>({
+    mutationFn: async (input) => {
+      const response = await fetch(`/api/documents/${props.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: getToken(),
         },
       });
-      //Check for ok response
       if (!response.ok) {
-        //Throw error if not ok
-        throw Error(response.statusText);
+        throw new Error("HTTP error " + response.status);
       }
-      window.location.reload();
-    } catch (error) {
-      console.log(error);
-    }
-  }
+      return await response.json();
+    },
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["documents"] });
+      toast({
+        title: "Success",
+        description: "Your document has been deleted successfully.",
+      });
+      navigate("/documents", { replace: false });
+    },
+    onError: (error) => {
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: "Something went wrong. Please try again.",
+      });
+    },
+  });
 
   return (
     <AlertDialog>
@@ -148,7 +166,7 @@ function DeleteModal(props: { id: string }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => deleteItem()}>Confirm</AlertDialogAction>
+          <AlertDialogAction onClick={() => mutation.mutate()}>Confirm</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -167,7 +185,6 @@ export function DocumentsTable(props: { data: Document[] }) {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,

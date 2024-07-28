@@ -69,7 +69,7 @@ export async function notesSingleLoader(id: string) {
 
 export async function documentsLoader() {
   return queryClient.fetchQuery({
-    queryKey: ["notes"],
+    queryKey: ["documents"],
     queryFn: async () => {
       const response = await fetch("/api/documents", {
         method: "GET",
