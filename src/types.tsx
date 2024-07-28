@@ -50,3 +50,18 @@ export type Document = {
   createdAt: number;
   updatedAt: number;
 };
+
+export type Book = {
+  id: string;
+  name: string;
+  isbn: string;
+  author: string;
+  genre: string;
+  rating: number;
+  image: string;
+  read: boolean;
+  wishlist: boolean;
+  userId: string;
+  createdAt: number;
+  updatedAt: number;
+};

@@ -111,3 +111,113 @@ export async function documentsSingleLoader(req: LoaderFunctionArgs) {
     },
   });
 }
+
+export async function booksLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["books"],
+    queryFn: async () => {
+      const response = await fetch("/api/books", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
+
+export async function booksReadLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["books"],
+    queryFn: async () => {
+      const response = await fetch("/api/books/read", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
+
+export async function booksUnreadLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["books"],
+    queryFn: async () => {
+      const response = await fetch("/api/books/unread", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
+
+export async function booksWishlistLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["books"],
+    queryFn: async () => {
+      const response = await fetch("/api/books/wishlist", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
+
+export async function booksSingleLoader(req: LoaderFunctionArgs) {
+  return queryClient.fetchQuery({
+    queryKey: [`books-${req.params.id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/books/${req.params.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        throw new Response("Unauthorised", { status: 401 });
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
