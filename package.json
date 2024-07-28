@@ -5,8 +5,7 @@
     "dev": "vite",
     "build": "vite build --mode client && vite build",
     "preview": "wrangler pages dev dist --compatibility-date=2024-07-04",
-    "deploy": "npm run build && wrangler pages deploy dist",
-    "migrate": "node ./src/db/migrate.js"
+    "deploy": "npm run build && wrangler pages deploy dist"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.609.0",
@@ -48,7 +47,6 @@
     "autoprefixer": "^10.4.19",
     "dotenv": "^16.4.5",
     "drizzle-kit": "^0.22.8",
-    "pg": "^8.12.0",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4",
     "vite": "^5.2.11",
