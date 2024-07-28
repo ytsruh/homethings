@@ -1,19 +1,15 @@
-import {
-  useRouteError,
-  isRouteErrorResponse,
-  useNavigate,
-} from "react-router-dom";
+import { useRouteError, isRouteErrorResponse, useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/Auth";
-import NotFound from "@/pages/NotFound";
+import { Button } from "@/components/ui/button";
 
-export default function Error() {
+export function Error() {
   const error = useRouteError();
   const navigate = useNavigate();
   const { signOut } = useAuth();
 
   if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
-      return <NotFound />;
+      return <ErrorTemplate status={404} />;
     }
 
     if (error.status === 401) {
@@ -23,13 +19,27 @@ export default function Error() {
     }
 
     if (error.status === 503) {
-      return <div>Looks like our API is down</div>;
+      return <ErrorTemplate status={503} />;
     }
 
     if (error.status === 418) {
-      return <div>🫖</div>;
+      return <ErrorTemplate status={418} />;
     }
   }
 
-  return <div>Something went wrong</div>;
+  return <ErrorTemplate status={500} />;
+}
+
+export function ErrorTemplate(props: { status: number }) {
+  return (
+    <div className="w-full h-full flex flex-col justify-center items-center">
+      <Button asChild>
+        <a href="/">Home</a>
+      </Button>
+      <img
+        src={`https://http.cat/${props.status.toString()}`}
+        alt={`${props.status.toString()} cat status`}
+      />
+    </div>
+  );
 }

@@ -18,23 +18,21 @@ import {
   booksUnreadLoader,
   booksSingleLoader,
 } from "@/lib/loaders";
+import Home from "@/pages/Home";
+import Login from "@/pages/Login";
+import Profile from "@/pages/Profile";
+import Notes from "@/pages/Notes";
+import SingleNote from "@/pages/NotesSingle";
+import Documents from "@/pages/Documents";
+import SingleDocument from "@/pages/DocumentsSingle";
+import BooksHome from "@/pages/books/Home";
+import BooksSearch from "@/pages/books/Search";
+import BooksCreate from "@/pages/books/Create";
+import BooksList from "@/pages/books/List";
 import SingleBook from "./pages/books/SingleBook";
-
-const Error = React.lazy(() => import("@/pages/Error"));
-const NotFound = React.lazy(() => import("@/pages/NotFound"));
-const Home = React.lazy(() => import("@/pages/Home"));
-const Login = React.lazy(() => import("@/pages/Login"));
-const Profile = React.lazy(() => import("@/pages/Profile"));
-const Notes = React.lazy(() => import("@/pages/Notes"));
-const SingleNote = React.lazy(() => import("@/pages/NotesSingle"));
-const Documents = React.lazy(() => import("@/pages/Documents"));
-const SingleDocument = React.lazy(() => import("@/pages/DocumentsSingle"));
-const BooksHome = React.lazy(() => import("@/pages/books/Home"));
-const BooksSearch = React.lazy(() => import("@/pages/books/search"));
-const BooksCreate = React.lazy(() => import("@/pages/books/Create"));
-const BooksList = React.lazy(() => import("@/pages/books/List"));
-const Feedback = React.lazy(() => import("@/pages/Feedback"));
-const Chat = React.lazy(() => import("@/pages/Chat"));
+import Feedback from "@/pages/Feedback";
+import Chat from "@/pages/Chat";
+import { Error, ErrorTemplate } from "@/pages/Error";
 
 const routes: RouteObject[] = [
   {
@@ -119,7 +117,7 @@ const routes: RouteObject[] = [
       },
     ],
   },
-  { path: "*", element: <NotFound /> },
+  { path: "*", element: <ErrorTemplate status={404} /> },
 ];
 
 function App() {
