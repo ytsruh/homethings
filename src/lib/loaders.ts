@@ -1,6 +1,7 @@
 import { getToken } from "@/lib/utils";
 import { queryClient } from "@/lib/utils";
 import { LoaderFunctionArgs } from "react-router-dom";
+import { redirect } from "react-router-dom";
 
 export async function profileLoader() {
   return queryClient.fetchQuery({
@@ -14,7 +15,8 @@ export async function profileLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -36,7 +38,8 @@ export async function notesLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -58,7 +61,8 @@ export async function notesSingleLoader(req: LoaderFunctionArgs) {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -80,7 +84,8 @@ export async function documentsLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -102,7 +107,8 @@ export async function documentsSingleLoader(req: LoaderFunctionArgs) {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -124,7 +130,8 @@ export async function booksLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -146,7 +153,8 @@ export async function booksReadLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -168,7 +176,8 @@ export async function booksUnreadLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -190,7 +199,8 @@ export async function booksWishlistLoader() {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);
@@ -212,7 +222,8 @@ export async function booksSingleLoader(req: LoaderFunctionArgs) {
         },
       });
       if (response.status === 401) {
-        throw new Response("Unauthorised", { status: 401 });
+        sessionStorage.clear();
+        return redirect("/login");
       }
       if (!response.ok) {
         throw new Error("HTTP error " + response.status);

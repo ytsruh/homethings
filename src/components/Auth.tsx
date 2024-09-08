@@ -6,6 +6,7 @@ import { removeLocalPreferences } from "@/lib/utils";
 type AuthState = {
   isAuthenticated: boolean;
   userToken: string | null;
+  expiry: Date | null;
 };
 
 type AuthAction = { type: "signIn"; payload: string } | { type: "signOut" };
@@ -20,11 +21,11 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         "auth",
         JSON.stringify({ token, expiry: expiryDate }),
       );
-      return { isAuthenticated: true, userToken: token };
+      return { isAuthenticated: true, userToken: token, expiry: expiryDate };
     case "signOut":
       sessionStorage.removeItem("auth");
       removeLocalPreferences();
-      return { isAuthenticated: false, userToken: null };
+      return { isAuthenticated: false, userToken: null, expiry: null };
     default:
       throw Error("Unknown action");
   }
@@ -36,14 +37,16 @@ type AuthProviderProps = {
 
 type ContextType = {
   userToken: string | null;
+  expiry: Date | null;
   signIn: (token: string | null) => void;
   signOut: () => void;
 };
 
 const AuthContext = createContext<ContextType>({
   userToken: null,
-  signIn: () => {},
-  signOut: () => {},
+  expiry: null,
+  signIn: () => { },
+  signOut: () => { },
 });
 
 export const useAuth = () => {
@@ -55,6 +58,7 @@ const initialState: AuthState = {
   userToken: sessionStorage.getItem("auth")
     ? JSON.parse(sessionStorage.getItem("auth")!).token
     : null,
+  expiry: sessionStorage.getItem("auth") ? JSON.parse(sessionStorage.getItem("auth")!).expiry : null,
 };
 
 export const AuthProvider = (props: AuthProviderProps) => {
@@ -75,6 +79,7 @@ export const AuthProvider = (props: AuthProviderProps) => {
   const contextValue = useMemo(
     () => ({
       userToken: state.userToken,
+      expiry: state.expiry,
       signIn,
       signOut,
     }),
@@ -90,11 +95,19 @@ export const AuthProvider = (props: AuthProviderProps) => {
 };
 
 export const ProtectedRoute = () => {
-  const { userToken } = useAuth();
+  const auth = useAuth();
 
-  // Check if the user is authenticated
-  if (!userToken) {
+  //Check if the user is authenticated & token is not expired
+  if (!auth.userToken || !auth.expiry) {
+    sessionStorage.clear();
     // If not authenticated, redirect to the login page
+    return <Navigate to="/login" />;
+  }
+  const now = new Date();
+  const expiryDate = new Date(auth.expiry);
+  if (expiryDate < now) {
+    sessionStorage.clear();
+    // If token is expired, redirect to the login page
     return <Navigate to="/login" />;
   }
 
