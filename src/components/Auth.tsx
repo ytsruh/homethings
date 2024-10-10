@@ -1,5 +1,5 @@
-import { useReducer, useContext, useMemo, createContext } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { useReducer, useContext, useMemo, createContext, useEffect } from "react";
+import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import Frame from "@/components/Frame";
 import { removeLocalPreferences } from "@/lib/utils";
 
@@ -17,10 +17,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       const token = action.payload;
       const expiryDate = new Date();
       expiryDate.setDate(expiryDate.getDate() + 30);
-      sessionStorage.setItem(
-        "auth",
-        JSON.stringify({ token, expiry: expiryDate }),
-      );
+      sessionStorage.setItem("auth", JSON.stringify({ token, expiry: expiryDate }));
       return { isAuthenticated: true, userToken: token, expiry: expiryDate };
     case "signOut":
       sessionStorage.removeItem("auth");
@@ -40,13 +37,15 @@ type ContextType = {
   expiry: Date | null;
   signIn: (token: string | null) => void;
   signOut: () => void;
+  checkTokenExpiration: () => boolean;
 };
 
 const AuthContext = createContext<ContextType>({
   userToken: null,
   expiry: null,
-  signIn: () => { },
-  signOut: () => { },
+  signIn: () => {},
+  signOut: () => {},
+  checkTokenExpiration: () => true,
 });
 
 export const useAuth = () => {
@@ -55,9 +54,7 @@ export const useAuth = () => {
 
 const initialState: AuthState = {
   isAuthenticated: sessionStorage.getItem("auth") ? true : false,
-  userToken: sessionStorage.getItem("auth")
-    ? JSON.parse(sessionStorage.getItem("auth")!).token
-    : null,
+  userToken: sessionStorage.getItem("auth") ? JSON.parse(sessionStorage.getItem("auth")!).token : null,
   expiry: sessionStorage.getItem("auth") ? JSON.parse(sessionStorage.getItem("auth")!).expiry : null,
 };
 
@@ -75,6 +72,18 @@ export const AuthProvider = (props: AuthProviderProps) => {
     dispatch({ type: "signOut" });
   };
 
+  const checkTokenExpiration = () => {
+    if (state.expiry) {
+      const now = new Date();
+      const expiryDate = new Date(state.expiry);
+      if (expiryDate < now) {
+        signOut();
+        return false;
+      }
+    }
+    return true;
+  };
+
   // Memoized value of the authentication context
   const contextValue = useMemo(
     () => ({
@@ -82,34 +91,26 @@ export const AuthProvider = (props: AuthProviderProps) => {
       expiry: state.expiry,
       signIn,
       signOut,
+      checkTokenExpiration,
     }),
-    [state],
+    [state]
   );
 
   // Provide the authentication context to the children components
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {props.children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{props.children}</AuthContext.Provider>;
 };
 
 export const ProtectedRoute = () => {
   const auth = useAuth();
+  const navigate = useNavigate();
 
   //Check if the user is authenticated & token is not expired
-  if (!auth.userToken || !auth.expiry) {
-    sessionStorage.clear();
-    // If not authenticated, redirect to the login page
-    return <Navigate to="/login" />;
-  }
-  const now = new Date();
-  const expiryDate = new Date(auth.expiry);
-  if (expiryDate < now) {
-    sessionStorage.clear();
-    // If token is expired, redirect to the login page
-    return <Navigate to="/login" />;
-  }
+  useEffect(() => {
+    if (!auth.userToken || !auth.expiry || !auth.checkTokenExpiration()) {
+      sessionStorage.clear();
+      navigate("/login", { replace: true });
+    }
+  }, [auth, navigate]);
 
   // If authenticated, render the child routes
   return (
