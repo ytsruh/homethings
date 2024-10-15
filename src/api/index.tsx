@@ -12,6 +12,7 @@ import notes from "./notes";
 import documents from "./documents";
 import chat from "./chat";
 import book from "./books";
+import wealth from "./wealth";
 
 type Bindings = {
   AUTH_SECRET: string;
@@ -59,6 +60,7 @@ app.route("/documents", documents);
 app.route("/notes", notes);
 app.route("/feedback", feedback);
 app.route("/profile", profile);
+app.route("/wealth", wealth);
 app.get("/", (c) => c.json("Hello Homethings"));
 
 export default app;

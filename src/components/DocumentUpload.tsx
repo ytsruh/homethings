@@ -1,4 +1,5 @@
-import { getToken, createId, queryClient } from "@/lib/utils";
+import { getToken, queryClient } from "@/lib/utils";
+import { createId } from "@paralleldrive/cuid2";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Document } from "@/types";

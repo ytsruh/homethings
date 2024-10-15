@@ -25,7 +25,7 @@ export function removeLocalPreferences() {
 
 export const queryClient = new QueryClient();
 
-export function getToken() {
+export function getToken(): string {
   const auth = sessionStorage.getItem("auth");
   if (!auth) {
     return "";
@@ -34,6 +34,19 @@ export function getToken() {
   return parsed.token as string;
 }
 
-export function createId() {
-  return Math.random().toString(14);
+// Helper function to convert Date or JSON date string to { year, month } object
+export function dateToYearMonth(date: Date | string): { year: number; month: number } {
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
+  if (!(parsedDate instanceof Date) || isNaN(parsedDate.getTime())) {
+    throw new Error("Invalid date input");
+  }
+  return {
+    year: parsedDate.getFullYear(),
+    month: parsedDate.getMonth() + 1, // JavaScript months are 0-indexed
+  };
+}
+
+// Helper function to convert year and month to Date
+export function yearMonthToDate(year: number, month: number): Date {
+  return new Date(year, month - 1, 1); // Subtract 1 from month for JavaScript's 0-indexing
 }

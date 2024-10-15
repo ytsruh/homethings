@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, unique } from "drizzle-orm/sqlite-core";
 import { createId } from "@paralleldrive/cuid2";
 
 export const accountsTable = sqliteTable("accounts", {
@@ -109,3 +109,48 @@ export const notesTable = sqliteTable("notes", {
 
 export type InsertNote = typeof notesTable.$inferInsert;
 export type SelectNote = typeof notesTable.$inferSelect;
+
+export const wealthItemsTable = sqliteTable("wealth_items", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => createId()),
+  name: text("name").notNull(),
+  type: text("type", { enum: ["asset", "liability"] }).notNull(),
+  notes: text("notes"),
+  link: text("link"),
+  open: integer("open", { mode: "boolean" }).default(true),
+  accountId: text("account_id").references(() => accountsTable.id),
+  createdAt: integer("created_at")
+    .default(sql`(CURRENT_TIMESTAMP)`)
+    .notNull(),
+  updatedAt: integer("updated_at").$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+});
+
+export type InsertWealthItem = typeof wealthItemsTable.$inferInsert;
+export type SelectWealthItem = typeof wealthItemsTable.$inferSelect;
+
+export const wealthValuesTable = sqliteTable(
+  "wealth_values",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    wealthItemId: text("wealth_item_id")
+      .notNull()
+      .references(() => wealthItemsTable.id, { onDelete: "cascade" }),
+    month: integer("month").notNull(),
+    year: integer("year").notNull(),
+    value: integer("value").notNull(),
+    createdAt: integer("created_at")
+      .default(sql`(CURRENT_TIMESTAMP)`)
+      .notNull(),
+    updatedAt: integer("updated_at").$onUpdate(() => sql`(CURRENT_TIMESTAMP)`),
+  },
+  (table) => ({
+    // Composite unique constraint enforcing unique value wealth item & month-year
+    uniqueMonthYearPerParent: unique("unique_value_per_item").on(table.wealthItemId, table.month, table.year),
+  })
+);
+
+export type InsertWealthValue = typeof wealthValuesTable.$inferInsert;
+export type SelectWealthValue = typeof wealthValuesTable.$inferSelect;
