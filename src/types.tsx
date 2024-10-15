@@ -31,6 +31,9 @@ export type AppPreferences = {
   profileImage: string | undefined;
   name: string | null;
   email: string | null;
+  showChat: boolean;
+  showNotes: boolean;
+  showWealth: boolean;
 };
 
 export type ProfileData = {
@@ -38,6 +41,9 @@ export type ProfileData = {
   email: string;
   showDocuments: boolean;
   showBooks: boolean;
+  showNotes: boolean;
+  showChat: boolean;
+  showWealth: boolean;
   profileImage: string | null;
 };
 

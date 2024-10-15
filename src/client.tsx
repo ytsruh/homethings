@@ -32,6 +32,7 @@ import BooksList from "@/pages/books/List";
 import SingleBook from "./pages/books/SingleBook";
 import Feedback from "@/pages/Feedback";
 import Chat from "@/pages/Chat";
+import Wealth from "@/pages/Wealth";
 import { Error, ErrorTemplate } from "@/pages/Error";
 
 const routes: RouteObject[] = [
@@ -101,6 +102,10 @@ const routes: RouteObject[] = [
         path: "/books/:id",
         loader: booksSingleLoader,
         element: <SingleBook />,
+      },
+      {
+        path: "/wealth",
+        element: <Wealth />,
       },
       {
         path: "/profile",

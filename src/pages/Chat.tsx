@@ -93,7 +93,7 @@ export default function Chat() {
       <PageTitle title="Chat | Homethings" />
       <PageHeader title="Chat" subtitle="AI powered chatbot" />
       <div className="flex flex-col h-[calc(100vh-210px)]">
-        <div id="chat" className="overflow-auto flex-grow p-4">
+        <div id="chat" className="overflow-auto flex-grow p-4 my-2 border border-zinc-700 rounded-lg">
           {messages.map((m, index) => {
             const codeRegex = /```([\s\S]*?)```/;
             const match = m.content.match(codeRegex);

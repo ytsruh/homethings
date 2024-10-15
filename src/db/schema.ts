@@ -26,6 +26,9 @@ export const usersTable = sqliteTable("users", {
   profileImage: text("profile_image"),
   showBooks: integer("show_books", { mode: "boolean" }).default(true),
   showDocuments: integer("show_documents", { mode: "boolean" }).default(true),
+  showChat: integer("show_chat", { mode: "boolean" }).default(true),
+  showNotes: integer("show_notes", { mode: "boolean" }).default(true),
+  showWealth: integer("show_wealth", { mode: "boolean" }).default(true),
   accountId: text("account_id").references(() => accountsTable.id),
   createdAt: integer("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)

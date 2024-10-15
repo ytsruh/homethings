@@ -8,12 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
-import {
-  getToken,
-  queryClient,
-  getLocalPreferences,
-  setLocalPreferences,
-} from "@/lib/utils";
+import { getToken, queryClient, getLocalPreferences, setLocalPreferences } from "@/lib/utils";
 import Loading from "@/components/Loading";
 
 type ProfileResponse = {
@@ -24,6 +19,9 @@ type ProfileInput = {
   name: string;
   showBooks: boolean;
   showDocuments: boolean;
+  showNotes: boolean;
+  showChat: boolean;
+  showWealth: boolean;
 };
 
 export default function Profile() {
@@ -58,6 +56,9 @@ export default function Profile() {
         name: variables.name,
         showBooks: variables.showBooks,
         showDocuments: variables.showDocuments,
+        showNotes: variables.showNotes,
+        showChat: variables.showChat,
+        showWealth: variables.showWealth,
       });
       navigate("/profile", { replace: false });
     },
@@ -72,9 +73,7 @@ export default function Profile() {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fields = Object.fromEntries(
-      new FormData(e.target as HTMLFormElement),
-    );
+    const fields = Object.fromEntries(new FormData(e.target as HTMLFormElement));
 
     if (!fields.name) {
       toast({
@@ -88,6 +87,9 @@ export default function Profile() {
       name: fields.name as string,
       showBooks: fields.showBooks === "on",
       showDocuments: fields.showDocuments === "on",
+      showNotes: fields.showNotes === "on",
+      showChat: fields.showChat === "on",
+      showWealth: fields.showWealth === "on",
     });
   }
 
@@ -103,42 +105,45 @@ export default function Profile() {
           title="Profile"
           subtitle="Change your profile picture or show/hide features to personalise your experience."
         />
-        <form
-          className="w-full flex flex-col justify-center items-center gap-2"
-          onSubmit={handleSubmit}
-        >
+        <form className="w-full flex flex-col justify-center items-center gap-2" onSubmit={handleSubmit}>
           <div className="w-full">
             <Label>Name:</Label>
-            <Input
-              className="my-2"
-              type="text"
-              placeholder="Name"
-              name="name"
-              defaultValue={data.name}
-            />
+            <Input className="my-2" type="text" placeholder="Name" name="name" defaultValue={data.name} />
           </div>
           <div className="w-full">
             <Label>Email:</Label>
             <Input className="my-2" type="text" value={data.email} disabled />
           </div>
-          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-10">
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="w-full flex justify-between items-center">
               <div>
                 <Label>Show Documents:</Label>
               </div>
-              <Switch
-                name="showDocuments"
-                defaultChecked={data.showDocuments || false}
-              />
+              <Switch name="showDocuments" defaultChecked={data.showDocuments || false} />
+            </div>
+            <div className="w-full flex justify-between items-center">
+              <div>
+                <Label>Show Notes:</Label>
+              </div>
+              <Switch name="showNotes" defaultChecked={data.showNotes as boolean} />
             </div>
             <div className="w-full flex justify-between items-center">
               <div>
                 <Label>Show Books:</Label>
               </div>
-              <Switch
-                name="showBooks"
-                defaultChecked={data.showBooks as boolean}
-              />
+              <Switch name="showBooks" defaultChecked={data.showBooks as boolean} />
+            </div>
+            <div className="w-full flex justify-between items-center">
+              <div>
+                <Label>Show Chat:</Label>
+              </div>
+              <Switch name="showChat" defaultChecked={data.showChat as boolean} />
+            </div>
+            <div className="w-full flex justify-between items-center">
+              <div>
+                <Label>Show Wealth:</Label>
+              </div>
+              <Switch name="showWealth" defaultChecked={data.showWealth as boolean} />
             </div>
           </div>
           <div className="flex justify-end w-full py-5">
