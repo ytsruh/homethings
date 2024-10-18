@@ -93,40 +93,48 @@ export default function Chat() {
       <PageTitle title="Chat | Homethings" />
       <PageHeader title="Chat" subtitle="AI powered chatbot" />
       <div className="flex flex-col h-[calc(100vh-210px)]">
-        <div id="chat" className="overflow-auto flex-grow p-4 my-2 border border-zinc-700 rounded-lg">
-          {messages.map((m, index) => {
-            const codeRegex = /```([\s\S]*?)```/;
-            const match = m.content.match(codeRegex);
+        {messages.length === 0 ? (
+          <div
+            id="chat"
+            className="flex w-full h-full items-center justify-center p-4 my-2 border border-zinc-700 rounded-lg">
+            <h2>Your chat will appear here</h2>
+          </div>
+        ) : (
+          <div id="chat" className="overflow-auto flex-grow p-4 my-2 border border-zinc-700 rounded-lg">
+            {messages.map((m, index) => {
+              const codeRegex = /```([\s\S]*?)```/;
+              const match = m.content.match(codeRegex);
 
-            if (match) {
-              // Split message content from code
-              const beforeCode = m.content.substring(0, match.index);
-              const codeContent = match[1]; // The actual code without backticks
-              const afterCode = m.content.substring((match?.index ?? 0) + (match?.[0]?.length ?? 0));
+              if (match) {
+                // Split message content from code
+                const beforeCode = m.content.substring(0, match.index);
+                const codeContent = match[1]; // The actual code without backticks
+                const afterCode = m.content.substring((match?.index ?? 0) + (match?.[0]?.length ?? 0));
 
-              return (
-                <div key={index} className="whitespace-pre-wrap py-1">
-                  <span className="text-accent">{m.role === "user" ? "User: " : "AI: "}</span>
-                  {beforeCode}
-                  <div className="p-1 bg-zinc-100 text-black dark:bg-zinc-800 dark:text-white">
-                    <pre>
-                      <code>{codeContent}</code>
-                    </pre>
+                return (
+                  <div key={index} className="whitespace-pre-wrap py-1">
+                    <span className="text-accent">{m.role === "user" ? "User: " : "AI: "}</span>
+                    {beforeCode}
+                    <div className="p-1 bg-zinc-100 text-black dark:bg-zinc-800 dark:text-white">
+                      <pre>
+                        <code>{codeContent}</code>
+                      </pre>
+                    </div>
+                    {afterCode}
                   </div>
-                  {afterCode}
-                </div>
-              );
-            } else {
-              // Render as normal if no code is detected
-              return (
-                <div key={index} className="whitespace-pre-wrap py-1">
-                  <span className="text-accent">{m.role === "user" ? "User: " : "AI: "}</span>
-                  {m.content}
-                </div>
-              );
-            }
-          })}
-        </div>
+                );
+              } else {
+                // Render as normal if no code is detected
+                return (
+                  <div key={index} className="whitespace-pre-wrap py-1">
+                    <span className="text-accent">{m.role === "user" ? "User: " : "AI: "}</span>
+                    {m.content}
+                  </div>
+                );
+              }
+            })}
+          </div>
+        )}
         <form
           onSubmit={handleSubmit}
           className="flex space-y-2 md:space-x-5 md:space-y-0 flex-col md:flex-row">
