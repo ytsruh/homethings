@@ -71,3 +71,18 @@ export type Book = {
   createdAt: number;
   updatedAt: number;
 };
+
+export type WealthItemWithValues = {
+  item: {
+    id: string;
+    name: string;
+    type: string;
+    notes: null | string;
+    link: null | string;
+    open: boolean;
+    accountId: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  values: any[];
+};

@@ -1,4 +1,3 @@
-import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider, RouteObject } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -17,6 +16,7 @@ import {
   booksWishlistLoader,
   booksUnreadLoader,
   booksSingleLoader,
+  wealthLoader,
 } from "@/lib/loaders";
 import Home from "@/pages/Home";
 import Login from "@/pages/Login";
@@ -32,7 +32,8 @@ import BooksList from "@/pages/books/List";
 import SingleBook from "./pages/books/SingleBook";
 import Feedback from "@/pages/Feedback";
 import Chat from "@/pages/Chat";
-import Wealth from "@/pages/Wealth";
+import Wealth from "@/pages/wealth";
+import WealthNewItem from "@/pages/wealth/NewItem";
 import { Error, ErrorTemplate } from "@/pages/Error";
 
 const routes: RouteObject[] = [
@@ -106,6 +107,11 @@ const routes: RouteObject[] = [
       {
         path: "/wealth",
         element: <Wealth />,
+        loader: wealthLoader,
+      },
+      {
+        path: "/wealth/new",
+        element: <WealthNewItem />,
       },
       {
         path: "/profile",

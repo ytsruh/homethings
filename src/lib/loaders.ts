@@ -232,3 +232,26 @@ export async function booksSingleLoader(req: LoaderFunctionArgs) {
     },
   });
 }
+
+export async function wealthLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["wealth"],
+    queryFn: async () => {
+      const response = await fetch("/api/wealth", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        sessionStorage.clear();
+        return redirect("/login");
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
