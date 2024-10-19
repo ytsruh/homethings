@@ -255,3 +255,49 @@ export async function wealthLoader() {
     },
   });
 }
+
+export async function wealthListLoader() {
+  return queryClient.fetchQuery({
+    queryKey: ["wealth-list"],
+    queryFn: async () => {
+      const response = await fetch("/api/wealth/list", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        sessionStorage.clear();
+        return redirect("/login");
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}
+
+export async function wealthSingleLoader(req: LoaderFunctionArgs) {
+  return queryClient.fetchQuery({
+    queryKey: [`wealth-${req.params.id}`],
+    queryFn: async () => {
+      const response = await fetch(`/api/wealth/${req.params.id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getToken(),
+        },
+      });
+      if (response.status === 401) {
+        sessionStorage.clear();
+        return redirect("/login");
+      }
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    },
+  });
+}

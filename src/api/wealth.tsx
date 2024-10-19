@@ -44,6 +44,43 @@ app.get("/", async (c) => {
   }
 });
 
+app.get("/list", async (c) => {
+  try {
+    console.log("list");
+
+    const storedUser = c.get("user");
+    const user: UserToken = JSON.parse(storedUser);
+    const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
+    const data = await db
+      .select()
+      .from(wealthItemsTable)
+      .where(eq(wealthItemsTable.accountId, user.accountId));
+
+    return c.json({ message: "success", data: data });
+  } catch (err) {
+    console.log(err);
+    return c.json({ error: "Something went wrong" }, { status: 500 });
+  }
+});
+
+app.get("/:id", async (c) => {
+  try {
+    const storedUser = c.get("user");
+    const user: UserToken = JSON.parse(storedUser);
+    const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
+
+    const rows = await db
+      .select()
+      .from(wealthItemsTable)
+      .where(and(eq(wealthItemsTable.accountId, user.accountId), eq(wealthItemsTable.id, c.req.param("id"))));
+
+    return c.json({ message: "success", data: rows[0] });
+  } catch (err) {
+    console.log(err);
+    return c.json({ error: "Something went wrong" }, { status: 500 });
+  }
+});
+
 // Query children for a specific parent and month-year
 // const startDate = new Date("2023-01-01");
 // const endDate = new Date("2023-12-31");

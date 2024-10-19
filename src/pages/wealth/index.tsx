@@ -1,8 +1,15 @@
 import PageTitle from "@/components/PageTitle";
 import PageHeader from "@/components/PageHeader";
 import { Button } from "@/components/ui/button";
-import { Link, useLoaderData } from "react-router-dom";
+import { Link, Outlet, useLoaderData } from "react-router-dom";
 import { WealthItemWithValues } from "@/types";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
 type WealthResponse = {
   message: string;
@@ -16,15 +23,43 @@ export default function Wealth() {
     <>
       <PageTitle title="Wealth | Homethings" />
       <PageHeader title="Wealth Tracker" subtitle="Track your assets and liabilities" />
-      <div className="w-full flex justify-end py-5">
-        <Button asChild>
-          <Link to="/wealth/new">Create</Link>
-        </Button>
-      </div>
       {data.data.length === 0 ? (
-        <NoItems />
+        <div>
+          <div className="w-full flex justify-end py-5">
+            <Button asChild>
+              <Link to="/wealth/new">New</Link>
+            </Button>
+          </div>
+          <NoItems />
+        </div>
       ) : (
-        <div className="text-center text-lg py-5">There are {data.data.length} items created</div>
+        <div className="w-full">
+          <div className="w-full flex justify-between py-5">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/wealth">Summary</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/wealth/list">List</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                    <Link to="/wealth/latest">Latest</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+            <Button asChild>
+              <Link to="/wealth/new">New</Link>
+            </Button>
+          </div>
+          <Outlet />
+        </div>
       )}
     </>
   );
