@@ -43,9 +43,15 @@ app.use(async (c, next) => {
   }
   // Verify token
   const isValid = await verify(authToken, c.env.AUTH_SECRET);
-  // Check for validity
+  // Check for validity & expiry
   if (!isValid) {
     c.status(401);
+    console.log("Token invalid");
+    return c.json({ message: "Unauthorized" });
+  }
+  if (isValid.exp && isValid.exp < Date.now() / 1000) {
+    c.status(401);
+    console.log("Token expired");
     return c.json({ message: "Unauthorized" });
   }
   // Decode token
