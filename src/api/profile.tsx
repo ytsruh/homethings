@@ -14,15 +14,9 @@ app.get("/", async (c) => {
   try {
     const storedUser = c.get("user");
     const user: UserToken = JSON.parse(storedUser);
-    const db = await createDBClient(
-      c.env.TURSO_DATABASE_URL,
-      c.env.TURSO_AUTH_TOKEN,
-    );
+    const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
 
-    const data: SelectUser[] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.id, user.id));
+    const data: SelectUser[] = await db.select().from(usersTable).where(eq(usersTable.id, user.id));
 
     return c.json({
       name: data[0].name,
@@ -30,6 +24,9 @@ app.get("/", async (c) => {
       profileImage: data[0].profileImage,
       showBooks: data[0].showBooks,
       showDocuments: data[0].showDocuments,
+      showChat: data[0].showChat,
+      showNotes: data[0].showNotes,
+      showWealth: data[0].showWealth,
     });
   } catch (err) {
     console.log(err);
@@ -41,10 +38,7 @@ app.post("/", async (c) => {
   try {
     const storedUser = c.get("user");
     const user: UserToken = JSON.parse(storedUser);
-    const db = await createDBClient(
-      c.env.TURSO_DATABASE_URL,
-      c.env.TURSO_AUTH_TOKEN,
-    );
+    const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
 
     const body = await c.req.json();
     if (!body) {
@@ -58,6 +52,9 @@ app.post("/", async (c) => {
         profileImage: body.profileImage,
         showDocuments: body.showDocuments,
         showBooks: body.showBooks,
+        showNotes: body.showNotes,
+        showChat: body.showChat,
+        showWealth: body.showWealth,
       })
       .where(eq(usersTable.id, user.id));
 

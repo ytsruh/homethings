@@ -8,6 +8,7 @@ The Homethings Apps & API
 
 - Rebuild as Hono & React Router app
 - Migrated DB from Neon Postgres to Turso SQLite
+- Added Wealth Tracker
 
 ### v1.1
 

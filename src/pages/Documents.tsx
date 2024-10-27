@@ -16,7 +16,7 @@ export default function Documents() {
     <>
       <PageTitle title="Documents | Homethings" />
       <PageHeader title="Documents" subtitle="Document storage shared across your account with all members" />
-      <div className="w-full xl:w-10/12">
+      <div className="w-full">
         <DocumentsTable data={LoadedData.data} />
         <div className="py-5">
           <h3 className="py-4 text-xl">Upload a new document</h3>

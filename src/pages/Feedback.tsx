@@ -66,7 +66,6 @@ export default function Feedback() {
       });
       return;
     }
-    console.log(fields);
     mutation.mutate({
       title: fields.title as string,
       body: fields.body as string,

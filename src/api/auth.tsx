@@ -11,16 +11,10 @@ const app = new Hono<{ Bindings: GlobalBindings }>();
 
 app.post("/login", async (c) => {
   const body = await c.req.json();
-  const db = await createDBClient(
-    c.env.TURSO_DATABASE_URL,
-    c.env.TURSO_AUTH_TOKEN,
-  );
+  const db = await createDBClient(c.env.TURSO_DATABASE_URL, c.env.TURSO_AUTH_TOKEN);
   try {
     // Look up a user in the database based on the email field sumitted in the body
-    const data: SelectUser[] = await db
-      .select()
-      .from(usersTable)
-      .where(eq(usersTable.email, body.email));
+    const data: SelectUser[] = await db.select().from(usersTable).where(eq(usersTable.email, body.email));
     const foundUser = data[0];
 
     // If no user is found, return an error
@@ -40,7 +34,7 @@ app.post("/login", async (c) => {
         accountId: foundUser.accountId,
         exp: Math.floor(Date.now() / 1000) + 24 * (60 * 60), // Expires: Now + 24h
       },
-      c.env.AUTH_SECRET,
+      c.env.AUTH_SECRET
     );
 
     return c.json({
@@ -52,6 +46,9 @@ app.post("/login", async (c) => {
         showDocuments: foundUser.showDocuments,
         showBooks: foundUser.showBooks,
         profileImage: foundUser.profileImage,
+        showNotes: foundUser.showNotes,
+        showChat: foundUser.showChat,
+        showWealth: foundUser.showWealth,
       },
     });
   } catch (error) {

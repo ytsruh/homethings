@@ -22,6 +22,9 @@ type PageProps = {
 const defaultPreferences = {
   showDocuments: true,
   showBooks: true,
+  showChat: true,
+  showNotes: true,
+  showWealth: true,
   profileImage: "",
   name: "",
   email: "",
@@ -45,10 +48,11 @@ export default function PageFrame(props: PageProps) {
         <div className="flex">
           <div className="hidden lg:flex lg:flex-col lg:p-2 lg:w-56 lg:space-y-3">
             <SideLink text="Home" link="/" />
-            <SideLink text="Chat" link="/chat" />
-            <SideLink text="Notes" link="/notes" />
+            {preferences.showChat && <SideLink text="Chat" link="/chat" />}
+            {preferences.showNotes && <SideLink text="Notes" link="/notes" />}
             {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
             {preferences.showBooks && <SideLink text="Books" link="/books" />}
+            {/* {preferences.showWealth && <SideLink text="Wealth" link="/wealth" />} */}
             <SideLink text="Profile" link="/profile" />
           </div>
           <div className="p-2 w-full">{navigation.state === "loading" ? <Loading /> : props.children}</div>
@@ -62,7 +66,7 @@ export default function PageFrame(props: PageProps) {
 function SideLink(props: { text: string; link: string }) {
   return (
     <a
-      className="hover:bg-zinc-800 rounded-md px-1 py-2 hover:cursor-pointer hover:text-white"
+      className="hover:bg-zinc-800 text-sm rounded-md px-2 py-2 hover:cursor-pointer hover:text-white"
       href={props.link}>
       {props.text}
     </a>

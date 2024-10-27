@@ -89,16 +89,20 @@ export default function MainNav(props: MainNavProps) {
           <SheetHeader>
             <SheetTitle>What do you want to do?</SheetTitle>
             <SheetDescription></SheetDescription>
-            <nav className="py-10 flex flex-col space-y-5">
+            <nav className="py-10 flex flex-col space-y-2">
               <a href="/" className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent">
                 Home
               </a>
-              <a href="/chat" className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent">
-                Chat
-              </a>
-              <a href="/notes" className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
-                Notes
-              </a>
+              {preferences.showChat && (
+                <a href="/chat" className="text-sm  hover:text-accent dark:text-white dark:hover:text-accent">
+                  Chat
+                </a>
+              )}
+              {preferences.showNotes && (
+                <a href="/notes" className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
+                  Notes
+                </a>
+              )}
               {preferences.showDocuments && (
                 <a
                   href="/documents"
@@ -111,6 +115,16 @@ export default function MainNav(props: MainNavProps) {
                   Books
                 </a>
               )}
+              {/* {preferences.showWealth && (
+                <a
+                  href="/wealth"
+                  className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
+                  Wealth
+                </a>
+              )} */}
+              <a href="/profile" className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
+                Profile
+              </a>
             </nav>
           </SheetHeader>
         </SheetContent>

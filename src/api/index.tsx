@@ -12,6 +12,7 @@ import notes from "./notes";
 import documents from "./documents";
 import chat from "./chat";
 import book from "./books";
+import wealth from "./wealth";
 
 type Bindings = {
   AUTH_SECRET: string;
@@ -42,9 +43,15 @@ app.use(async (c, next) => {
   }
   // Verify token
   const isValid = await verify(authToken, c.env.AUTH_SECRET);
-  // Check for validity
+  // Check for validity & expiry
   if (!isValid) {
     c.status(401);
+    console.log("Token invalid");
+    return c.json({ message: "Unauthorized" });
+  }
+  if (isValid.exp && isValid.exp < Date.now() / 1000) {
+    c.status(401);
+    console.log("Token expired");
     return c.json({ message: "Unauthorized" });
   }
   // Decode token
@@ -59,6 +66,7 @@ app.route("/documents", documents);
 app.route("/notes", notes);
 app.route("/feedback", feedback);
 app.route("/profile", profile);
+app.route("/wealth", wealth);
 app.get("/", (c) => c.json("Hello Homethings"));
 
 export default app;
