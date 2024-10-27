@@ -115,13 +115,13 @@ export default function MainNav(props: MainNavProps) {
                   Books
                 </a>
               )}
-              {preferences.showWealth && (
+              {/* {preferences.showWealth && (
                 <a
                   href="/wealth"
                   className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
                   Wealth
                 </a>
-              )}
+              )} */}
               <a href="/profile" className="text-sm hover:text-accent dark:text-white dark:hover:text-accent">
                 Profile
               </a>

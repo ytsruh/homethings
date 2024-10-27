@@ -52,7 +52,7 @@ export default function PageFrame(props: PageProps) {
             {preferences.showNotes && <SideLink text="Notes" link="/notes" />}
             {preferences.showDocuments && <SideLink text="Documents" link="/documents" />}
             {preferences.showBooks && <SideLink text="Books" link="/books" />}
-            {preferences.showWealth && <SideLink text="Wealth" link="/wealth" />}
+            {/* {preferences.showWealth && <SideLink text="Wealth" link="/wealth" />} */}
             <SideLink text="Profile" link="/profile" />
           </div>
           <div className="p-2 w-full">{navigation.state === "loading" ? <Loading /> : props.children}</div>
