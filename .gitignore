@@ -1,15 +1,13 @@
-# dependencies
+test-results
 node_modules
-
-# production
+/.svelte-kit
 /build
-dist/
-
-# env
-.env
-.dev.vars
-.wrangler
-
-# misc
-package-lock.json
 .DS_Store
+.env
+.env.*
+!.env.example
+!.env.test
+*.db
+package-lock.json
+
+_archive
