@@ -1,0 +1,48 @@
+<script lang="ts">
+ import * as Form from "$lib/components/ui/form/index.js";
+ import { Input } from "$lib/components/ui/input/index.js";
+ import { formSchema, type FormSchema } from "$lib/schema";
+ import {
+  type SuperValidated,
+  type Infer,
+  superForm,
+ } from "sveltekit-superforms";
+ import { zodClient } from "sveltekit-superforms/adapters";
+ import { toast } from "svelte-sonner";
+
+ 
+ export let data: SuperValidated<Infer<FormSchema>>;
+ 
+ const form = superForm(data, {
+  validators: zodClient(formSchema),
+  onUpdate: ({ form, formElement, cancel, result }) => {
+    //cancel()
+    console.log(result);
+    if (result.type === "failure"){
+        toast.error("Something went wrong");
+    }
+  }
+ });
+ const { form: formData, enhance } = form;
+ 
+</script>
+ 
+<form method="POST" use:enhance>
+ <Form.Field {form} name="username">
+  <Form.Control>
+   {#snippet children({ props })}
+    <Form.Label>Username/email</Form.Label>
+    <Input {...props} bind:value={$formData.username} />
+   {/snippet}
+  </Form.Control>
+ </Form.Field>
+ <Form.Field {form} name="password">
+  <Form.Control>
+   {#snippet children({ props })}
+    <Form.Label>Password</Form.Label>
+    <Input {...props} bind:value={$formData.password} type="password"/>
+   {/snippet}
+  </Form.Control>
+ </Form.Field>
+ <Form.Button class="my-2">Submit</Form.Button>
+</form>
