@@ -25,11 +25,14 @@
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/typography": "^0.5.15",
     "autoprefixer": "^10.4.20",
-    "bits-ui": "^1.0.0-next.33",
+    "bits-ui": "^1.0.0-next.34",
     "clsx": "^2.1.1",
     "drizzle-kit": "^0.22.0",
     "formsnap": "^2.0.0-next.1",
+    "lucide-svelte": "^0.454.0",
     "mode-watcher": "^0.4.1",
+    "prettier": "^3.3.3",
+    "prettier-plugin-svelte": "^3.2.7",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
     "svelte-sonner": "^0.3.28",
@@ -51,7 +54,6 @@
     "@oslojs/encoding": "^1.1.0",
     "bcrypt-edge": "^0.1.0",
     "drizzle-orm": "^0.33.0",
-    "hono": "^4.6.7",
-    "lucide-svelte": "^0.454.0"
+    "hono": "^4.6.7"
   }
 }

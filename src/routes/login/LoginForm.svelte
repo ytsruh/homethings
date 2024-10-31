@@ -9,6 +9,7 @@
  } from "sveltekit-superforms";
  import { zodClient } from "sveltekit-superforms/adapters";
  import { toast } from "svelte-sonner";
+    import DarkModeToggle from "@/lib/components/DarkModeToggle.svelte"
 
  
  export let data: SuperValidated<Infer<FormSchema>>;
@@ -44,5 +45,8 @@
    {/snippet}
   </Form.Control>
  </Form.Field>
- <Form.Button class="my-2">Submit</Form.Button>
+    <div class="flex justify-between items-center py-5"> 
+            <Form.Button>Submit</Form.Button>
+        <DarkModeToggle />
+    </div>
 </form>
