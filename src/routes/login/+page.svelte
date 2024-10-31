@@ -1,10 +1,9 @@
 <script lang="ts">
-  import img from '$lib/assets/login.webp'
-  import { Toaster } from '$lib/components/ui/sonner/index.js'
-  import type { PageData } from './$types.js'
-  import SettingsForm from './LoginForm.svelte'
-  export let data: PageData
-  //console.log(data)
+  import img from "$lib/assets/login.webp";
+  import { Toaster } from "$lib/components/ui/sonner/index.js";
+  import type { PageData } from "./$types.js";
+  import SettingsForm from "./LoginForm.svelte";
+  export let data: PageData;
 </script>
 
 <svelte:head>
@@ -13,7 +12,9 @@
 </svelte:head>
 
 <div class="flex flex-col items-center justify-center h-screen max-h-screen">
-  <div class="flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0 dark:bg-zinc-900">
+  <div
+    class="flex flex-col m-6 space-y-10 shadow-2xl rounded-2xl md:flex-row md:space-y-0 md:m-0 dark:bg-zinc-900"
+  >
     <div class="p-6 md:p-20">
       <div class="text-center py-5">
         <h1 class="text-5xl py-2">
