@@ -1,69 +1,43 @@
-import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { z } from "zod";
+import { getCookie } from "hono/cookie";
+import { logger } from "hono/logger";
+import { etag } from "hono/etag";
+import { secureHeaders } from "hono/secure-headers";
+import { timeout } from "hono/timeout";
+import { trimTrailingSlash } from "hono/trailing-slash";
+import chat from "./chat";
+import * as auth from "$lib/server/auth.js";
 
-export const Task = z.object({
-  id: z.string().uuid(),
-  name: z.string().min(1),
-  done: z.boolean(),
+export type GlobalVariables = {
+  userid: string;
+};
+
+export const app = new Hono<{ Variables: GlobalVariables }>().basePath("/api");
+export type Router = typeof app;
+
+// Setup middleware
+app.use(logger());
+app.use(etag());
+app.use(secureHeaders());
+app.use(timeout(7000));
+app.use(trimTrailingSlash());
+
+// Check auth
+app.use(async (c, next) => {
+  const sessionId = getCookie(c, "auth-session");
+  if (!sessionId) {
+    c.status(401);
+    return c.json({ message: "Unauthorized" });
+  }
+  const { user } = await auth.validateSession(sessionId);
+  if (!user) {
+    c.status(401);
+    return c.json({ message: "Unauthorized" });
+  }
+  c.set("userid", user.id);
+  await next();
 });
 
-export type Task = z.infer<typeof Task>;
-
-export const TaskCreateInput = Task.pick({ name: true });
-
-export type TaskCreateInput = z.infer<typeof TaskCreateInput>;
-
-export const TaskParam = Task.pick({ id: true });
-export type TaskParam = z.infer<typeof TaskParam>;
-
-/**
- * This will be our in-memory data store
- */
-let tasks: Task[] = [
-  { id: "1", name: "old task", done: false },
-  { id: "2", name: "new task", done: false },
-];
-
-export const router = new Hono()
-  .get("/", (c) => c.json({ message: "Hello World" }))
-  .get("/tasks", (c) => c.json<Task[]>(tasks))
-  .post("/tasks", zValidator("json", TaskCreateInput), (c) => {
-    const body = c.req.valid("json");
-    const task = {
-      id: crypto.randomUUID(),
-      name: body.name,
-      done: false,
-    };
-    tasks = [...tasks, task];
-    return c.json(task);
-  })
-  .post("/tasks/:id/finish", zValidator("param", TaskParam), (c) => {
-    const { id } = c.req.valid("param");
-    const task = tasks.find((task) => task.id === id);
-    if (task) {
-      task.done = true;
-      return c.json(task);
-    }
-
-    throw c.json({ message: "Task not found" }, 404);
-  })
-  .post("/tasks/:id/undo", zValidator("param", TaskParam), (c) => {
-    const { id } = c.req.valid("param");
-    const task = tasks.find((task) => task.id === id);
-    if (task) {
-      task.done = false;
-      return c.json(task);
-    }
-
-    throw c.json({ message: "Task not found" }, 404);
-  })
-  .post("/tasks/:id/delete", zValidator("param", TaskParam), (c) => {
-    const { id } = c.req.valid("param");
-    tasks = tasks.filter((task) => task.id !== id);
-    return c.json({ message: "Task deleted" });
-  });
-
-export const api = new Hono().route("/api", router);
-
-export type Router = typeof router;
+// Setup routes
+app.route("/chat", chat);
+app.get("/", (c) => c.json("Hello Homethings"));
