@@ -5,7 +5,7 @@
 <div class={`flex items-center justify-center ${small ? null : "h-full"}`}>
   <svg
     role="status"
-    class="w-24 h-24 mr-2 text-zinc-200 animate-spin dark:text-zinc-600 fill-theme"
+    class="w-24 h-24 mr-2 text-zinc-200 animate-spin dark:text-zinc-500 fill-theme"
     viewBox="0 0 100 101"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"

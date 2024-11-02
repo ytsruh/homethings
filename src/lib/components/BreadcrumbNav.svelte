@@ -14,7 +14,7 @@
     {#each paths as path, index}
       <Breadcrumb.Separator />
       <Breadcrumb.Item>
-        <Breadcrumb.Link href={paths.slice(0, index + 1).join("/")} class="capitalize">
+        <Breadcrumb.Link href={"/" + paths.slice(0, index + 1).join("/")} class="capitalize">
           {path}
         </Breadcrumb.Link>
       </Breadcrumb.Item>

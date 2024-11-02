@@ -5,8 +5,18 @@
   import DarkModeToggle from "./DarkModeToggle.svelte";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
-  import type { SelectUser } from "$lib/server/db/schema";
-  let { user }: { user: SelectUser } = $props();
+  let { user }: { user: User } = $props();
+  type User = {
+    id: string;
+    name: string | null;
+    email: string;
+    profileImage: string | null;
+    showBooks: boolean | null;
+    showDocuments: boolean | null;
+    showChat: boolean | null;
+    showNotes: boolean | null;
+    showWealth: boolean | null;
+  };
 </script>
 
 <div class="border-b">
