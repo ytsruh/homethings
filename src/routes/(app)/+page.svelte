@@ -8,5 +8,5 @@
   <meta name="description" content="Welcome to your Homethings dashboard" />
 </svelte:head>
 
-<h1>Hi, {data.user.username}!</h1>
+<h1>Hi, {data.user.email}!</h1>
 <p>Your user ID is {data.user.id}.</p>

@@ -27,11 +27,11 @@
 </script>
  
 <form method="POST" use:enhance>
- <Form.Field {form} name="username">
+ <Form.Field {form} name="email">
   <Form.Control>
    {#snippet children({ props })}
     <Form.Label>Username/email</Form.Label>
-    <Input {...props} bind:value={$formData.username} />
+    <Input {...props} bind:value={$formData.email} />
    {/snippet}
   </Form.Control>
  </Form.Field>

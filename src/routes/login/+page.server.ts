@@ -26,13 +26,13 @@ export const actions: Actions = {
       return fail(400, { form });
     }
 
-    const results = await db.select().from(table.user).where(eq(table.user.username, form.data.username));
+    const results = await db.select().from(table.users).where(eq(table.users.email, form.data.email));
 
     const existingUser = results.at(0);
     if (!existingUser) {
-      return setError(form, "username", "User not found");
+      return setError(form, "email", "User not found");
     }
-    const validPassword = await compareSync(form.data.password, existingUser.passwordHash);
+    const validPassword = await compareSync(form.data.password, existingUser.password);
 
     if (!validPassword) {
       return setError(form, "password", "Incorrect Password");

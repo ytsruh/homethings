@@ -34,11 +34,21 @@ export async function validateSession(sessionId: string) {
   const [result] = await db
     .select({
       // Adjust user table here to tweak returned data
-      user: { id: table.user.id, username: table.user.username },
+      user: {
+        id: table.users.id,
+        email: table.users.email,
+        name: table.users.name,
+        profileImage: table.users.profileImage,
+        showBooks: table.users.showBooks,
+        showDocuments: table.users.showDocuments,
+        showChat: table.users.showChat,
+        showNotes: table.users.showNotes,
+        showWealth: table.users.showWealth,
+      },
       session: table.session,
     })
     .from(table.session)
-    .innerJoin(table.user, eq(table.session.userId, table.user.id))
+    .innerJoin(table.users, eq(table.session.userId, table.users.id))
     .where(eq(table.session.id, sessionId));
 
   if (!result) {

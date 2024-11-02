@@ -11,6 +11,7 @@
     "test": "npm run test:unit -- --run && npm run test:e2e",
     "test:e2e": "playwright test",
     "db:push": "drizzle-kit push",
+    "db:pull": "rm -f local.db && turso db shell homethings .dump > dump.sql && cat dump.sql | sqlite3 local.db && rm dump.sql",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio"
   },
@@ -52,6 +53,7 @@
     "@libsql/client": "^0.9.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
+    "@paralleldrive/cuid2": "^2.2.2",
     "bcrypt-edge": "^0.1.0",
     "drizzle-orm": "^0.33.0",
     "hono": "^4.6.7"
