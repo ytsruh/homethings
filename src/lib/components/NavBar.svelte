@@ -5,7 +5,8 @@
   import DarkModeToggle from "./DarkModeToggle.svelte";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
   import * as Avatar from "$lib/components/ui/avatar/index.js";
-  export let user;
+  import type { SelectUser } from "$lib/server/db/schema";
+  let { user }: { user: SelectUser } = $props();
 </script>
 
 <div class="border-b">
