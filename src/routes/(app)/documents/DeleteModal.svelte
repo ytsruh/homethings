@@ -10,9 +10,9 @@
 </script>
 
 <AlertDialog.Root bind:open={dialogOpen}>
-  <AlertDialog.Trigger class={buttonVariants({ variant: "destructive" })}>
-    Delete
-  </AlertDialog.Trigger>
+  <AlertDialog.Trigger class={buttonVariants({ variant: "destructive" })}
+    >Delete</AlertDialog.Trigger
+  >
   <AlertDialog.Content>
     <form
       method="POST"
@@ -21,15 +21,15 @@
         return async ({ result }) => {
           if (result.type === "success") {
             dialogOpen = false;
-            goto(`/notes`);
-            toast.success("Note successfully deleted");
+            goto(`/documents`);
+            toast.success("Document successfully deleted");
           }
           if (result.type === "failure") {
             if (result.data?.message) {
               toast.error(result.data.message as string);
             } else {
               toast.error(
-                "Something went wrong & note was not deleted. Please try again.",
+                "Something went wrong & your document was not deleted. Please try again.",
               );
             }
           }
@@ -38,11 +38,11 @@
     >
       <AlertDialog.Header>
         <AlertDialog.Title class="text-theme"
-          >Are you sure you want to delete this note?</AlertDialog.Title
+          >Are you sure you want to delete this document?</AlertDialog.Title
         >
         <AlertDialog.Description>
-          This action cannot be undone. This will permanently delete your note
-          and remove it from the database.
+          This action cannot be undone. This will permanently delete your
+          document and remove it from the database & storage.
         </AlertDialog.Description>
       </AlertDialog.Header>
       <input type="hidden" name="id" value={id} />

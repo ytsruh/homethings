@@ -1,6 +1,9 @@
 import { eq } from "drizzle-orm";
 import { sha256 } from "@oslojs/crypto/sha2";
-import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/encoding";
+import {
+  encodeBase32LowerCaseNoPadding,
+  encodeHexLowerCase,
+} from "@oslojs/encoding";
 import { db } from "$lib/server/db";
 import * as table from "$lib/server/db/schema";
 
@@ -38,6 +41,7 @@ export async function validateSession(sessionId: string) {
         id: table.users.id,
         email: table.users.email,
         name: table.users.name,
+        accountId: table.users.accountId,
         profileImage: table.users.profileImage,
         showBooks: table.users.showBooks,
         showDocuments: table.users.showDocuments,
@@ -62,7 +66,8 @@ export async function validateSession(sessionId: string) {
     return { session: null, user: null };
   }
 
-  const renewSession = Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * 15;
+  const renewSession =
+    Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * 15;
   if (renewSession) {
     session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
     await db
@@ -74,4 +79,6 @@ export async function validateSession(sessionId: string) {
   return { session, user };
 }
 
-export type SessionValidationResult = Awaited<ReturnType<typeof validateSession>>;
+export type SessionValidationResult = Awaited<
+  ReturnType<typeof validateSession>
+>;

@@ -1,25 +1,45 @@
 import type { ColumnDef } from "@tanstack/table-core";
+import {
+  renderComponent,
+  renderSnippet,
+} from "$lib/components/ui/data-table/index.js";
+import DocumentActions from "./DocumentActions.svelte";
+import type { SelectDocument } from "@/lib/server/db/schema";
+import { createRawSnippet } from "svelte";
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const columns: ColumnDef<SelectDocument>[] = [
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "title",
+    header: "Title",
   },
   {
-    accessorKey: "email",
-    header: "Email",
+    accessorKey: "description",
+    header: "Description",
   },
   {
-    accessorKey: "amount",
-    header: "Amount",
+    accessorKey: "updatedAt",
+    header: "Updated At",
+    cell: ({ row }) => {
+      const updatedAtCellSnippet = createRawSnippet<[string]>((getValue) => {
+        const updatedAt = getValue();
+        return {
+          render: () => `<div class="text-left font-medium">${updatedAt}</div>`,
+        };
+      });
+      return renderSnippet(
+        updatedAtCellSnippet,
+        new Date(row.getValue("updatedAt")).toLocaleString("en-GB", {
+          year: "2-digit",
+          month: "short",
+          day: "numeric",
+        }),
+      );
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => {
+      return renderComponent(DocumentActions, { data: row.original });
+    },
   },
 ];

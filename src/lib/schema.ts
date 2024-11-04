@@ -21,7 +21,9 @@ export const feedbackFormSchema = z.object({
     .string()
     .min(3, { message: "Title must be 3 or more characters long" })
     .max(50, { message: "Title must not be more than 50 characters long" }),
-  body: z.string().min(5, { message: "Your message must be 5 or more characters long" }),
+  body: z
+    .string()
+    .min(5, { message: "Your message must be 5 or more characters long" }),
 });
 export type FeedbackFormSchema = typeof feedbackFormSchema;
 
@@ -30,7 +32,9 @@ export const createNoteFormSchema = z.object({
     .string()
     .min(3, { message: "Title must be 3 or more characters long" })
     .max(50, { message: "Title must not be more than 50 characters long" }),
-  body: z.string().min(5, { message: "Your message must be 5 or more characters long" }),
+  body: z
+    .string()
+    .min(5, { message: "Your message must be 5 or more characters long" }),
 });
 export type CreateNoteFormSchema = typeof createNoteFormSchema;
 
@@ -39,6 +43,18 @@ export const updateNoteFormSchema = z.object({
     .string()
     .min(3, { message: "Title must be 3 or more characters long" })
     .max(50, { message: "Title must not be more than 50 characters long" }),
-  body: z.string().min(5, { message: "Your message must be 5 or more characters long" }),
+  body: z
+    .string()
+    .min(5, { message: "Your message must be 5 or more characters long" }),
 });
 export type UpdateNoteFormSchema = typeof updateNoteFormSchema;
+
+export type Document = {
+  id: string;
+  title: string;
+  description: string;
+  accountId: string;
+  fileName: string;
+  createdAt: number;
+  updatedAt: number;
+};

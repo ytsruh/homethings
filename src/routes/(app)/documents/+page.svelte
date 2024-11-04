@@ -8,8 +8,14 @@
 
 <svelte:head>
   <title>Documents | Homethings</title>
-  <meta name="description" content="Document storage shared across your account" />
+  <meta
+    name="description"
+    content="Document storage shared across your account"
+  />
 </svelte:head>
 
-<PageHeader title="Documents" subtitle="Document storage shared across your account" />
-<DocumentsTable data={data.payments} {columns} />
+<PageHeader
+  title="Documents"
+  subtitle="Document storage shared across your account"
+/>
+<DocumentsTable data={data.documents} {columns} />

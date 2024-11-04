@@ -6,6 +6,7 @@ import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 import { trimTrailingSlash } from "hono/trailing-slash";
 import chat from "./chat";
+import docuemnts from "./documents";
 import * as auth from "$lib/server/auth.js";
 
 export type GlobalVariables = {
@@ -40,4 +41,5 @@ app.use(async (c, next) => {
 
 // Setup routes
 app.route("/chat", chat);
+app.route("/documents", docuemnts);
 app.get("/", (c) => c.json("Hello Homethings"));

@@ -6,12 +6,16 @@
   import { createNoteFormSchema, type CreateNoteFormSchema } from "$lib/schema";
   import Textarea from "@/lib/components/ui/textarea/textarea.svelte";
   import { toast } from "svelte-sonner";
-  import { type SuperValidated, type Infer, superForm } from "sveltekit-superforms";
+  import {
+    type SuperValidated,
+    type Infer,
+    superForm,
+  } from "sveltekit-superforms";
   import { zodClient } from "sveltekit-superforms/adapters";
 
   export let data: SuperValidated<Infer<CreateNoteFormSchema>>;
-  export let dialogOpen: boolean = false  
-  
+  export let dialogOpen: boolean = false;
+
   const form = superForm(data, {
     validators: zodClient(createNoteFormSchema),
     onUpdate: ({ result }) => {
@@ -29,11 +33,15 @@
 </script>
 
 <AlertDialog.Root bind:open={dialogOpen}>
-  <AlertDialog.Trigger class={buttonVariants({ variant: "default" })}>Create</AlertDialog.Trigger>
+  <AlertDialog.Trigger class={buttonVariants({ variant: "default" })}>
+    Create
+  </AlertDialog.Trigger>
   <AlertDialog.Content>
     <form method="POST" use:enhance>
       <AlertDialog.Header>
-        <AlertDialog.Title class="text-theme">Create a new Note</AlertDialog.Title>
+        <AlertDialog.Title class="text-theme">
+          Create a new Note
+        </AlertDialog.Title>
       </AlertDialog.Header>
       <Form.Field {form} name="title">
         <Form.Control>
@@ -55,9 +63,7 @@
       </Form.Field>
       <AlertDialog.Footer class="pt-5">
         <AlertDialog.Cancel type="button">Cancel</AlertDialog.Cancel>
-        <AlertDialog.Action type="submit"> 
-          Submit
-        </AlertDialog.Action>
+        <AlertDialog.Action type="submit">Submit</AlertDialog.Action>
       </AlertDialog.Footer>
     </form>
   </AlertDialog.Content>
