@@ -49,12 +49,11 @@ export const updateNoteFormSchema = z.object({
 });
 export type UpdateNoteFormSchema = typeof updateNoteFormSchema;
 
-export type Document = {
-  id: string;
-  title: string;
-  description: string;
-  accountId: string;
-  fileName: string;
-  createdAt: number;
-  updatedAt: number;
-};
+export const updateDocumentFormSchema = z.object({
+  title: z
+    .string()
+    .min(3, { message: "Title must be 3 or more characters long" })
+    .max(50, { message: "Title must not be more than 50 characters long" }),
+  description: z.string().optional(),
+});
+export type UpdateDocumentFormSchema = typeof updateDocumentFormSchema;
