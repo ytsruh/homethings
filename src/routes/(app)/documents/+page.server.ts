@@ -4,6 +4,9 @@ import { db } from "$lib/server/db";
 import { eq, and } from "drizzle-orm";
 import * as table from "$lib/server/db/schema";
 import { deleteFile } from "@/lib/server/storage";
+import { superValidate } from "sveltekit-superforms";
+import { uploadDocumentFormSchema } from "$lib/schema";
+import { zod } from "sveltekit-superforms/adapters";
 
 export async function load({ locals }) {
   if (!locals.user) {
@@ -15,11 +18,26 @@ export async function load({ locals }) {
     .where(eq(table.documents.accountId, locals.user.accountId as string));
 
   return {
+    form: await superValidate(zod(uploadDocumentFormSchema)),
     documents: data,
   };
 }
 
 export const actions = {
+  upload: async (event) => {
+    // const formData = await request.formData();
+    // console.log(formData);
+    // return { success: true };
+    const form = await superValidate(event, zod(uploadDocumentFormSchema));
+    if (!form.valid) {
+      return fail(400, {
+        form,
+      });
+    }
+    return {
+      form,
+    };
+  },
   delete: async ({ request, locals }) => {
     if (!locals.user) {
       return redirect(302, "/login");
