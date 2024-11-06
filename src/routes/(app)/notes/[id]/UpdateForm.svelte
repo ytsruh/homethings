@@ -19,7 +19,7 @@
     onUpdate: ({ result }) => {
       if (result.type === "success") {
         toast.success("Note successfully updated");
-        goto(`/notes`);
+        return goto(`/notes`);
       }
       if (result.type === "failure") {
         toast.error("Something went wrong. Note has not been updated");
