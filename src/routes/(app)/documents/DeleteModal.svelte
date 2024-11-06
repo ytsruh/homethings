@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { goto } from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import * as AlertDialog from "$lib/components/ui/alert-dialog";
   import { buttonVariants } from "$lib/components/ui/button";
   import { toast } from "svelte-sonner";
@@ -21,7 +21,7 @@
         return async ({ result }) => {
           if (result.type === "success") {
             dialogOpen = false;
-            goto(`/documents`);
+            invalidateAll();
             toast.success("Document successfully deleted");
           }
           if (result.type === "failure") {

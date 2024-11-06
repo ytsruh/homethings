@@ -1,8 +1,5 @@
 import { Hono } from "hono";
 import type { GlobalVariables } from "./";
-import { db } from "$lib/server/db";
-import { eq, and } from "drizzle-orm";
-import * as table from "$lib/server/db/schema";
 import { createS3GetUrl, createS3PutUrl } from "$lib/server/storage";
 
 const app = new Hono<{

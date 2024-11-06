@@ -21,4 +21,4 @@
   subtitle="Document storage shared across your account"
 />
 <DocumentsTable data={data.documents} {columns} />
-<UploadForm data={data.form} />
+<UploadForm />

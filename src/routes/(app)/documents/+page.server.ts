@@ -4,9 +4,6 @@ import { db } from "$lib/server/db";
 import { eq, and } from "drizzle-orm";
 import * as table from "$lib/server/db/schema";
 import { deleteFile } from "@/lib/server/storage";
-import { superValidate } from "sveltekit-superforms";
-import { uploadDocumentFormSchema } from "$lib/schema";
-import { zod } from "sveltekit-superforms/adapters";
 
 export async function load({ locals }) {
   if (!locals.user) {
@@ -18,25 +15,32 @@ export async function load({ locals }) {
     .where(eq(table.documents.accountId, locals.user.accountId as string));
 
   return {
-    form: await superValidate(zod(uploadDocumentFormSchema)),
     documents: data,
   };
 }
 
 export const actions = {
   upload: async (event) => {
-    // const formData = await request.formData();
-    // console.log(formData);
-    // return { success: true };
-    const form = await superValidate(event, zod(uploadDocumentFormSchema));
-    if (!form.valid) {
-      return fail(400, {
-        form,
-      });
+    if (!event.locals.user) {
+      return redirect(302, "/login");
     }
-    return {
-      form,
-    };
+    const formData = await event.request.formData();
+    const title = formData.get("title");
+    const fileName = formData.get("fileName");
+    if (!title || !fileName) {
+      return fail(400, { success: false });
+    }
+    try {
+      await db.insert(table.documents).values({
+        title: title as string,
+        fileName: fileName as string,
+        accountId: event.locals.user.accountId,
+      });
+      return { success: true };
+    } catch (error) {
+      console.log(error);
+      return fail(500, { success: false });
+    }
   },
   delete: async ({ request, locals }) => {
     if (!locals.user) {

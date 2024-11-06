@@ -47,7 +47,7 @@ export const createS3PutUrl = async (
     Bucket: envs.STORAGE_BUCKET,
     Key: `docs/${fileName}`,
     ACL: "public-read",
-    ContentType: "multipart/form-data",
+    //ContentType: "multipart/form-data",
   });
   const s3 = await getClient();
   return await getSignedUrl(s3, command, { expiresIn: expiry });

@@ -63,7 +63,7 @@ export const uploadDocumentFormSchema = z.object({
     .string()
     .min(3, { message: "Title must be 3 or more characters long" })
     .max(50, { message: "Title must not be more than 50 characters long" }),
-  fileName: z
+  file: z
     .instanceof(File, { message: "Please upload a file." })
     .refine((f) => f.size < 10_000_000, {
       message: "File size must be less than 10MB",
