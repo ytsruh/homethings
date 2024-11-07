@@ -83,3 +83,17 @@ export const updateBookFormSchema = z.object({
   wishlist: z.boolean(),
 });
 export type UpdateBookFormSchema = typeof updateBookFormSchema;
+
+export const createBookFormSchema = z.object({
+  name: z
+    .string()
+    .min(3, { message: "Title must be 3 or more characters long" })
+    .max(100, { message: "Title must not be more than 100 characters long" }),
+  author: z.string().optional(),
+  genre: z.string().optional(),
+  image: z.string().optional(),
+  isbn: z.string().optional(),
+  read: z.boolean(),
+  wishlist: z.boolean(),
+});
+export type CreateBookFormSchema = typeof createBookFormSchema;

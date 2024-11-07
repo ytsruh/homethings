@@ -4,6 +4,7 @@
   import type { PageServerData } from "./$types";
   import { navigating } from "$app/stores";
   import Loading from "@/lib/components/Loading.svelte";
+  import Separator from "@/lib/components/ui/separator/separator.svelte";
 
   let { children, data }: { children: any; data: PageServerData } = $props();
 </script>
@@ -48,6 +49,7 @@
     </Menubar.Menu>
   </Menubar.Root>
 </div>
+<Separator class="my-5" />
 <div class="py-2 w-full">
   {#if $navigating}
     <Loading />
