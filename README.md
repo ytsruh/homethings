@@ -4,11 +4,14 @@ The Homethings Apps & API
 
 ## Versions
 
+### v1.3
+
+- Rebuild as Sveltekit & Hono
+
 ### v1.2
 
 - Rebuild as Hono & React Router app
 - Migrated DB from Neon Postgres to Turso SQLite
-- Added Wealth Tracker
 
 ### v1.1
 
