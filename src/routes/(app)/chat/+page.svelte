@@ -136,25 +136,40 @@
   <PageHeader title="Chat" subtitle="Your AI powered chatbot" />
   <div class="flex flex-col h-[calc(100vh-230px)]">
     {#if messages.length > 0}
-      <div class="overflow-auto flex-grow p-4 my-2 border border-zinc-700 rounded-lg">
+      <div
+        class="overflow-auto flex-grow p-4 my-2 border border-zinc-700 rounded-lg"
+      >
         {#each messages as message}
           <div class="whitespace-pre-wrap py-1">
-            <span class="text-theme">{message.role === "user" ? "User: " : "AI: "}</span>
+            <span class="text-theme"
+              >{message.role === "user" ? "User: " : "AI: "}</span
+            >
             {@html formatMessageWithCode(message.content)}
           </div>
         {/each}
       </div>
     {:else}
-      <div class="flex w-full h-full items-center justify-center p-4 my-2 border border-zinc-700 rounded-lg">
+      <div
+        class="flex w-full h-full items-center justify-center p-4 my-2 border border-zinc-700 rounded-lg"
+      >
         <h2>Your chat will appear here</h2>
       </div>
     {/if}
-    <form onsubmit={handleSubmit} class="flex space-y-2 md:space-x-5 md:space-y-0 flex-col md:flex-row">
-      <Input type="text" bind:value={input} placeholder="Chat to your assistant" />
+    <form
+      onsubmit={handleSubmit}
+      class="flex space-y-2 md:space-x-5 md:space-y-0 flex-col md:flex-row"
+    >
+      <Input
+        type="text"
+        bind:value={input}
+        placeholder="Chat to your assistant"
+      />
       <Button type="submit" disabled={loading}>
         {loading ? "Sending..." : "Submit"}
       </Button>
-      <Button onclick={handleCancel} type="button" variant="secondary">Clear</Button>
+      <Button onclick={handleCancel} type="button" variant="secondary"
+        >Clear</Button
+      >
     </form>
   </div>
 </div>

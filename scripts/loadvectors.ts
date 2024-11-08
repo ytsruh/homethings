@@ -70,15 +70,16 @@ const chunkMarkdownToSentences = (markdown: string): string[] => {
 };
 
 async function loadVectors() {
-  const markdownFiles = getAllFiles("./scripts/tmp");
-  const maxCount = 1;
-  let count = 0;
+  const type = "svelte";
+  const markdownFiles = getAllFiles(`./scripts/tmp/${type}`);
+  // const maxCount = 1;
+  // let count = 0;
   for (const file of markdownFiles) {
     console.log(file);
-    if (count >= maxCount) {
-      console.log("Reached max count, breaking");
-      break;
-    }
+    // if (count >= maxCount) {
+    //   console.log("Reached max count, breaking");
+    //   break;
+    // }
     // read the file into memory
     const contents = fs.readFileSync(file, "utf-8");
     const chunks = chunkMarkdownToSentences(contents);
@@ -94,18 +95,18 @@ async function loadVectors() {
       await turso.execute({
         sql: `INSERT INTO svelte (type, text, full_emb) VALUES (?, ?, ?)`,
         args: [
-          "docs",
+          type,
           chunk,
           new Float32Array(embedding.data[0].embedding).buffer as ArrayBuffer,
         ],
       });
     }
     // Increase file count
-    count++;
+    //count++;
   }
 }
 
-await turso.execute(`DROP TABLE IF EXISTS svelte`);
+//await turso.execute(`DROP TABLE IF EXISTS svelte`);
 await turso.execute(`CREATE TABLE IF NOT EXISTS svelte (
     type    TEXT,
     text    TEXT,
