@@ -12,6 +12,15 @@
     type?: "code" | "text";
   };
 
+  import * as Select from "$lib/components/ui/select/index.js";
+
+  const models = [
+    { value: "default", label: "ChatGPT 4" },
+    { value: "svelte", label: "Svelte" },
+  ];
+
+  let selectedModel = $state(models[0].value || "");
+
   // Function to detect code in the streamed content
   function detectCodeBlock(text: string) {
     // Check for code block markers
@@ -74,9 +83,13 @@
     messages = [...messages, { role: "user", content: input }];
     const userInput = input;
     input = "";
+    let endpoint = "/api/chat";
+    if (selectedModel === "svelte") {
+      endpoint = "/api/chat/svelte";
+    }
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -135,6 +148,22 @@
 
 <div class="max-h-full">
   <PageHeader title="Chat" subtitle="Your AI powered chatbot" />
+  <div class="flex justify-end w-full py-2">
+    <Select.Root type="single" name="chatModel" bind:value={selectedModel}>
+      <Select.Trigger class="w-40">
+        {models.find((model) => model.value === selectedModel)?.label}
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Group>
+          {#each models as model}
+            <Select.Item value={model.value} label={model.value}>
+              {model.label}
+            </Select.Item>
+          {/each}
+        </Select.Group>
+      </Select.Content>
+    </Select.Root>
+  </div>
   <div class="flex flex-col h-[calc(100vh-230px)]">
     {#if messages.length > 0}
       <div
