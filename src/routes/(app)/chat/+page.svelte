@@ -148,22 +148,6 @@
 
 <div class="max-h-full">
   <PageHeader title="Chat" subtitle="Your AI powered chatbot" />
-  <div class="flex justify-end w-full py-2">
-    <Select.Root type="single" name="chatModel" bind:value={selectedModel}>
-      <Select.Trigger class="w-40">
-        {models.find((model) => model.value === selectedModel)?.label}
-      </Select.Trigger>
-      <Select.Content>
-        <Select.Group>
-          {#each models as model}
-            <Select.Item value={model.value} label={model.value}>
-              {model.label}
-            </Select.Item>
-          {/each}
-        </Select.Group>
-      </Select.Content>
-    </Select.Root>
-  </div>
   <div class="flex flex-col h-[calc(100vh-230px)]">
     {#if messages.length > 0}
       <div
@@ -200,6 +184,20 @@
       <Button onclick={handleCancel} type="button" variant="secondary"
         >Clear</Button
       >
+      <Select.Root type="single" name="chatModel" bind:value={selectedModel}>
+        <Select.Trigger class="w-40">
+          {models.find((model) => model.value === selectedModel)?.label}
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Group>
+            {#each models as model}
+              <Select.Item value={model.value} label={model.value}>
+                {model.label}
+              </Select.Item>
+            {/each}
+          </Select.Group>
+        </Select.Content>
+      </Select.Root>
     </form>
   </div>
 </div>

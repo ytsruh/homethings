@@ -25,7 +25,10 @@
       <Sheet.Trigger>
         <MenuIcon class="h-[1.4rem] w-[1.4rem] lg:hidden cursor-pointer" />
       </Sheet.Trigger>
-      <a class="text-theme justify-center items-center gap-2 hidden lg:flex" href="/">
+      <a
+        class="text-theme justify-center items-center gap-2 hidden lg:flex"
+        href="/"
+      >
         <House class="h-[1.4rem] w-[1.4rem]" />
         <p>Homethings</p>
       </a>
@@ -34,7 +37,10 @@
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <Avatar.Root>
-              <Avatar.Image src={user.profileImage} alt={user.name || "User Profile"} />
+              <Avatar.Image
+                src={user.profileImage}
+                alt={user.name || "User Profile"}
+              />
               <Avatar.Fallback>{user.name?.charAt(0) || "??"}</Avatar.Fallback>
             </Avatar.Root>
           </DropdownMenu.Trigger>
@@ -42,19 +48,29 @@
             <DropdownMenu.Group>
               <DropdownMenu.GroupHeading>
                 <div class="flex flex-col space-y-1">
-                  <p class="text-sm font-medium leading-none">{user.name || "--"}</p>
-                  <p class="text-xs leading-none text-muted-foreground">{user.email || ""}</p>
+                  <p class="text-sm font-medium leading-none">
+                    {user.name || "--"}
+                  </p>
+                  <p class="text-xs leading-none text-muted-foreground">
+                    {user.email || ""}
+                  </p>
                 </div>
               </DropdownMenu.GroupHeading>
               <DropdownMenu.Separator />
               <a href="/profile">
-                <DropdownMenu.Item class="hover:cursor-pointer">Profile</DropdownMenu.Item>
+                <DropdownMenu.Item class="hover:cursor-pointer"
+                  >Profile</DropdownMenu.Item
+                >
               </a>
               <a href="/feedback">
-                <DropdownMenu.Item class="hover:cursor-pointer">Feedback</DropdownMenu.Item>
+                <DropdownMenu.Item class="hover:cursor-pointer"
+                  >Feedback</DropdownMenu.Item
+                >
               </a>
               <a href="/logout">
-                <DropdownMenu.Item class="hover:cursor-pointer">Logout</DropdownMenu.Item>
+                <DropdownMenu.Item class="hover:cursor-pointer"
+                  >Logout</DropdownMenu.Item
+                >
               </a>
             </DropdownMenu.Group>
           </DropdownMenu.Content>
@@ -64,28 +80,56 @@
         <Sheet.Header>
           <Sheet.Title>What do you want to do?</Sheet.Title>
           <nav class="py-10 flex flex-col space-y-4">
-            <a href="/" class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"> Home </a>
+            <a
+              href="/"
+              class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+            >
+              Home
+            </a>
             {#if user.showChat}
-              <a href="/chat" class="text-sm hover:text-theme dark:text-white dark:hover:text-theme">
+              <a
+                href="/chat"
+                class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+              >
                 Chat
               </a>
             {/if}
             {#if user.showNotes}
-              <a href="/notes" class="text-sm hover:text-theme dark:text-white dark:hover:text-theme">
+              <a
+                href="/notes"
+                class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+              >
                 Notes
               </a>
             {/if}
             {#if user.showDocuments}
-              <a href="/documents" class="text-sm hover:text-theme dark:text-white dark:hover:text-theme">
+              <a
+                href="/documents"
+                class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+              >
                 Documents
               </a>
             {/if}
             {#if user.showBooks}
-              <a href="/books" class="text-sm hover:text-theme dark:text-white dark:hover:text-theme">
+              <a
+                href="/books"
+                class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+              >
                 Books
               </a>
             {/if}
-            <a href="/profile" class="text-sm hover:text-theme dark:text-white dark:hover:text-theme">
+            {#if user.showWealth}
+              <a
+                href="/wealth"
+                class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+              >
+                Wealth
+              </a>
+            {/if}
+            <a
+              href="/profile"
+              class="text-sm hover:text-theme dark:text-white dark:hover:text-theme"
+            >
               Profile
             </a>
           </nav>

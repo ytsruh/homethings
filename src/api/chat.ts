@@ -31,6 +31,9 @@ app.post("/", async (c) => {
       stream: true,
     });
 
+    // Set the response headers
+    c.header("Content-Encoding", "Identity");
+
     return streamText(c, async (stream) => {
       for await (const message of chatStream) {
         await stream.write(message.choices[0]?.delta.content ?? "");
@@ -85,6 +88,9 @@ app.post("/svelte", async (c) => {
       model: "gpt-4",
       stream: true,
     });
+
+    // Set the response headers
+    c.header("Content-Encoding", "Identity");
 
     return streamText(c, async (stream) => {
       for await (const message of chatStream) {
