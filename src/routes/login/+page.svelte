@@ -2,7 +2,7 @@
   import img from "$lib/assets/login.webp";
   import { Toaster } from "$lib/components/ui/sonner/index.js";
   import type { PageData } from "./$types.js";
-  import SettingsForm from "./LoginForm.svelte";
+  import LoginForm from "./LoginForm.svelte";
   export let data: PageData;
 </script>
 
@@ -22,7 +22,7 @@
         </h1>
         <h6 class="text-xl py-2">Login to view awesome things</h6>
       </div>
-      <SettingsForm data={data.form} />
+      <LoginForm data={data.form} />
     </div>
     <img src={img} alt="" class="w-96 hidden lg:block rounded-r-2xl" />
   </div>
