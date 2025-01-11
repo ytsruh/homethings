@@ -8,6 +8,7 @@ The Homethings Apps & API
 
 - Rebuild as Sveltekit & Hono
 - Added scripts to support a RAG chat model for Svelte docs
+- Big fixes
 
 ### v1.2
 
