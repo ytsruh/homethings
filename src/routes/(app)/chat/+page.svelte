@@ -70,7 +70,6 @@
       toast.error("Please enter a message to start using chat");
       return;
     }
-    // Optimistically add the user message to the messages array
     loading = true;
     messages = [...messages, { role: "user", content: input }];
     const userInput = input;
@@ -83,7 +82,9 @@
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [{ role: "user", content: userInput }],
+          messages: messages
+            .slice(0, -1)
+            .concat({ role: "user", content: userInput }),
         }),
       });
 
