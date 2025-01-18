@@ -12,6 +12,15 @@
     type?: "code" | "text";
   };
 
+  import * as Select from "$lib/components/ui/select/index.js";
+
+  const models = [
+    { value: "default", label: "ChatGPT 4" },
+    { value: "svelte", label: "Svelte" },
+  ];
+
+  let selectedModel = $state(models[0].value || "");
+
   // Function to detect code in the streamed content
   function detectCodeBlock(text: string) {
     // Check for code block markers
@@ -70,20 +79,25 @@
       toast.error("Please enter a message to start using chat");
       return;
     }
-    // Optimistically add the user message to the messages array
     loading = true;
     messages = [...messages, { role: "user", content: input }];
     const userInput = input;
     input = "";
+    let endpoint = "/api/chat";
+    if (selectedModel === "svelte") {
+      endpoint = "/api/chat/svelte";
+    }
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          messages: [{ role: "user", content: userInput }],
+          messages: messages
+            .slice(0, -1)
+            .concat({ role: "user", content: userInput }),
         }),
       });
 
@@ -170,6 +184,20 @@
       <Button onclick={handleCancel} type="button" variant="secondary"
         >Clear</Button
       >
+      <Select.Root type="single" name="chatModel" bind:value={selectedModel}>
+        <Select.Trigger class="w-40">
+          {models.find((model) => model.value === selectedModel)?.label}
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Group>
+            {#each models as model}
+              <Select.Item value={model.value} label={model.value}>
+                {model.label}
+              </Select.Item>
+            {/each}
+          </Select.Group>
+        </Select.Content>
+      </Select.Root>
     </form>
   </div>
 </div>

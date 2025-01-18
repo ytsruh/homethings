@@ -6,6 +6,12 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import * as envs from "$env/static/private";
+import { createClient } from "@libsql/client";
+
+export const turso = createClient({
+  url: envs.DATABASE_URL!,
+  authToken: envs.DATABASE_AUTH_TOKEN!,
+});
 
 const getClient = () => {
   return new S3Client({

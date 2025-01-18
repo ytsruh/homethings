@@ -70,8 +70,8 @@ const chunkMarkdownToSentences = (markdown: string): string[] => {
 };
 
 async function loadVectors() {
-  const type = "svelte";
-  const markdownFiles = getAllFiles(`./scripts/tmp/${type}`);
+  const type = "kit";
+  const markdownFiles = getAllFiles(`./scripts/tmp/${type}/`);
   // const maxCount = 1;
   // let count = 0;
   for (const file of markdownFiles) {
