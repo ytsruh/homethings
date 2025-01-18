@@ -11,6 +11,9 @@ type ChatMessage = {
 };
 
 export const POST: RequestHandler = async (event: RequestEvent) => {
+  if (!event.locals.user) {
+    return error(401, "Unauthorized");
+  }
   try {
     const body = (await event.request.json()) as { messages: ChatMessage[] };
 
