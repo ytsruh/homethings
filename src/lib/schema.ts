@@ -97,3 +97,13 @@ export const createBookFormSchema = z.object({
   wishlist: z.boolean(),
 });
 export type CreateBookFormSchema = typeof createBookFormSchema;
+
+export const createWealthAccountSchema = z.object({
+  name: z.string().min(3).max(50),
+  type: z.enum(["asset", "liability"]),
+  notes: z
+    .string()
+    .max(100, { message: "Notes must not be more than 500 characters long" })
+    .optional(),
+});
+export type CreateWealthAccountSchema = typeof createWealthAccountSchema;
