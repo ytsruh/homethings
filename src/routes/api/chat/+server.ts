@@ -26,28 +26,24 @@ export const POST: RequestHandler = async (event: RequestEvent) => {
       stream: true,
     });
 
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of chatStream) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-              controller.enqueue(content);
-            }
-          }
-          controller.close();
-        } catch (error) {
-          controller.error(error);
-        }
-      },
-    });
+    const { readable, writable } = new TransformStream();
 
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain",
-        "Transfer-Encoding": "chunked",
-      },
-    });
+    const writer = writable.getWriter();
+    const encoder = new TextEncoder();
+    const response = new Response(readable);
+
+    (async () => {
+      try {
+        for await (const chunk of chatStream as any) {
+          writer.write(encoder.encode(chunk.choices[0]?.delta?.content));
+        }
+        writer.close();
+      } catch (e) {
+        return new Response("Error while reading stream", { status: 500 });
+      }
+    })();
+
+    return response;
   } catch (err: unknown) {
     // For errors, log to console and send a 500 response back
     console.log(err);
