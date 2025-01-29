@@ -148,7 +148,7 @@
 
 <div class="max-h-full">
   <PageHeader title="Chat" subtitle="Your AI powered chatbot" />
-  <div class="flex flex-col h-[calc(100vh-230px)]">
+  <div class="flex flex-col h-[calc(100vh-135px)] sm:h-[calc(100vh-230px)]">
     {#if messages.length > 0}
       <div
         class="overflow-auto flex-grow p-4 my-2 border border-zinc-700 rounded-lg"
@@ -171,21 +171,10 @@
     {/if}
     <form
       onsubmit={handleSubmit}
-      class="flex space-y-2 md:space-x-5 md:space-y-0 flex-col md:flex-row"
+      class="flex space-y-2 sm:space-x-2 sm:space-y-0 flex-col sm:flex-row gap-y-1"
     >
-      <Input
-        type="text"
-        bind:value={input}
-        placeholder="Chat to your assistant"
-      />
-      <Button type="submit" disabled={loading}>
-        {loading ? "Sending..." : "Submit"}
-      </Button>
-      <Button onclick={handleCancel} type="button" variant="secondary"
-        >Clear</Button
-      >
       <Select.Root type="single" name="chatModel" bind:value={selectedModel}>
-        <Select.Trigger class="w-40">
+        <Select.Trigger class="w-full sm:w-48 order-last sm:order-first">
           {models.find((model) => model.value === selectedModel)?.label}
         </Select.Trigger>
         <Select.Content>
@@ -198,6 +187,17 @@
           </Select.Group>
         </Select.Content>
       </Select.Root>
+      <Input
+        type="text"
+        bind:value={input}
+        placeholder="Chat to your assistant"
+      />
+      <Button type="submit" disabled={loading}>
+        {loading ? "Sending..." : "Submit"}
+      </Button>
+      <Button onclick={handleCancel} type="button" variant="secondary"
+        >Clear</Button
+      >
     </form>
   </div>
 </div>
