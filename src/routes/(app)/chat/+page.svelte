@@ -17,6 +17,7 @@
   const models = [
     { value: "default", label: "ChatGPT 4" },
     { value: "svelte", label: "Svelte" },
+    { value: "deepseek", label: "DeepSeek" },
   ];
 
   let selectedModel = $state(models[0].value || "");
@@ -86,6 +87,9 @@
     let endpoint = "/api/chat";
     if (selectedModel === "svelte") {
       endpoint = "/api/chat/svelte";
+    }
+    if (selectedModel === "deepseek") {
+      endpoint = "/api/chat/deepseek";
     }
 
     try {

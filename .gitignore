@@ -9,6 +9,5 @@ node_modules
 !.env.test
 *.db
 package-lock.json
+bun.lock
 /scripts/tmp
-
-_archive
