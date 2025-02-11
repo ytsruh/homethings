@@ -3,8 +3,8 @@ import { fail, redirect } from "@sveltejs/kit";
 import { superValidate } from "sveltekit-superforms";
 import { feedbackFormSchema } from "$lib/schema";
 import { zod } from "sveltekit-superforms/adapters";
-import { db } from "$lib/server/db";
-import * as table from "$lib/server/db/schema";
+import { db } from "@server/db";
+import * as table from "@server/db/schema";
 
 export const load: PageServerLoad = async ({ locals }) => {
   if (!locals.user) {

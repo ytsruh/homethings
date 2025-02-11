@@ -4,7 +4,7 @@
   import CreateModal from "./CreateModal.svelte";
   import { Input } from "@/lib/components/ui/input";
   import type { PageData } from "./$types";
-  import type { SelectNote } from "$lib/server/db/schema";
+  import type { SelectNote } from "@/server/db/schema";
 
   let { data }: { data: PageData } = $props();
   let search: string = $state("");
@@ -23,10 +23,16 @@
 
 <svelte:head>
   <title>Notes | Homethings</title>
-  <meta name="description" content="A personal space to jot down your thoughts" />
+  <meta
+    name="description"
+    content="A personal space to jot down your thoughts"
+  />
 </svelte:head>
 
-<PageHeader title="Notes" subtitle="A personal space to jot down your thoughts" />
+<PageHeader
+  title="Notes"
+  subtitle="A personal space to jot down your thoughts"
+/>
 
 <div class="w-full flex justify-between items-center gap-5 py-5">
   <Input placeholder="Filter notes..." bind:value={search} />
@@ -37,7 +43,9 @@
     <h2>No notes have been created</h2>
   </div>
 {:else}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
+  >
     {#each notes as note}
       <NoteCard data={note} />
     {/each}

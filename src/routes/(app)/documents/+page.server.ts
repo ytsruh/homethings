@@ -1,8 +1,8 @@
 import type { Actions } from "./$types.js";
 import { fail, redirect } from "@sveltejs/kit";
-import { db } from "$lib/server/db";
+import { db } from "@server/db";
 import { eq, and } from "drizzle-orm";
-import * as table from "$lib/server/db/schema";
+import * as table from "@server/db/schema";
 import { deleteFile } from "@/lib/server/storage";
 
 export async function load({ locals }) {

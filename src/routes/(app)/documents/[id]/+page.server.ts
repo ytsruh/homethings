@@ -3,9 +3,9 @@ import { fail, redirect } from "@sveltejs/kit";
 import { superValidate } from "sveltekit-superforms";
 import { updateDocumentFormSchema } from "$lib/schema";
 import { zod } from "sveltekit-superforms/adapters";
-import { db } from "$lib/server/db";
+import { db } from "@server/db";
 import { eq, and } from "drizzle-orm";
-import * as table from "$lib/server/db/schema";
+import * as table from "@server/db/schema";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
   if (!locals.user) {

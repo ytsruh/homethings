@@ -1,7 +1,7 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
-import { db } from "$lib/server/db";
-import * as table from "$lib/server/db/schema";
+import { db } from "@server/db";
+import * as table from "@server/db/schema";
 import type { Actions, PageServerLoad } from "./$types";
 import { profileFormSchema } from "$lib/schema";
 

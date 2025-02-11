@@ -4,8 +4,8 @@ import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { db } from "$lib/server/db";
-import * as table from "$lib/server/db/schema";
+import { db } from "@server/db";
+import * as table from "@server/db/schema";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 

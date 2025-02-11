@@ -1,10 +1,10 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { eq, and } from "drizzle-orm";
-import { db } from "$lib/server/db";
+import { db } from "@server/db";
 import { superValidate } from "sveltekit-superforms";
 import { updateBookFormSchema } from "$lib/schema";
 import { zod } from "sveltekit-superforms/adapters";
-import * as table from "$lib/server/db/schema";
+import * as table from "@server/db/schema";
 import type { PageServerLoad, Actions } from "./$types.js";
 
 export const load: PageServerLoad = async (event) => {

@@ -1,7 +1,7 @@
 import { error, json } from "@sveltejs/kit";
 import type { RequestEvent } from "@sveltejs/kit";
 import type { RequestHandler } from "../$types";
-import { createS3GetUrl, createS3PutUrl } from "$lib/server/storage";
+import { createS3GetUrl, createS3PutUrl } from "@server/storage";
 
 export const GET: RequestHandler = async (event: RequestEvent) => {
   if (!event.locals.user) {

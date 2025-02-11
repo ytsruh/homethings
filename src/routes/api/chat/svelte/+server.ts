@@ -3,7 +3,7 @@ import type { RequestHandler } from "./$types";
 import { OpenAI } from "openai";
 import * as envs from "$env/static/private";
 import type { RequestEvent } from "@sveltejs/kit";
-import { turso } from "@/lib/server/storage";
+import { turso } from "@server/storage";
 
 type ChatMessage = {
   role: "system" | "user";

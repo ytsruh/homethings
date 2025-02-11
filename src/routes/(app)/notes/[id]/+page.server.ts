@@ -3,9 +3,9 @@ import { fail, redirect } from "@sveltejs/kit";
 import { superValidate } from "sveltekit-superforms";
 import { updateNoteFormSchema } from "$lib/schema";
 import { zod } from "sveltekit-superforms/adapters";
-import { db } from "$lib/server/db";
+import { db } from "@server/db";
 import { eq, and } from "drizzle-orm";
-import * as table from "$lib/server/db/schema";
+import * as table from "@server/db/schema";
 
 export const load: PageServerLoad = async ({ locals, params }) => {
   if (!locals.user) {
@@ -14,7 +14,12 @@ export const load: PageServerLoad = async ({ locals, params }) => {
   const results: table.SelectNote[] = await db
     .select()
     .from(table.notes)
-    .where(and(eq(table.notes.userId, locals.user.id), eq(table.notes.id, params.id)));
+    .where(
+      and(
+        eq(table.notes.userId, locals.user.id),
+        eq(table.notes.id, params.id),
+      ),
+    );
   const defaultFormData = {
     title: results[0]?.title || "",
     body: results[0]?.body || "",
@@ -37,11 +42,17 @@ export const actions = {
       return fail(400, { message: "Invalid request" });
     }
     try {
-      await db.delete(table.notes).where(and(eq(table.notes.id, id), eq(table.notes.userId, locals.user.id)));
+      await db
+        .delete(table.notes)
+        .where(
+          and(eq(table.notes.id, id), eq(table.notes.userId, locals.user.id)),
+        );
       return { success: true };
     } catch (error) {
       console.log(error);
-      return fail(400, { message: "Something went wrong. Failed to delete note" });
+      return fail(400, {
+        message: "Something went wrong. Failed to delete note",
+      });
     }
   },
   update: async (event) => {
@@ -58,11 +69,18 @@ export const actions = {
       await db
         .update(table.notes)
         .set({ title: form.data.title, body: form.data.body })
-        .where(and(eq(table.notes.id, event.params.id), eq(table.notes.userId, event.locals.user.id)));
+        .where(
+          and(
+            eq(table.notes.id, event.params.id),
+            eq(table.notes.userId, event.locals.user.id),
+          ),
+        );
       return { form };
     } catch (error) {
       console.log(error);
-      return fail(400, { message: "Something went wrong. Failed to update note" });
+      return fail(400, {
+        message: "Something went wrong. Failed to update note",
+      });
     }
   },
 } satisfies Actions;

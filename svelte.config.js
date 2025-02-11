@@ -7,6 +7,7 @@ export default {
     alias: {
       "@/*": "./src/*",
       "@lib/*": "./src/lib/*",
+      "@server/*": "./src/server/*",
     },
     adapter: adapter({
       routes: {
