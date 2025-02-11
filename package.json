@@ -7,9 +7,6 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "test:unit": "vitest",
-    "test": "npm run test:unit -- --run && npm run test:e2e",
-    "test:e2e": "playwright test",
     "db:push": "drizzle-kit push",
     "db:pull": "rm -f local.db && turso db shell homethings .dump > dump.sql && cat dump.sql | sqlite3 local.db && rm dump.sql",
     "db:migrate": "drizzle-kit migrate",
@@ -18,7 +15,6 @@
     "vectors:query": "tsx scripts/queryvectors.ts"
   },
   "devDependencies": {
-    "@playwright/test": "^1.49.1",
     "@sveltejs/adapter-auto": "^3.3.1",
     "@sveltejs/adapter-cloudflare": "^5.0.1",
     "@sveltejs/kit": "^2.16.0",
@@ -48,7 +44,6 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.3",
     "vite": "^5.4.11",
-    "vitest": "^2.1.8",
     "wrangler": "^3.103.2",
     "zod": "^3.24.1"
   },
