@@ -28,7 +28,7 @@
       onchange={(e) => {
         table.getColumn("title")?.setFilterValue(e.currentTarget.value);
       }}
-      class="h-8 w-[150px] lg:w-[250px]"
+      class="h-8 w-[150px] lg:w-[350px]"
     />
 
     {#if statusCol}
@@ -57,5 +57,8 @@
       </Button>
     {/if}
   </div>
-  <DataTableViewOptions {table} />
+  <div class="flex items-center space-x-2">
+    <DataTableViewOptions {table} />
+    <Button class="h-8 px-2 lg:px-3">Add Task</Button>
+  </div>
 </div>

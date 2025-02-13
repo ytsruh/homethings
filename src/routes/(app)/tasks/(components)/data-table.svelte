@@ -8,7 +8,6 @@
     type ColumnDef,
     type ColumnFiltersState,
     type PaginationState,
-    type RowSelectionState,
     type SortingState,
     type VisibilityState,
     getCoreRowModel,
@@ -29,7 +28,6 @@
     data,
   }: { columns: ColumnDef<TData, TValue>[]; data: TData[] } = $props();
 
-  let rowSelection = $state<RowSelectionState>({});
   let columnVisibility = $state<VisibilityState>({});
   let columnFilters = $state<ColumnFiltersState>([]);
   let sorting = $state<SortingState>([]);
@@ -46,9 +44,6 @@
       get columnVisibility() {
         return columnVisibility;
       },
-      get rowSelection() {
-        return rowSelection;
-      },
       get columnFilters() {
         return columnFilters;
       },
@@ -58,13 +53,6 @@
     },
     columns,
     enableRowSelection: true,
-    onRowSelectionChange: (updater) => {
-      if (typeof updater === "function") {
-        rowSelection = updater(rowSelection);
-      } else {
-        rowSelection = updater;
-      }
-    },
     onSortingChange: (updater) => {
       if (typeof updater === "function") {
         sorting = updater(sorting);

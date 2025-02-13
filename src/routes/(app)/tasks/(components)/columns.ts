@@ -1,60 +1,16 @@
 import type { ColumnDef } from "@tanstack/table-core";
-import { createRawSnippet } from "svelte";
 import type { Task } from "../(data)/schemas.js";
 import {
-  DataTableCheckbox,
   DataTableColumnHeader,
   DataTablePriorityCell,
   DataTableRowActions,
   DataTableStatusCell,
   DataTableTitleCell,
+  DataTableLabel,
 } from "./index.js";
-import {
-  renderComponent,
-  renderSnippet,
-} from "$lib/components/ui/data-table/index.js";
+import { renderComponent } from "$lib/components/ui/data-table/index.js";
 
 export const columns: ColumnDef<Task>[] = [
-  {
-    id: "select",
-    header: ({ table }) =>
-      renderComponent(DataTableCheckbox, {
-        checked: table.getIsAllPageRowsSelected(),
-        onCheckedChange: (value) => table.toggleAllPageRowsSelected(!!value),
-        "aria-label": "Select all",
-        class: "translate-y-[2px]",
-      }),
-    cell: ({ row }) =>
-      renderComponent(DataTableCheckbox, {
-        checked: row.getIsSelected(),
-        onCheckedChange: (value) => row.toggleSelected(!!value),
-        "aria-label": "Select row",
-        class: "translate-y-[2px]",
-      }),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
-    header: ({ column }) => {
-      return renderComponent(DataTableColumnHeader<Task, unknown>, {
-        column,
-        title: "Task",
-      });
-    },
-    cell: ({ row }) => {
-      const idSnippet = createRawSnippet<[string]>((getId) => {
-        const id = getId();
-        return {
-          render: () => `<div class="w-[80px]">${id}</div>`,
-        };
-      });
-
-      return renderSnippet(idSnippet, row.getValue("id"));
-    },
-    enableSorting: false,
-    enableHiding: false,
-  },
   {
     accessorKey: "title",
     header: ({ column }) =>
@@ -64,10 +20,25 @@ export const columns: ColumnDef<Task>[] = [
       }),
     cell: ({ row }) => {
       return renderComponent(DataTableTitleCell, {
-        labelValue: row.original.label,
         value: row.original.title,
       });
     },
+  },
+  {
+    accessorKey: "label",
+    header: ({ column }) => {
+      return renderComponent(DataTableColumnHeader<Task, unknown>, {
+        column,
+        title: "Label",
+      });
+    },
+    cell: ({ row }) => {
+      return renderComponent(DataTableLabel, {
+        labelValue: row.original.label,
+      });
+    },
+    enableSorting: false,
+    enableHiding: false,
   },
   {
     accessorKey: "status",
