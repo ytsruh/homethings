@@ -48,6 +48,7 @@ export async function validateSession(sessionId: string) {
         showChat: table.users.showChat,
         showNotes: table.users.showNotes,
         showWealth: table.users.showWealth,
+        showTasks: table.users.showTasks,
       },
       session: table.session,
     })

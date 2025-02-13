@@ -10,8 +10,6 @@ import { setError, superValidate } from "sveltekit-superforms";
 import { loginFormSchema } from "$lib/schema";
 import { zod } from "sveltekit-superforms/adapters";
 
-const delay = () => new Promise((resolve) => setTimeout(resolve, 3000));
-
 export const load: PageServerLoad = async (event) => {
   if (event.locals.user) {
     return redirect(302, "/");
@@ -23,7 +21,6 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
   default: async (event) => {
-    await delay(); // Add artificial delay
     const form = await superValidate(event, zod(loginFormSchema));
     if (!form.valid) {
       return fail(400, { form });

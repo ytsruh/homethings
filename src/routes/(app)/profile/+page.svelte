@@ -18,11 +18,20 @@
   title="Profile"
   subtitle="Change your profile picture or show/hide features to personalise your experience."
 />
-<form method="POST" class="w-full flex flex-col justify-center items-center gap-2">
+<form
+  method="POST"
+  class="w-full flex flex-col justify-center items-center gap-2"
+>
   <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
     <div class="w-full">
       <Label>Name:</Label>
-      <Input class="my-2" type="text" placeholder="Name" name="name" value={data.user.name} />
+      <Input
+        class="my-2"
+        type="text"
+        placeholder="Name"
+        name="name"
+        value={data.user.name}
+      />
     </div>
     <div class="w-full">
       <Label>Email:</Label>
@@ -59,6 +68,12 @@
         <Label>Show Wealth:</Label>
       </div>
       <Switch name="showWealth" checked={data.user.showWealth || false} />
+    </div>
+    <div class="w-full flex justify-between items-center">
+      <div>
+        <Label>Show Tasks:</Label>
+      </div>
+      <Switch name="showTasks" checked={data.user.showTasks || false} />
     </div>
   </div>
   <div class="flex items-center justify-end w-full py-5 gap-2">

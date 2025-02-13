@@ -24,6 +24,7 @@ export const actions: Actions = {
     const showBooks = data.get("showBooks") === "on";
     const showChat = data.get("showChat") === "on";
     const showWealth = data.get("showWealth") === "on";
+    const showTasks = data.get("showTasks") === "on";
 
     const input = await profileFormSchema.safeParse({
       name,
@@ -32,6 +33,7 @@ export const actions: Actions = {
       showBooks,
       showChat,
       showWealth,
+      showTasks,
     });
     if (!input.success) {
       return fail(400, { success: false });
@@ -48,6 +50,7 @@ export const actions: Actions = {
           showBooks: input.data.showBooks,
           showChat: input.data.showChat,
           showWealth: input.data.showWealth,
+          showTasks: input.data.showTasks,
         })
         .where(eq(table.users.email, locals.user.email));
       // Update the user in the locals
@@ -57,6 +60,7 @@ export const actions: Actions = {
       locals.user.showBooks = input.data.showBooks;
       locals.user.showChat = input.data.showChat;
       locals.user.showWealth = input.data.showWealth;
+      locals.user.showTasks = input.data.showTasks;
       // Return success
       return { success: true };
     } catch (error) {

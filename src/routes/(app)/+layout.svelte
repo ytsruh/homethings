@@ -31,6 +31,14 @@
             Chat
           </a>
         {/if}
+        {#if user.showTasks}
+          <a
+            class="hover:bg-zinc-800 text-sm rounded-md px-2 py-2 hover:cursor-pointer hover:text-white"
+            href="/tasks"
+          >
+            Tasks
+          </a>
+        {/if}
         {#if user.showNotes}
           <a
             class="hover:bg-zinc-800 text-sm rounded-md px-2 py-2 hover:cursor-pointer hover:text-white"
