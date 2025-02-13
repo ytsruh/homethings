@@ -3,7 +3,7 @@ import { fail, redirect } from "@sveltejs/kit";
 import { db } from "@server/db";
 import { eq, and } from "drizzle-orm";
 import * as table from "@server/db/schema";
-import { deleteFile } from "@/lib/server/storage";
+import { deleteFile } from "@/server/storage";
 
 export async function load({ locals }) {
   if (!locals.user) {

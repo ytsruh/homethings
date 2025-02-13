@@ -8,9 +8,13 @@
 		class: className,
 		children,
 		...restProps
-	}: WithElementRef<HTMLAttributes<HTMLTableSectionElement>> = $props();
+	}: WithElementRef<HTMLAttributes<HTMLDivElement>> = $props();
 </script>
 
-<tfoot bind:this={ref} class={cn("bg-muted/50 font-medium", className)} {...restProps}>
+<div
+	bind:this={ref}
+	class={cn("flex flex-col space-y-1.5 text-center sm:text-left", className)}
+	{...restProps}
+>
 	{@render children?.()}
-</tfoot>
+</div>
