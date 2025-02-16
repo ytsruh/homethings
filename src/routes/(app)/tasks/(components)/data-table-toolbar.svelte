@@ -7,7 +7,9 @@
   import type { Table } from "@tanstack/table-core";
   import { priorities, statuses } from "../(data)/data.js";
   import { DataTableFacetedFilter, DataTableViewOptions } from "./index.js";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import Button, {
+    buttonVariants,
+  } from "$lib/components/ui/button/button.svelte";
   import { Input } from "$lib/components/ui/input/index.js";
 
   let { table }: { table: Table<TData> } = $props();
@@ -59,6 +61,8 @@
   </div>
   <div class="flex items-center space-x-2">
     <DataTableViewOptions {table} />
-    <Button class="h-8 px-2 lg:px-3">Add Task</Button>
+    <a href="/tasks/new" class={buttonVariants() + " h-8 px-2 lg:px-3"}>
+      Add Task
+    </a>
   </div>
 </div>

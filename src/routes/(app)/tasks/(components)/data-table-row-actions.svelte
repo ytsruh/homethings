@@ -28,7 +28,9 @@
     {/snippet}
   </DropdownMenu.Trigger>
   <DropdownMenu.Content class="w-[160px]" align="end">
-    <DropdownMenu.Item>Edit</DropdownMenu.Item>
+    <a href={`/tasks/${task.id}`}>
+      <DropdownMenu.Item>Edit</DropdownMenu.Item>
+    </a>
     <DropdownMenu.Item>Mark as complete</DropdownMenu.Item>
     <DropdownMenu.Separator />
     <DropdownMenu.Item>Delete</DropdownMenu.Item>

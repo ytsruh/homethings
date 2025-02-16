@@ -25,16 +25,16 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "label",
+    accessorKey: "labels",
     header: ({ column }) => {
       return renderComponent(DataTableColumnHeader<Task, unknown>, {
         column,
-        title: "Label",
+        title: "Labels",
       });
     },
     cell: ({ row }) => {
       return renderComponent(DataTableLabel, {
-        labelValue: row.original.label,
+        labels: row.original.labels,
       });
     },
     enableSorting: false,
