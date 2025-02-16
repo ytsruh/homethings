@@ -37,8 +37,10 @@ export const columns: ColumnDef<Task>[] = [
         labels: row.original.labels,
       });
     },
-    enableSorting: false,
-    enableHiding: false,
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id) as string[];
+      return rowValue.some((item) => value.includes(item));
+    },
   },
   {
     accessorKey: "status",

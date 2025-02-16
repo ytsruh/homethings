@@ -27,7 +27,7 @@ function generateRandomDocuments() {
       documentTypes[Math.floor(Math.random() * documentTypes.length)];
     const size = (Math.random() * docType.maxSize).toFixed(1);
     return {
-      id: index + 1,
+      id: (index + 1).toString(),
       name: `document-${index + 1}.${docType.ext}`,
       size: `${size}MB`,
     };
@@ -38,11 +38,10 @@ function generateRandomDocuments() {
 function generateRandomUpdates() {
   if (Math.random() < 0.2) return []; // 20% chance of no updates
 
-  const numUpdates = Math.floor(Math.random() * 4) + 1; // 1-4 updates
-  const users = ["Alice Smith", "Bob Johnson", "Carol Williams", "David Brown"];
+  const numUpdates = Math.floor(Math.random() * 4) + 1;
 
   return Array.from({ length: numUpdates }, (_, index) => ({
-    id: index + 1,
+    id: (index + 1).toString(),
     text: [
       "Updated task status",
       "Added new requirements",
@@ -52,7 +51,6 @@ function generateRandomUpdates() {
       "Updated documentation",
       "Started working on this task",
     ][Math.floor(Math.random() * 7)],
-    author: users[Math.floor(Math.random() * users.length)],
     timestamp: getRandomDate(),
   })).sort(
     (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
@@ -69,6 +67,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-7878",
@@ -79,6 +78,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-7839",
@@ -88,6 +88,7 @@ const tasks = [
     priority: "high",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-5562",
@@ -98,6 +99,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-8686",
@@ -108,6 +110,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-1280",
@@ -118,6 +121,7 @@ const tasks = [
     priority: "high",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-7262",
@@ -128,6 +132,7 @@ const tasks = [
     priority: "high",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-1138",
@@ -138,6 +143,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-7184",
@@ -147,6 +153,7 @@ const tasks = [
     priority: "low",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-5160",
@@ -157,6 +164,7 @@ const tasks = [
     priority: "high",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-5618",
@@ -167,6 +175,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
   {
     id: "TASK-6699",
@@ -177,6 +186,7 @@ const tasks = [
     priority: "medium",
     documents: generateRandomDocuments(),
     updates: generateRandomUpdates(),
+    completed: false,
   },
 ];
 
@@ -184,4 +194,5 @@ export const data = tasks.map((task) => ({
   ...task,
   documents: generateRandomDocuments(),
   updates: generateRandomUpdates(),
+  completed: false,
 }));

@@ -5,7 +5,7 @@
 <script lang="ts" generics="TData">
   import X from "lucide-svelte/icons/x";
   import type { Table } from "@tanstack/table-core";
-  import { priorities, statuses } from "../(data)/data.js";
+  import { priorities, statuses, labels } from "../(data)/data.js";
   import { DataTableFacetedFilter, DataTableViewOptions } from "./index.js";
   import Button, {
     buttonVariants,
@@ -17,6 +17,7 @@
   const isFiltered = $derived(table.getState().columnFilters.length > 0);
   const statusCol = $derived(table.getColumn("status"));
   const priorityCol = $derived(table.getColumn("priority"));
+  const labelsCol = $derived(table.getColumn("labels"));
 </script>
 
 <div class="flex items-center justify-between">
@@ -32,7 +33,13 @@
       }}
       class="h-8 w-[150px] lg:w-[350px]"
     />
-
+    {#if labelsCol}
+      <DataTableFacetedFilter
+        column={labelsCol}
+        title="Labels"
+        options={labels}
+      />
+    {/if}
     {#if statusCol}
       <DataTableFacetedFilter
         column={statusCol}

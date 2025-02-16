@@ -46,3 +46,18 @@ export const priorities = [
     icon: ArrowUp,
   },
 ];
+
+export const labels = [
+  {
+    value: "documentation",
+    label: "Documentation",
+  },
+  {
+    value: "feature",
+    label: "Feature",
+  },
+  {
+    value: "bug",
+    label: "Bug",
+  },
+];
