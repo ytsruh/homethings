@@ -16,7 +16,6 @@
   import { X, Paperclip } from "lucide-svelte";
 
   let { data }: { data: PageData } = $props();
-  console.log(data.task);
 
   // TODO: Replace with actual data fetching
   let task = data.task;
