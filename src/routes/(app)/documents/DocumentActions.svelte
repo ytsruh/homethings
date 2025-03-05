@@ -2,7 +2,7 @@
   import Ellipsis from "lucide-svelte/icons/ellipsis";
   import { Button } from "$lib/components/ui/button/index.js";
   import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
-  import type { SelectDocument } from "@/lib/server/db/schema";
+  import type { SelectDocument } from "@/server/db/schema";
   import DeleteModal from "./DeleteModal.svelte";
 
   let { data }: { data: SelectDocument } = $props();

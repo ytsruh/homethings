@@ -2,15 +2,13 @@ import { compareSync } from "bcrypt-edge";
 import { fail, redirect } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import { dev } from "$app/environment";
-import * as auth from "$lib/server/auth";
-import { db } from "$lib/server/db";
-import * as table from "$lib/server/db/schema";
+import * as auth from "@server/auth";
+import { db } from "@server/db";
+import * as table from "@server/db/schema";
 import type { Actions, PageServerLoad } from "./$types";
 import { setError, superValidate } from "sveltekit-superforms";
 import { loginFormSchema } from "$lib/schema";
 import { zod } from "sveltekit-superforms/adapters";
-
-const delay = () => new Promise((resolve) => setTimeout(resolve, 3000));
 
 export const load: PageServerLoad = async (event) => {
   if (event.locals.user) {
@@ -23,7 +21,6 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions: Actions = {
   default: async (event) => {
-    await delay(); // Add artificial delay
     const form = await superValidate(event, zod(loginFormSchema));
     if (!form.valid) {
       return fail(400, { form });

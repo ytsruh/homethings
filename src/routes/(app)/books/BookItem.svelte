@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { SelectBook } from "$lib/server/db/schema";
+  import type { SelectBook } from "@/server/db/schema";
   let { data }: { data: SelectBook } = $props();
 </script>
 

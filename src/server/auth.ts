@@ -4,8 +4,8 @@ import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase,
 } from "@oslojs/encoding";
-import { db } from "$lib/server/db";
-import * as table from "$lib/server/db/schema";
+import { db } from "@server/db";
+import * as table from "@server/db/schema";
 
 const DAY_IN_MS = 1000 * 60 * 60 * 24;
 
@@ -48,6 +48,7 @@ export async function validateSession(sessionId: string) {
         showChat: table.users.showChat,
         showNotes: table.users.showNotes,
         showWealth: table.users.showWealth,
+        showTasks: table.users.showTasks,
       },
       session: table.session,
     })

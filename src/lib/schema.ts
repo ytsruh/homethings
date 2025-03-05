@@ -13,6 +13,7 @@ export const profileFormSchema = z.object({
   showBooks: z.boolean(),
   showChat: z.boolean(),
   showWealth: z.boolean(),
+  showTasks: z.boolean(),
 });
 export type ProfileFormSchema = typeof profileFormSchema;
 

@@ -29,6 +29,7 @@ export const users = sqliteTable("users", {
   showChat: integer("show_chat", { mode: "boolean" }).default(true),
   showNotes: integer("show_notes", { mode: "boolean" }).default(true),
   showWealth: integer("show_wealth", { mode: "boolean" }).default(true),
+  showTasks: integer("show_tasks", { mode: "boolean" }).default(true),
   accountId: text("account_id").references(() => accounts.id),
   createdAt: integer("created_at")
     .default(sql`(CURRENT_TIMESTAMP)`)
