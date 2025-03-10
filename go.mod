@@ -3,6 +3,7 @@ module homethings
 go 1.23.4
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/pocketbase/dbx v1.11.0
 	github.com/pocketbase/pocketbase v0.25.8
 	github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d
