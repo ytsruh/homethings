@@ -23,4 +23,13 @@ migration-snapshot:
 	@go run cmd/server/main.go migrate collections
 	@go run cmd/server/main.go migrate history-sync
 
-.PHONY: build run test clean migration-snapshot
+docker-build: # Build the docker image
+	docker build -t homethings .
+
+docker-run: # Run the docker image
+	docker run -p 8080:8080 homethings
+
+docker-clean: # Clear the docker cache
+	docker builder prune
+
+.PHONY: build run test clean migration-snapshot docker-build docker-run docker-clean

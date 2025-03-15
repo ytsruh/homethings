@@ -8,5 +8,5 @@ RUN go mod download
 RUN go build -o homethings cmd/server/main.go
 
 EXPOSE 8080
-ENTRYPOINT ["/homethings"]
+ENTRYPOINT ["./homethings"]
 CMD ["serve", "--http=0.0.0.0:8080"]
