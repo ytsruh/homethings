@@ -1,4 +1,4 @@
-module homethings
+module github.com/homethings
 
 go 1.23.4
 

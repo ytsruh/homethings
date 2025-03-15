@@ -1,5 +1,3 @@
-# Simple Makefile for a Go project
-
 # Build the application
 build:
 	@echo "Building..."
@@ -20,4 +18,9 @@ clean:
 	@echo "Cleaning..."
 	@rm -f main
 
-.PHONY: build run test clean
+migration-snapshot:
+	@echo "Creating snapshot..."
+	@go run cmd/server/main.go migrate collections
+	@go run cmd/server/main.go migrate history-sync
+
+.PHONY: build run test clean migration-snapshot

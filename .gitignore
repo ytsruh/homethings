@@ -5,6 +5,7 @@ node_modules
 *.db
 package-lock.json
 bun.lock
+tmp
 _archive/scripts/tmp
 
 # Pocketbase

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"homethings/pkg"
+	"github.com/homethings/pkg"
 )
 
 func main() {
