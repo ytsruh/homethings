@@ -12,18 +12,10 @@ _archive/scripts/tmp
 .pocketbase
 pb_data
 
-# Test binary, built with "go test -c"
+# Project build & test binary, built with "go test -c"
 *.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-# IDE specific files
-.vscode
-.idea
-
-# .env file
-.env
-
-# Project build
 main
+
+# React Router
+.react-router/
+build/
