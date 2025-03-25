@@ -8,13 +8,13 @@ import { toast } from "~/components/Toaster";
 import { ModeToggle } from "~/components/theme-toggle";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import PocketBase from "pocketbase";
+const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login to Homethings" }, { name: "description", content: "Login to view awesome things" }];
 }
 
 export async function clientAction({ request }: Route.ActionArgs) {
-  const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
   try {
     // Get & parse the form data
     let formData = await request.formData();
