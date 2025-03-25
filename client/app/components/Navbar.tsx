@@ -1,4 +1,4 @@
-import { Calendar, Home, Inbox, House, Search, Settings, Menu } from "lucide-react";
+import { Home, House, Bot, NotebookPen, Menu, User, X, BookOpenText, ListTodo } from "lucide-react";
 import { Link } from "react-router";
 import { useEffect, useRef } from "react";
 import {
@@ -7,6 +7,7 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -31,10 +32,10 @@ export function Navbar() {
       <AppSidebar />
       <div className="flex h-16 items-center px-6">
         <Menu onClick={toggleSidebar} className="h-[1.4rem] w-[1.4rem] lg:hidden cursor-pointer" />
-        <a className="text-theme justify-center items-center gap-2 hidden lg:flex" href="/">
+        <Link className="text-theme justify-center items-center gap-2 hidden lg:flex" to="/">
           <House className="h-[1.4rem] w-[1.4rem]" />
           <p>Homethings</p>
-        </a>
+        </Link>
         <div className="ml-auto flex items-center space-x-4">
           <ModeToggle />
           <DropdownMenu>
@@ -70,31 +71,36 @@ export function Navbar() {
 }
 
 // Menu items.
-const items = [
+export const menuItems = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
-    title: "Inbox",
-    url: "#",
-    icon: Inbox,
+    title: "Chat",
+    url: "/chat",
+    icon: Bot,
   },
   {
-    title: "Calendar",
-    url: "#",
-    icon: Calendar,
+    title: "Tasks",
+    url: "/tasks",
+    icon: ListTodo,
   },
   {
-    title: "Search",
-    url: "#",
-    icon: Search,
+    title: "Notes",
+    url: "/notes",
+    icon: NotebookPen,
   },
   {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Books",
+    url: "/books",
+    icon: BookOpenText,
+  },
+  {
+    title: "Profile",
+    url: "/profile",
+    icon: User,
   },
 ];
 
@@ -125,21 +131,26 @@ function AppSidebar() {
     <Sidebar ref={sidebarRef} variant="floating" collapsible="offcanvas">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>
-            <button onClick={toggleSidebar}>Toggle Sidebar</button>Application
+          <SidebarGroupLabel className="flex justify-end">
+            <X onClick={toggleSidebar} className="h-[1.4rem] w-[1.4rem] cursor-pointer hover:text-theme" />
           </SidebarGroupLabel>
+          <SidebarHeader>
+            <h1>What do you want to do?</h1>
+          </SidebarHeader>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <nav className="my-5 flex flex-col space-y-3">
+                {menuItems.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </nav>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router";
 import React from "react";
-
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,7 +15,7 @@ export function BreadcrumbNav() {
   const pathSegments = location.pathname.split("/").filter((segment) => segment !== "");
 
   return (
-    <Breadcrumb>
+    <Breadcrumb className="hidden sm:flex">
       <BreadcrumbList className="my-3 ml-3">
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
