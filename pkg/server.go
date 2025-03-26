@@ -103,7 +103,7 @@ func Run() {
 		// https://github.com/pocketbase/pocketbase/blob/develop/core/settings_model.go#L121-L130
 		settings.Meta = core.MetaConfig{
 			AppName:       "homethings",
-			AppURL:        "https://homethings.com",
+			AppURL:        "https://homethings.ytsruh.com",
 			HideControls:  false,
 			SenderName:    "homethings",
 			SenderAddress: "homethings@webiliti.com",

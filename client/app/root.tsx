@@ -4,6 +4,7 @@ import type { Route } from "./+types/root";
 import "./styles.css";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "~/components/theme-provider";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -42,6 +43,14 @@ export default function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Outlet />
     </ThemeProvider>
+  );
+}
+
+export function HydrateFallback() {
+  return (
+    <div className="flex items-center justify-center h-screen">
+      <LoadingSpinner />;
+    </div>
   );
 }
 

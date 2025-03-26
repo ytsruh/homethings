@@ -24,7 +24,7 @@ export default function AppLayout() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(pb.authStore.record);
+    //console.log(pb.authStore.record);
     const loggedIn = pb.authStore.isValid;
     if (!loggedIn) {
       navigate("/login");
