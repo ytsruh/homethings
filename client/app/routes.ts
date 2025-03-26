@@ -8,6 +8,8 @@ export default [
     route("chat", "routes/chat.tsx"),
     route("tasks", "routes/tasks.tsx"),
     route("notes", "routes/notes.tsx"),
+    route("notes/:id", "routes/notes-single.tsx"),
+    route("notes/:id/delete", "routes/notes-delete.tsx"),
     route("books", "routes/books.tsx"),
     route("profile", "routes/profile.tsx"),
     route("feedback", "routes/feedback.tsx"),

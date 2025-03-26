@@ -6,6 +6,6 @@ export const loginForm = z.object({
 });
 
 export const createNoteForm = z.object({
-  title: z.string().min(1, "Please enter a title"),
+  title: z.string().min(5, "Please enter a title of at least 5 characters"),
   body: z.string().nullish(), // string | null | undefined
 });
