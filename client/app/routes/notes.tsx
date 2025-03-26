@@ -20,7 +20,7 @@ import { Textarea } from "~/components/ui/textarea";
 import { createNoteForm } from "~/lib/schema";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
-const pb = new PocketBase("http://127.0.0.1:8090");
+const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
 export function meta({}: Route.MetaArgs) {
   return [

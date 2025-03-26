@@ -1,7 +1,4 @@
-import { Link, Outlet, useNavigate } from "react-router";
-import { useEffect } from "react";
-import PocketBase from "pocketbase";
-import { useLocation } from "react-router";
+import { Link, Outlet } from "react-router";
 import {
   Sidebar,
   SidebarContent,
@@ -17,20 +14,7 @@ import { Separator } from "~/components/ui/separator";
 import { BreadcrumbNav } from "~/components/BreadcrumbNav";
 import { menuItems } from "~/components/Navbar";
 
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
-
 export default function AppLayout() {
-  let location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    //console.log(pb.authStore.record);
-    const loggedIn = pb.authStore.isValid;
-    if (!loggedIn) {
-      navigate("/login");
-    }
-  }, [location, navigate]);
-
   return (
     <SidebarProvider defaultOpen={false}>
       <main className="min-h-screen w-full flex flex-col">
