@@ -3,6 +3,7 @@ package pkg
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"reflect"
 	"strconv"
@@ -11,6 +12,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
@@ -34,6 +36,7 @@ type envvar struct {
 	SMTP_PORT             string
 	SMTP_USERNAME         string
 	SMTP_PASSWORD         string
+	WEBILITI_SYSTEM_KEY   string
 }
 
 func init() {
@@ -55,6 +58,7 @@ func init() {
 		SMTP_PORT:             os.Getenv("SMTP_PORT"),
 		SMTP_USERNAME:         os.Getenv("SMTP_USERNAME"),
 		SMTP_PASSWORD:         os.Getenv("SMTP_PASSWORD"),
+		WEBILITI_SYSTEM_KEY:   os.Getenv("WEBILITI_SYSTEM_KEY"),
 	}
 
 	v := reflect.ValueOf(env)
@@ -168,6 +172,16 @@ func Run() {
 		app.Save(settings)
 
 		return nil
+	})
+
+	app.OnServe().BindFunc(func(se *core.ServeEvent) error {
+		// register "GET /api/keys" route (allowed only for authenticated users)
+		se.Router.GET("/api/keys", func(e *core.RequestEvent) error {
+			// do something ...
+			return e.JSON(http.StatusOK, map[string]string{"webiliti": Config.WEBILITI_SYSTEM_KEY})
+		}).Bind(apis.RequireAuth())
+
+		return se.Next()
 	})
 
 	if err := app.Start(); err != nil {

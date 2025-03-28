@@ -92,11 +92,11 @@ export const menuItems = [
     url: "/notes",
     icon: NotebookPen,
   },
-  {
-    title: "Books",
-    url: "/books",
-    icon: BookOpenText,
-  },
+  // {
+  //   title: "Books",
+  //   url: "/books",
+  //   icon: BookOpenText,
+  // },
   {
     title: "Profile",
     url: "/profile",
