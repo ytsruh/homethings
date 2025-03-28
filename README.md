@@ -1,3 +1,19 @@
 # Homethings
 
-A Sveltekit app consisting of mini-apps and homelab
+A Pocketbase app consisting of mini-apps and homelab
+
+## ENVIRONMENT VARIABLES
+
+- ENV
+- TURSO_TOKEN
+- TURSO_URL
+- STORAGE_KEY
+- STORAGE_SECRET
+- STORAGE_ENDPOINT
+- STORAGE_BUCKET
+- STORAGE_BACKUP_BUCKET
+- SMTP_SERVER
+- SMTP_PORT
+- SMTP_USERNAME
+- SMTP_PASSWORD
+- WEBILITI_SYSTEM_KEY

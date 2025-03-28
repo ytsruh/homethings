@@ -1,12 +1,21 @@
 node_modules
-/.svelte-kit
-/build
+.svelte-kit
 .DS_Store
 .env
-.env.*
-!.env.example
-!.env.test
 *.db
 package-lock.json
 bun.lock
-/scripts/tmp
+tmp
+_archive/scripts/tmp
+
+# Pocketbase
+.pocketbase
+pb_data
+
+# Project build & test binary, built with "go test -c"
+*.test
+main
+
+# React Router
+.react-router/
+build/
