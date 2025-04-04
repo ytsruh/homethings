@@ -55,7 +55,11 @@ export default function App() {
   const isNavigating = Boolean(navigation.location);
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      {isNavigating && <LoadingSpinner />}
+      {isNavigating && (
+        <div className="flex items-center justify-center h-screen">
+          <LoadingSpinner />;
+        </div>
+      )}
       <Outlet />
     </ThemeProvider>
   );
