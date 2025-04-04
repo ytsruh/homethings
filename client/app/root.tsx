@@ -1,4 +1,12 @@
-import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import {
+  isRouteErrorResponse,
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useNavigation,
+} from "react-router";
 
 import type { Route } from "./+types/root";
 import "./styles.css";
@@ -43,8 +51,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      {isNavigating && <LoadingSpinner />}
       <Outlet />
     </ThemeProvider>
   );
