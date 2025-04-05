@@ -27,7 +27,7 @@ export const createNoteForm = z.object({
 });
 
 const PRIORITIES = ["low", "medium", "high", "urgent"] as const;
-export const createTaskForm = z.object({
+export const taskForm = z.object({
   title: z.string().min(5, "Please enter a title of at least 5 characters"),
   description: z.string().nullish(), // string | null | undefined
   priority: z.enum(PRIORITIES),

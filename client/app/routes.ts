@@ -9,6 +9,7 @@ export default [
     route("tasks", "routes/tasks/all.tsx"),
     route("tasks/:id", "routes/tasks/single.tsx"),
     route("tasks/:id/delete", "routes/tasks/delete.tsx"),
+    route("tasks/:id/complete", "routes/tasks/complete.tsx"),
     route("notes", "routes/notes.tsx"),
     route("notes/:id", "routes/notes-single.tsx"),
     route("notes/:id/delete", "routes/notes-delete.tsx"),

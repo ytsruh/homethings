@@ -1,12 +1,10 @@
 node_modules
-.svelte-kit
 .DS_Store
 .env
 *.db
 package-lock.json
 bun.lock
 tmp
-_archive/scripts/tmp
 
 # Pocketbase
 .pocketbase

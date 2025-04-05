@@ -2,7 +2,7 @@ import { pb } from "~/lib/utils";
 import type { Route } from "./+types/all";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { redirect, useFetcher } from "react-router";
+import { Form, redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { useEffect, useState } from "react";
 import {
@@ -21,7 +21,8 @@ import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
 import { toast } from "~/components/Toaster";
 import { ZodError } from "zod";
-import { createTaskForm, type Task } from "~/lib/schema";
+import { taskForm, type Task } from "~/lib/schema";
+import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Tasks" }, { name: "description", content: "Welcome to Homethings" }];
@@ -33,7 +34,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
     const title = formData.get("title");
     const description = formData.get("description");
     const priority = formData.get("priority");
-    createTaskForm.parse({ title, description, priority });
+    taskForm.parse({ title, description, priority });
     const data = {
       title: title as string,
       description: description as string,
@@ -68,7 +69,7 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
     }
     const records = await pb.collection("tasks").getFullList({
       sort: "-updated",
-      filter: `createdBy = '${(user?.id as string) || ""}'`,
+      filter: `createdBy = '${(user?.id as string) || ""}' && completed = false`,
     });
     return { tasks: records };
   } catch (error) {
@@ -79,7 +80,6 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 
 export default function Tasks({ loaderData }: Route.ComponentProps) {
   const { tasks } = loaderData;
-  console.log(tasks);
   return (
     <>
       <PageHeader title="Tasks" subtitle="Manage your tasks" />
@@ -144,7 +144,7 @@ function NewTask() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Create</Button>
+              {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Create</Button>}
             </DialogFooter>
           </fetcher.Form>
         </DialogContent>

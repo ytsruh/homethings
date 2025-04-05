@@ -9,6 +9,37 @@ import { Bot } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
 import { pb } from "~/lib/utils";
+import ReactMarkdown from "react-markdown";
+
+const MarkdownComponents = {
+  h1: ({ children }: any) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-xl font-bold mb-3">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-lg font-bold mb-2">{children}</h3>,
+  h4: ({ children }: any) => <h4 className="text-base font-bold mb-2">{children}</h4>,
+  ul: ({ children }: any) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
+  li: ({ children }: any) => <li className="mb-1">{children}</li>,
+  code: ({ node, inline, className, children, ...props }: any) => {
+    const match = /language-(\w+)/.exec(className || "");
+    const language = match ? match[1] : "";
+
+    if (inline) {
+      return (
+        <code className="bg-black/20 rounded px-1 break-words" {...props}>
+          {children}
+        </code>
+      );
+    }
+    return (
+      <pre className="bg-black/20 p-2 rounded-md overflow-x-auto my-2 whitespace-pre-wrap break-words">
+        <code className={language ? `language-${language}` : ""} {...props}>
+          {children}
+        </code>
+      </pre>
+    );
+  },
+  p: ({ children }: any) => <p className="mb-2 last:mb-0 break-words">{children}</p>,
+};
 
 type Message = {
   role: "user" | "assistant";
@@ -35,7 +66,7 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 }
 
 export default function Chat({ loaderData }: Route.ComponentProps) {
-  const { keys } = loaderData;
+  const { keys } = loaderData as { keys: any };
   const { width } = useWindowSize();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
@@ -83,12 +114,31 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
           const lines = text.split("\n").filter((line) => line.trim());
           for (const line of lines) {
             const content = line.startsWith("data: ") ? line.slice(6) : line;
-            fullMessage += content;
+            // Clean up the content
+            const cleanContent = content
+              .replace(/\n\s+/g, "\n") // Remove extra spaces at start of lines
+              .replace(/\s+/g, " ") // Replace multiple spaces with single space
+              .replace(/```(\w+)\s+/g, "```$1\n") // Add newline after code block language
+              .replace(/\n+/g, "\n") // Replace multiple newlines with single newline
+              .replace(/(?<!\n)###/g, "\n###") // Add newline before ### if not already there
+              .replace(/###(?!\s)/g, "### ") // Add space after ### if not already there
+              .replace(/(?:\s*\n\s*){2,}###/g, "\n\n###"); // Ensure at most one blank line before ###
+
+            fullMessage = (fullMessage + cleanContent).trim();
             setStreamingMessage(fullMessage);
           }
         } catch (e) {
           console.error("Error processing chunk:", e);
-          fullMessage += text;
+          const cleanContent = text
+            .replace(/\n\s+/g, "\n")
+            .replace(/\s+/g, " ")
+            .replace(/```(\w+)\s+/g, "```$1\n")
+            .replace(/\n+/g, "\n")
+            .replace(/(?<!\n)###/g, "\n###")
+            .replace(/###(?!\s)/g, "### ")
+            .replace(/(?:\s*\n\s*){2,}###/g, "\n\n###");
+
+          fullMessage = (fullMessage + cleanContent).trim();
           setStreamingMessage(fullMessage);
         }
       }
@@ -112,21 +162,26 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="w-full mx-auto p-4 flex flex-col h-[calc(100vh-8rem)]">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+    <div className="max-w-full mx-auto p-4 flex flex-col h-[calc(100vh-8rem)]">
+      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
         {messages.map((message, i) => (
           <div
             key={i}
-            className={`p-4 rounded-lg text-white ${
+            className={`p-4 rounded-lg text-white break-words ${
               message.role === "user"
                 ? "bg-theme/90 dark:bg-theme/50 ml-auto max-w-[80%]"
                 : "bg-zinc-900 mr-auto max-w-[80%]"
-            }`}>
-            {message.content}
+            }`}
+            style={{ overflowWrap: 'break-word', wordWrap: 'break-word', hyphens: 'auto' }}>
+            <ReactMarkdown components={MarkdownComponents}>{message.content}</ReactMarkdown>
           </div>
         ))}
         {isLoading && streamingMessage && (
-          <div className="bg-zinc-900 text-white p-4 rounded-lg mr-auto max-w-[80%]">{streamingMessage}</div>
+          <div 
+            className="bg-zinc-900 text-white p-4 rounded-lg mr-auto max-w-[80%] break-words"
+            style={{ overflowWrap: 'break-word', wordWrap: 'break-word', hyphens: 'auto' }}>
+            <ReactMarkdown components={MarkdownComponents}>{streamingMessage}</ReactMarkdown>
+          </div>
         )}
       </div>
 
