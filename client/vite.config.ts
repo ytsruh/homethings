@@ -5,4 +5,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  resolve:
+    process.env.NODE_ENV === "development"
+      ? {}
+      : {
+          alias: {
+            "react-dom/server": "react-dom/server.node",
+          },
+        },
 });
