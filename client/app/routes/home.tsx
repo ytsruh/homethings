@@ -1,7 +1,6 @@
 import type { Route } from "./+types/home";
 import { redirect } from "react-router";
-import PocketBase from "pocketbase";
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
+import { pb } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "New React Router App" }, { name: "description", content: "Welcome to Homethings" }];

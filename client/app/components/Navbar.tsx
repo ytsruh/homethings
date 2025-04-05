@@ -1,4 +1,14 @@
-import { Home, House, Bot, NotebookPen, Menu, User, X, BookOpenText, ListTodo } from "lucide-react";
+import {
+  Home,
+  House,
+  Bot,
+  NotebookPen,
+  Menu,
+  User as UserIcon,
+  X,
+  BookOpenText,
+  ListTodo,
+} from "lucide-react";
 import { Link } from "react-router";
 import { useEffect, useRef } from "react";
 import {
@@ -23,13 +33,14 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { type User } from "~/lib/schema";
 
-export function Navbar() {
+export function Navbar({ user }: { user: User | null }) {
   const { toggleSidebar } = useSidebar();
 
   return (
     <>
-      <AppSidebar />
+      <AppSidebar user={user} />
       <div className="flex h-16 items-center px-6">
         <Menu onClick={toggleSidebar} className="h-[1.4rem] w-[1.4rem] lg:hidden cursor-pointer" />
         <Link className="text-theme justify-center items-center gap-2 hidden lg:flex" to="/">
@@ -41,15 +52,15 @@ export function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="hover:cursor-pointer">
               <Avatar>
-                <AvatarImage src="https://avatar.iran.liara.run/public" alt="@shadcn" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback>{user?.name?.slice(0, 1)}</AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[12rem]">
               <DropdownMenuLabel>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">Example Name</p>
-                  <p className="text-xs leading-none text-muted-foreground">example@example.com</p>
+                  <p className="text-sm font-medium leading-none">{user?.name}</p>
+                  <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -92,19 +103,14 @@ export const menuItems = [
     url: "/notes",
     icon: NotebookPen,
   },
-  // {
-  //   title: "Books",
-  //   url: "/books",
-  //   icon: BookOpenText,
-  // },
   {
     title: "Profile",
     url: "/profile",
-    icon: User,
+    icon: UserIcon,
   },
 ];
 
-function AppSidebar() {
+function AppSidebar({ user }: { user: User | null }) {
   const { toggleSidebar, setOpen } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
@@ -140,16 +146,25 @@ function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <nav className="my-5 flex flex-col space-y-3">
-                {menuItems.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {menuItems.map((item) => {
+                  if (
+                    (item.title === "Notes" && !user?.showNotes) ||
+                    (item.title === "Chat" && !user?.showChat) ||
+                    (item.title === "Tasks" && !user?.showTasks)
+                  ) {
+                    return null;
+                  }
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
               </nav>
             </SidebarMenu>
           </SidebarGroupContent>

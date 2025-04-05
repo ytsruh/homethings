@@ -15,12 +15,11 @@ import {
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { useEffect, useState } from "react";
-import PocketBase from "pocketbase";
 import { Textarea } from "~/components/ui/textarea";
 import { createNoteForm } from "~/lib/schema";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
+import { pb } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -81,7 +80,7 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
   const { notes } = loaderData;
   const [search, setSearch] = useState("");
   return (
-    <div>
+    <>
       <PageHeader title="Notes" subtitle="A personal space to jot down your thoughts" />
       <div className="flex items-center justify-between mb-5 gap-x-2">
         <Input placeholder="Search notes..." value={search} onChange={(e) => setSearch(e.target.value)} />
@@ -100,7 +99,7 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
             ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
 

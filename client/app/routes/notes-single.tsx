@@ -2,7 +2,6 @@ import type { Route } from "./+types/notes-single";
 import { Link, redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -15,12 +14,11 @@ import {
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { useEffect, useState } from "react";
-import PocketBase from "pocketbase";
 import { Textarea } from "~/components/ui/textarea";
 import { createNoteForm } from "~/lib/schema";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
+import { pb } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [

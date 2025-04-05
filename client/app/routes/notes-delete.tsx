@@ -1,11 +1,10 @@
 import type { Route } from "./+types/notes-delete";
 import { redirect } from "react-router";
-import PocketBase from "pocketbase";
+import { pb } from "~/lib/utils";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
 
-export async function clientAction({ request, params }: Route.ClientActionArgs) {
+export async function clientAction({ params }: Route.ClientActionArgs) {
   try {
     const id = params.id as string;
     await pb.collection("notes").delete(id);

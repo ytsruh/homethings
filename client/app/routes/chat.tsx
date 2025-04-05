@@ -8,8 +8,7 @@ import { SiGooglegemini, SiOpenai } from "react-icons/si";
 import { Bot } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
-import PocketBase from "pocketbase";
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
+import { pb } from "~/lib/utils";
 
 type Message = {
   role: "user" | "assistant";

@@ -9,3 +9,19 @@ export const createNoteForm = z.object({
   title: z.string().min(5, "Please enter a title of at least 5 characters"),
   body: z.string().nullish(), // string | null | undefined
 });
+
+export type User = {
+  account: string;
+  avatar: string;
+  collectionId: string;
+  collectionName: string;
+  created: string;
+  email: string;
+  emailVisibility: boolean;
+  id: string;
+  name: string;
+  showChat: boolean;
+  showNotes: boolean;
+  showTasks: boolean;
+  updated: string;
+};

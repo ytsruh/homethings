@@ -7,8 +7,7 @@ import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
 import { ModeToggle } from "~/components/theme-toggle";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
-import PocketBase from "pocketbase";
-const pb = new PocketBase(import.meta.env.VITE_POCKETBASE_URL);
+import { pb } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Login to Homethings" }, { name: "description", content: "Login to view awesome things" }];

@@ -57,7 +57,7 @@ export default function App() {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       {isNavigating && (
         <div className="flex items-center justify-center h-screen">
-          <LoadingSpinner />;
+          <LoadingSpinner />
         </div>
       )}
       <Outlet />
@@ -68,7 +68,7 @@ export default function App() {
 export function HydrateFallback() {
   return (
     <div className="flex items-center justify-center h-screen">
-      <LoadingSpinner />;
+      <LoadingSpinner />
     </div>
   );
 }
