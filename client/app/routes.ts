@@ -6,7 +6,7 @@ export default [
     index("routes/home.tsx"),
     route("logout", "routes/logout.tsx"),
     route("chat", "routes/chat.tsx"),
-    route("tasks", "routes/tasks.tsx"),
+    route("tasks", "routes/tasks/page.tsx"),
     route("notes", "routes/notes.tsx"),
     route("notes/:id", "routes/notes-single.tsx"),
     route("notes/:id/delete", "routes/notes-delete.tsx"),
