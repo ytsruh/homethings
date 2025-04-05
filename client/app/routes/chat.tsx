@@ -19,14 +19,14 @@ const MarkdownComponents = {
   h4: ({ children }: any) => <h4 className="text-base font-bold mb-2">{children}</h4>,
   ul: ({ children }: any) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
   ol: ({ children }: any) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
-  li: ({ children }: any) => <li className="mb-1">{children}</li>,
+  li: ({ children }: any) => <li className="mb-1 font-normal">{children}</li>,
   code: ({ node, inline, className, children, ...props }: any) => {
     const match = /language-(\w+)/.exec(className || "");
     const language = match ? match[1] : "";
 
     if (inline) {
       return (
-        <code className="bg-black/20 rounded px-1 break-words" {...props}>
+        <code className="bg-black/20 rounded px-1 break-words font-normal" {...props}>
           {children}
         </code>
       );
@@ -39,7 +39,7 @@ const MarkdownComponents = {
       </pre>
     );
   },
-  p: ({ children }: any) => <p className="mb-2 last:mb-0 break-words">{children}</p>,
+  p: ({ children }: any) => <p className="mb-2 last:mb-0 break-words font-normal">{children}</p>,
 };
 
 type Message = {
@@ -97,9 +97,8 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
       const response = await fetch(`${import.meta.env.VITE_WEBILITI_BASE_URL}/system/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "Webiliti-System-Key": keys.webiliti },
-        body: JSON.stringify({ model: chatModel, messages: [{ role: "user", content: input }] }),
+        body: JSON.stringify({ model: chatModel, messages: [...messages, userMessage] }),
       });
-      console.log(response);
       if (!response.ok) throw new Error("Failed to send message");
 
       const reader = response.body?.getReader();
