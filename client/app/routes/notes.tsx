@@ -149,7 +149,7 @@ function NewNote() {
 
 function NoteCard({ data }: { data: any }) {
   return (
-    <Card>
+    <Card className="w-full flex flex-col justify-between">
       <CardHeader>
         <CardTitle>{data.title}</CardTitle>
       </CardHeader>
