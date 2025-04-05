@@ -1,6 +1,6 @@
 import { pb } from "~/lib/utils";
-import type { Route } from "../tasks/+types/page";
-import { type Payment, columns } from "./columns";
+import type { Route } from "./+types/all";
+import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
@@ -14,14 +14,51 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Textarea } from "~/components/ui/textarea";
+import { toast } from "~/components/Toaster";
+import { ZodError } from "zod";
+import { createTaskForm, type Task } from "~/lib/schema";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Tasks" }, { name: "description", content: "Welcome to Homethings" }];
 }
+
+export async function clientAction({ request }: Route.ClientActionArgs) {
+  try {
+    const formData = await request.formData();
+    const title = formData.get("title");
+    const description = formData.get("description");
+    const priority = formData.get("priority");
+    createTaskForm.parse({ title, description, priority });
+    const data = {
+      title: title as string,
+      description: description as string,
+      priority: priority as string,
+      createdBy: (pb.authStore.record?.id as string) || "",
+    };
+    await pb.collection("tasks").create(data);
+    toast({
+      description: "Task created",
+      title: "Success",
+    });
+    return { success: true, error: null };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      toast({
+        description: error.errors[0].message,
+        title: "Task not created",
+        type: "destructive",
+      });
+      return { success: false, error: error.errors[0].message };
+    }
+    return { success: false, error: error as string };
+  }
+}
+
 export async function clientLoader({}: Route.ClientLoaderArgs) {
   try {
     const user = pb.authStore.record;
@@ -47,111 +84,12 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
     <>
       <PageHeader title="Tasks" subtitle="Manage your tasks" />
       <NewTask />
-      {data?.length === 0 ? (
-        <div className="w-full text-center py-5">
-          <h2>No tasks have been created</h2>
-        </div>
-      ) : (
-        <div className="container mx-auto py-10">
-          <DataTable columns={columns} data={data} />
-        </div>
-      )}
+      <div className="container mx-auto py-10">
+        <DataTable columns={columns} data={tasks as Task[]} />
+      </div>
     </>
   );
 }
-
-const data: Payment[] = [
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-  {
-    id: "728ed52f",
-    amount: 100,
-    status: "pending",
-    email: "m@example.com",
-  },
-];
 
 function NewTask() {
   const fetcher = useFetcher();
@@ -164,7 +102,7 @@ function NewTask() {
   }, [fetcher.data?.success]);
 
   return (
-    <div className="flex items-center justify-end mb-5 gap-x-2">
+    <div className="flex items-center justify-end gap-x-2">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button>Create</Button>
@@ -180,13 +118,29 @@ function NewTask() {
                 <Label htmlFor="title" className="text-right">
                   Title
                 </Label>
-                <Input name="title" placeholder="Task title" className="w-full" />
+                <Input name="title" placeholder="Title" className="w-full" />
               </div>
               <div className="grid w-full gap-2">
                 <Label htmlFor="description" className="text-right">
                   Description
                 </Label>
-                <Textarea name="description" placeholder="Task description" className="w-full" />
+                <Textarea rows={4} name="description" placeholder="Description" className="w-full" />
+              </div>
+              <div className="grid w-full gap-2">
+                <Label htmlFor="priority" className="text-right">
+                  Priority
+                </Label>
+                <Select defaultValue="medium" name="priority">
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select a priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>

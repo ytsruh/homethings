@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table";
+import { Link } from "react-router";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -52,9 +53,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     <>
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) => table.getColumn("email")?.setFilterValue(event.target.value)}
+          placeholder="Filter tasks by title..."
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
+          onChange={(event) => table.getColumn("title")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
@@ -135,6 +136,9 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           </Button>
         </div>
       </div>
+      {/* <div className="flex items-center justify-center space-x-2 py-4 text-sm text-muted-foreground">
+        <Link to="/tasks/completed">View Completed</Link>
+      </div> */}
     </>
   );
 }
