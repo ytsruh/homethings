@@ -1,6 +1,6 @@
 # Homethings
 
-A Pocketbase app consisting of mini-apps and homelab
+A Pocketbase & React app consisting of mini-apps and homelab
 
 ## ENVIRONMENT VARIABLES
 
