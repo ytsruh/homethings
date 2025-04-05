@@ -10,6 +10,7 @@ import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
 import { pb } from "~/lib/utils";
 import ReactMarkdown from "react-markdown";
+import PageHeader from "~/components/PageHeader";
 
 const MarkdownComponents = {
   h1: ({ children }: any) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
@@ -162,75 +163,78 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <div className="max-w-full mx-auto p-4 flex flex-col h-[calc(100vh-8rem)]">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-        {messages.map((message, i) => (
-          <div
-            key={i}
-            className={`p-4 rounded-lg text-white break-words ${
-              message.role === "user"
-                ? "bg-theme/90 dark:bg-theme/50 ml-auto max-w-[80%]"
-                : "bg-zinc-900 mr-auto max-w-[80%]"
-            }`}
-            style={{ overflowWrap: 'break-word', wordWrap: 'break-word', hyphens: 'auto' }}>
-            <ReactMarkdown components={MarkdownComponents}>{message.content}</ReactMarkdown>
-          </div>
-        ))}
-        {isLoading && streamingMessage && (
-          <div 
-            className="bg-zinc-900 text-white p-4 rounded-lg mr-auto max-w-[80%] break-words"
-            style={{ overflowWrap: 'break-word', wordWrap: 'break-word', hyphens: 'auto' }}>
-            <ReactMarkdown components={MarkdownComponents}>{streamingMessage}</ReactMarkdown>
-          </div>
-        )}
-      </div>
-
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
-        <div className="w-full">
-          <Input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type your message..."
-            className="w-full"
-            disabled={isLoading}
-          />
-        </div>
-        <div className="flex w-full sm:w-auto gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="flex-1 sm:flex-initial">
-                <Bot className="size-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-full my-2" align={width < 640 ? "start" : "end"}>
-              <div className="w-full pb-2">
-                <h4 className="font-medium leading-none">Model</h4>
-                <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {modelList.map((model) => (
-                  <ModelCard
-                    key={model.value}
-                    model={model}
-                    onClick={() => setChatModel(model.value)}
-                    selected={model.value === chatModel}
-                  />
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-initial">
-            {isLoading ? "Sending..." : "Send"}
-          </Button>
-          <Button variant="outline" asChild>
-            <div onClick={() => setMessages([])} className="flex-1 sm:flex-initial cursor-pointer">
-              Clear
+    <>
+      <PageHeader title="Chat" subtitle="Your personal AI assistant" />
+      <div className="max-w-full mx-auto p-4 flex flex-col h-[calc(100vh-8rem)] sm:h-[calc(100vh-13rem)]">
+        <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+          {messages.map((message, i) => (
+            <div
+              key={i}
+              className={`p-4 rounded-lg text-white break-words ${
+                message.role === "user"
+                  ? "bg-theme/90 dark:bg-theme/50 ml-auto max-w-[80%]"
+                  : "bg-zinc-900 mr-auto max-w-[80%]"
+              }`}
+              style={{ overflowWrap: "break-word", wordWrap: "break-word", hyphens: "auto" }}>
+              <ReactMarkdown components={MarkdownComponents}>{message.content}</ReactMarkdown>
             </div>
-          </Button>
+          ))}
+          {isLoading && streamingMessage && (
+            <div
+              className="bg-zinc-900 text-white p-4 rounded-lg mr-auto max-w-[80%] break-words"
+              style={{ overflowWrap: "break-word", wordWrap: "break-word", hyphens: "auto" }}>
+              <ReactMarkdown components={MarkdownComponents}>{streamingMessage}</ReactMarkdown>
+            </div>
+          )}
         </div>
-      </form>
-    </div>
+
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+          <div className="w-full">
+            <Input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              className="w-full"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="flex w-full sm:w-auto gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="flex-1 sm:flex-initial">
+                  <Bot className="size-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full my-2" align={width < 640 ? "start" : "end"}>
+                <div className="w-full pb-2">
+                  <h4 className="font-medium leading-none">Model</h4>
+                  <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {modelList.map((model) => (
+                    <ModelCard
+                      key={model.value}
+                      model={model}
+                      onClick={() => setChatModel(model.value)}
+                      selected={model.value === chatModel}
+                    />
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-initial">
+              {isLoading ? "Sending..." : "Send"}
+            </Button>
+            <Button variant="outline" asChild>
+              <div onClick={() => setMessages([])} className="flex-1 sm:flex-initial cursor-pointer">
+                Clear
+              </div>
+            </Button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 }
 
