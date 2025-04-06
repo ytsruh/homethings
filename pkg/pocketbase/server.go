@@ -1,4 +1,4 @@
-package pkg
+package pocketbase
 
 import (
 	"fmt"

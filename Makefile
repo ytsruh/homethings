@@ -2,21 +2,21 @@
 build:
 	@echo "Building..."
 	
-	@go build -o main cmd/server/main.go
+	@go build -o homethings-server ./cmd/server
+	@go build -o homethings-cli ./cmd/cli
 
-# Run the application
+# Run the web application
 run:
 	@go run cmd/server/main.go serve
+
+# Run the cli application
+run-cli:
+	@go run cmd/cli/main.go
 
 # Test the application
 test:
 	@echo "Testing..."
 	@go test ./tests -v
-
-# Clean the binary
-clean:
-	@echo "Cleaning..."
-	@rm -f main
 
 migration-snapshot:
 	@echo "Creating snapshot..."
@@ -32,4 +32,4 @@ docker-run: # Run the docker image
 docker-clean: # Clear the docker cache
 	docker builder prune
 
-.PHONY: build run test clean migration-snapshot docker-build docker-run docker-clean
+.PHONY: build run run-cli test migration-snapshot docker-build docker-run docker-clean
