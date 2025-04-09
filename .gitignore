@@ -13,6 +13,8 @@ pb_data
 # Project build & test binary, built with "go test -c"
 *.test
 main
+homethings-server
+homethings-cli
 
 # React Router
 .react-router/
