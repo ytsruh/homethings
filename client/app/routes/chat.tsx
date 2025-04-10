@@ -198,45 +198,45 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
 }
 
 const modelList = [
-  { name: "GPT", variant: "4o-mini", value: "openai/gpt-4o-mini", icon: SiOpenai },
+  { name: "GPT", variant: "4o mini", value: "openai/gpt-4o-mini", icon: SiOpenai },
   { name: "GPT", variant: "4o", value: "openai/gpt-4o", icon: SiOpenai },
   {
     name: "Gemini",
-    variant: "2.0-flash-lite",
+    variant: "2.0 flash lite",
     value: "google/gemini-2.0-flash-lite-001",
     icon: SiGooglegemini,
   },
-  { name: "Gemini", variant: "2.0-flash", value: "google/gemini-2.0-flash-001", icon: SiGooglegemini },
-  { name: "GPT", variant: "o3-mini", value: "openai/o3-mini", icon: SiOpenai },
+  { name: "Gemini", variant: "2.0 flash", value: "google/gemini-2.0-flash-001", icon: SiGooglegemini },
+  { name: "GPT", variant: "o3 mini", value: "openai/o3-mini", icon: SiOpenai },
   {
     name: "Gemini",
-    variant: "2.5-pro-preview",
+    variant: "2.5 pro",
     value: "google/gemini-2.5-pro-preview-03-25",
     icon: SiGooglegemini,
   },
-  { name: "X", variant: "Grok-3-mini", value: "x-ai/grok-3-mini-beta", icon: SiX },
-  { name: "X", variant: "Grok-3", value: "x-ai/grok-3-beta", icon: SiX },
+  { name: "Grok", variant: "3 mini", value: "x-ai/grok-3-mini-beta", icon: SiX },
+  { name: "Grok", variant: "3", value: "x-ai/grok-3-beta", icon: SiX },
   {
-    name: "Anthropic",
-    variant: "Claude-3.5-sonnet",
+    name: "Claude",
+    variant: "3.5 sonnet",
     value: "anthropic/claude-3.5-sonnet",
     icon: SiAnthropic,
   },
   {
-    name: "Anthropic",
-    variant: "Claude-3.7-sonnet",
+    name: "Claude",
+    variant: "3.7 sonnet",
     value: "anthropic/claude-3.7-sonnet",
     icon: SiAnthropic,
   },
   {
     name: "DeepSeek",
-    variant: "DeepSeek V3",
+    variant: "V3",
     value: "deepseek/deepseek-chat-v3-0324",
     icon: SiHelix,
   },
-  { name: "DeepSeek", variant: "DeepSeek R1", value: "deepseek/deepseek-r1", icon: SiHelix },
-  { name: "Secret", variant: "Optimus Alpha", value: "openrouter/optimus-alpha", icon: SiHelix },
-  { name: "Secret", variant: "Quasar Alpha", value: "openrouter/quasar-alpha", icon: SiHelix },
+  { name: "DeepSeek", variant: "R1", value: "deepseek/deepseek-r1", icon: SiHelix },
+  { name: "Mystery", variant: "Optimus Alpha", value: "openrouter/optimus-alpha", icon: SiHelix },
+  { name: "Mystery", variant: "Quasar Alpha", value: "openrouter/quasar-alpha", icon: SiHelix },
 ];
 
 type Model = {
