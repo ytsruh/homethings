@@ -105,7 +105,12 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
       <PageHeader title="Chat" subtitle="Your personal AI assistant" />
       <div className="max-w-full mx-auto p-4 flex flex-col h-[calc(100vh-8rem)] sm:h-[calc(100vh-13rem)]">
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-          {messages.map((message, i) => (
+          {[
+            ...messages,
+            ...(isLoading && streamingMessage
+              ? [{ role: "assistant" as const, content: streamingMessage }]
+              : []),
+          ].map((message, i) => (
             <div
               key={i}
               className={`p-4 rounded-lg ${
@@ -116,63 +121,24 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
               <Remark
                 rehypeReactOptions={{
                   components: {
-                    code: (props: object) => {
-                      console.log("code");
-                      console.log(props);
-                      return (
-                        <code
-                          className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100"
-                          {...props}
-                        />
-                      );
-                    },
-                    pre: (props: object) => {
-                      console.log("pre");
-                      console.log(props);
-                      return (
-                        <pre
-                          className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 rounded-lg"
-                          {...props}
-                        />
-                      );
-                    },
+                    code: (props: object) => (
+                      <code
+                        className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-1 m-1 rounded"
+                        {...props}
+                      />
+                    ),
+                    pre: (props: object) => (
+                      <pre
+                        className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 m-1 rounded-lg"
+                        {...props}
+                      />
+                    ),
                   },
                 }}>
                 {message.content}
               </Remark>
             </div>
           ))}
-          {isLoading && streamingMessage && (
-            <div className={`p-4 rounded-lg"bg-zinc-100 dark:bg-zinc-800 mr-auto max-w-[80%]`}>
-              <Remark
-                rehypeReactOptions={{
-                  components: {
-                    code: (props: object) => {
-                      console.log("code");
-                      console.log(props);
-                      return (
-                        <code
-                          className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100"
-                          {...props}
-                        />
-                      );
-                    },
-                    pre: (props: object) => {
-                      console.log("pre");
-                      console.log(props);
-                      return (
-                        <pre
-                          className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 rounded-lg"
-                          {...props}
-                        />
-                      );
-                    },
-                  },
-                }}>
-                {streamingMessage}
-              </Remark>
-            </div>
-          )}
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
