@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
-import { SiGooglegemini, SiOpenai } from "react-icons/si";
+import { SiGooglegemini, SiOpenai, SiX, SiHelix, SiAnthropic } from "react-icons/si";
 import { Bot, Copy, Check } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
@@ -161,7 +161,7 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
                   <h4 className="font-medium leading-none">Model</h4>
                   <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
                   {modelList.map((model) => (
                     <ModelCard
                       key={model.value}
@@ -198,6 +198,36 @@ const modelList = [
     icon: SiGooglegemini,
   },
   { name: "Gemini", variant: "2.0-flash", value: "google/gemini-2.0-flash-001", icon: SiGooglegemini },
+  { name: "GPT", variant: "o3-mini", value: "openai/o3-mini", icon: SiOpenai },
+  {
+    name: "Gemini",
+    variant: "2.5-pro-preview",
+    value: "google/gemini-2.5-pro-preview-03-25",
+    icon: SiGooglegemini,
+  },
+  { name: "X", variant: "Grok-3-mini", value: "x-ai/grok-3-mini-beta", icon: SiX },
+  { name: "X", variant: "Grok-3", value: "x-ai/grok-3-beta", icon: SiX },
+  {
+    name: "Anthropic",
+    variant: "Claude-3.5-sonnet",
+    value: "anthropic/claude-3.5-sonnet",
+    icon: SiAnthropic,
+  },
+  {
+    name: "Anthropic",
+    variant: "Claude-3.7-sonnet",
+    value: "anthropic/claude-3.7-sonnet",
+    icon: SiAnthropic,
+  },
+  {
+    name: "DeepSeek",
+    variant: "DeepSeek V3",
+    value: "deepseek/deepseek-chat-v3-0324",
+    icon: SiHelix,
+  },
+  { name: "DeepSeek", variant: "DeepSeek R1", value: "deepseek/deepseek-r1", icon: SiHelix },
+  { name: "Secret", variant: "Optimus Alpha", value: "openrouter/optimus-alpha", icon: SiHelix },
+  { name: "Secret", variant: "Quasar Alpha", value: "openrouter/quasar-alpha", icon: SiHelix },
 ];
 
 type Model = {
