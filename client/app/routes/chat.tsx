@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Route } from "./+types/chat";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -12,7 +12,6 @@ import { pb } from "~/lib/utils";
 import { Remark } from "react-remark";
 import PageHeader from "~/components/PageHeader";
 import { redirect } from "react-router";
-import { useRef } from "react";
 
 type Message = {
   role: "user" | "assistant";
@@ -41,11 +40,20 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 export default function Chat({ loaderData }: Route.ComponentProps) {
   const { keys } = loaderData as { keys: any };
   const { width } = useWindowSize();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState("");
   const [chatModel, setChatModel] = useState("openai/gpt-4o-mini");
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, streamingMessage]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -136,6 +144,7 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
               </Remark>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
