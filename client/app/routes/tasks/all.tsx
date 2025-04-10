@@ -4,7 +4,7 @@ import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { Form, redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -94,12 +94,21 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
 function NewTask() {
   const fetcher = useFetcher();
   const [open, setOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (fetcher.data?.success) {
+    if (fetcher.state === "idle" && fetcher.data?.success) {
       setOpen(false);
+      formRef.current?.reset();
     }
-  }, [fetcher.data?.success]);
+  }, [fetcher.state, fetcher.data]);
+
+  const handleSubmit = () => {
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      fetcher.submit(formData, { method: "post" });
+    }
+  };
 
   return (
     <div className="flex items-center justify-end gap-x-2">
@@ -108,7 +117,10 @@ function NewTask() {
           <Button>Create</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]" aria-describedby="create-note">
-          <fetcher.Form autoComplete="off" method="post">
+          <fetcher.Form ref={formRef} autoComplete="off" method="post" onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}>
             <DialogHeader>
               <DialogTitle>Create new task</DialogTitle>
             </DialogHeader>

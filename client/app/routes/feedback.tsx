@@ -8,6 +8,7 @@ import { pb } from "~/lib/utils";
 import { toast } from "~/components/Toaster";
 import { ZodError } from "zod";
 import { Textarea } from "~/components/ui/textarea";
+import { useRef, useEffect } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Feedback" }, { name: "description", content: "Please give your feedback" }];
@@ -57,10 +58,33 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
 export default function Feedback() {
   const fetcher = useFetcher();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data?.ok) {
+      formRef.current?.reset();
+    }
+  }, [fetcher.state, fetcher.data]);
+
+  const handleSubmit = () => {
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      fetcher.submit(formData, { method: "post" });
+    }
+  };
+
   return (
     <>
       <PageHeader title="Feedback" subtitle="Please give your feedback" />
-      <fetcher.Form method="post" className="flex flex-col w-full max-w-xl items-center gap-4">
+      <fetcher.Form 
+        ref={formRef}
+        method="post" 
+        className="flex flex-col w-full max-w-xl items-center gap-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="title">Title</Label>
           <Input name="title" placeholder="Title" />
