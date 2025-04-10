@@ -16,15 +16,26 @@ import { menuItems } from "~/components/Navbar";
 import { useEffect, useState } from "react";
 import { type User } from "~/lib/schema";
 import { pb } from "~/lib/utils";
+import { useNavigate } from "react-router";
 
 export default function AppLayout() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(pb.authStore.record as User | null);
+
   useEffect(() => {
+    // If the auth store is invalid, clear it and redirect to logout
+    if (!pb.authStore.isValid) {
+      pb.authStore.clear();
+      navigate("/logout");
+      return;
+    }
+
+    // Register a listener for changes to the auth store to update the UI with user preferences
     pb.authStore.onChange(() => {
-      console.log("updating");
       setUser(pb.authStore.record as User | null);
     });
-  }, []);
+  }, [pb.authStore]);
+
   return (
     <SidebarProvider defaultOpen={false}>
       <main className="min-h-screen w-full flex flex-col">

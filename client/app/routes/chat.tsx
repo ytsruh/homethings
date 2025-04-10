@@ -5,12 +5,14 @@ import { Input } from "~/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import { SiGooglegemini, SiOpenai } from "react-icons/si";
-import { Bot } from "lucide-react";
+import { Bot, Copy, Check } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
 import { pb } from "~/lib/utils";
 import { Remark } from "react-remark";
 import PageHeader from "~/components/PageHeader";
+import { redirect } from "react-router";
+import { useRef } from "react";
 
 type Message = {
   role: "user" | "assistant";
@@ -127,12 +129,7 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
                         {...props}
                       />
                     ),
-                    pre: (props: object) => (
-                      <pre
-                        className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 m-1 rounded-lg"
-                        {...props}
-                      />
-                    ),
+                    pre: (props: any) => <PreBlock {...props} />,
                   },
                 }}>
                 {message.content}
@@ -231,6 +228,47 @@ function ModelCard({ model, onClick, selected }: { model: Model; onClick: () => 
     </Card>
   );
 }
-function redirect(arg0: string) {
-  throw new Error("Function not implemented.");
+
+function PreBlock({ children, ...props }: { children: React.ReactNode } & Record<string, any>) {
+  const [copied, setCopied] = useState(false);
+  const preRef = useRef<HTMLPreElement>(null);
+
+  const copyToClipboard = async () => {
+    try {
+      if (!preRef.current) return;
+      const text = preRef.current.textContent || "";
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Copied",
+        description: "Code copied to clipboard",
+      });
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        type: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="relative">
+      <pre
+        ref={preRef}
+        className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 m-1 rounded-lg"
+        {...props}>
+        {children}
+      </pre>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="absolute top-1 right-1 h-8 w-8 mx-1"
+        onClick={copyToClipboard}>
+        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      </Button>
+    </div>
+  );
 }
