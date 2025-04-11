@@ -4,7 +4,8 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
-import { SiGooglegemini, SiOpenai, SiX, SiHelix, SiAnthropic } from "react-icons/si";
+import { SiGooglegemini, SiOpenai, SiX, SiAnthropic } from "react-icons/si";
+import { BiBrain } from "react-icons/bi";
 import { Bot, Copy, Check } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
@@ -232,11 +233,9 @@ const modelList = [
     name: "DeepSeek",
     variant: "V3",
     value: "deepseek/deepseek-chat-v3-0324",
-    icon: SiHelix,
+    icon: BiBrain,
   },
-  { name: "DeepSeek", variant: "R1", value: "deepseek/deepseek-r1", icon: SiHelix },
-  { name: "Mystery", variant: "Optimus Alpha", value: "openrouter/optimus-alpha", icon: SiHelix },
-  { name: "Mystery", variant: "Quasar Alpha", value: "openrouter/quasar-alpha", icon: SiHelix },
+  { name: "DeepSeek", variant: "R1", value: "deepseek/deepseek-r1", icon: BiBrain },
 ];
 
 type Model = {
