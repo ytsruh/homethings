@@ -1,46 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Route } from "./+types/chat";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
 import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
-import { SiGooglegemini, SiOpenai } from "react-icons/si";
-import { Bot } from "lucide-react";
+import { SiGooglegemini, SiOpenai, SiX, SiAnthropic } from "react-icons/si";
+import { BiBrain } from "react-icons/bi";
+import { Bot, Copy, Check } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
 import { pb } from "~/lib/utils";
-import ReactMarkdown from "react-markdown";
+import { Remark } from "react-remark";
 import PageHeader from "~/components/PageHeader";
-
-const MarkdownComponents = {
-  h1: ({ children }: any) => <h1 className="text-2xl font-bold mb-4">{children}</h1>,
-  h2: ({ children }: any) => <h2 className="text-xl font-bold mb-3">{children}</h2>,
-  h3: ({ children }: any) => <h3 className="text-lg font-bold mb-2">{children}</h3>,
-  h4: ({ children }: any) => <h4 className="text-base font-bold mb-2">{children}</h4>,
-  ul: ({ children }: any) => <ul className="list-disc pl-6 mb-4">{children}</ul>,
-  ol: ({ children }: any) => <ol className="list-decimal pl-6 mb-4">{children}</ol>,
-  li: ({ children }: any) => <li className="mb-1 font-normal">{children}</li>,
-  code: ({ node, inline, className, children, ...props }: any) => {
-    const match = /language-(\w+)/.exec(className || "");
-    const language = match ? match[1] : "";
-
-    if (inline) {
-      return (
-        <code className="bg-black/20 rounded px-1 break-words font-normal" {...props}>
-          {children}
-        </code>
-      );
-    }
-    return (
-      <pre className="bg-black/20 p-2 rounded-md overflow-x-auto my-2 whitespace-pre-wrap break-words">
-        <code className={language ? `language-${language}` : ""} {...props}>
-          {children}
-        </code>
-      </pre>
-    );
-  },
-  p: ({ children }: any) => <p className="mb-2 last:mb-0 break-words font-normal">{children}</p>,
-};
+import { redirect } from "react-router";
 
 type Message = {
   role: "user" | "assistant";
@@ -69,11 +41,20 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 export default function Chat({ loaderData }: Route.ComponentProps) {
   const { keys } = loaderData as { keys: any };
   const { width } = useWindowSize();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState("");
   const [chatModel, setChatModel] = useState("openai/gpt-4o-mini");
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, streamingMessage]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -103,46 +84,15 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No reader available");
-
       let fullMessage = "";
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         const text = new TextDecoder().decode(value);
-        try {
-          const lines = text.split("\n").filter((line) => line.trim());
-          for (const line of lines) {
-            const content = line.startsWith("data: ") ? line.slice(6) : line;
-            // Clean up the content
-            const cleanContent = content
-              .replace(/\n\s+/g, "\n") // Remove extra spaces at start of lines
-              .replace(/\s+/g, " ") // Replace multiple spaces with single space
-              .replace(/```(\w+)\s+/g, "```$1\n") // Add newline after code block language
-              .replace(/\n+/g, "\n") // Replace multiple newlines with single newline
-              .replace(/(?<!\n)###/g, "\n###") // Add newline before ### if not already there
-              .replace(/###(?!\s)/g, "### ") // Add space after ### if not already there
-              .replace(/(?:\s*\n\s*){2,}###/g, "\n\n###"); // Ensure at most one blank line before ###
-
-            fullMessage = (fullMessage + cleanContent).trim();
-            setStreamingMessage(fullMessage);
-          }
-        } catch (e) {
-          console.error("Error processing chunk:", e);
-          const cleanContent = text
-            .replace(/\n\s+/g, "\n")
-            .replace(/\s+/g, " ")
-            .replace(/```(\w+)\s+/g, "```$1\n")
-            .replace(/\n+/g, "\n")
-            .replace(/(?<!\n)###/g, "\n###")
-            .replace(/###(?!\s)/g, "### ")
-            .replace(/(?:\s*\n\s*){2,}###/g, "\n\n###");
-
-          fullMessage = (fullMessage + cleanContent).trim();
-          setStreamingMessage(fullMessage);
-        }
+        fullMessage += text;
+        setStreamingMessage(fullMessage);
       }
-
       // Add assistant's message to the chat
       setMessages((prev) => [...prev, { role: "assistant", content: fullMessage }]);
     } catch (error) {
@@ -166,25 +116,36 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
       <PageHeader title="Chat" subtitle="Your personal AI assistant" />
       <div className="max-w-full mx-auto p-4 flex flex-col h-[calc(100vh-8rem)] sm:h-[calc(100vh-13rem)]">
         <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-          {messages.map((message, i) => (
+          {[
+            ...messages,
+            ...(isLoading && streamingMessage
+              ? [{ role: "assistant" as const, content: streamingMessage }]
+              : []),
+          ].map((message, i) => (
             <div
               key={i}
-              className={`p-4 rounded-lg text-white break-words ${
+              className={`p-4 rounded-lg ${
                 message.role === "user"
-                  ? "bg-theme/90 dark:bg-theme/50 ml-auto max-w-[80%]"
-                  : "bg-zinc-900 mr-auto max-w-[80%]"
-              }`}
-              style={{ overflowWrap: "break-word", wordWrap: "break-word", hyphens: "auto" }}>
-              <ReactMarkdown components={MarkdownComponents}>{message.content}</ReactMarkdown>
+                  ? "bg-theme/90 dark:bg-theme/50 text-zinc-50 ml-auto max-w-[80%]"
+                  : "bg-zinc-100 dark:bg-zinc-800 mr-auto max-w-[80%]"
+              }`}>
+              <Remark
+                rehypeReactOptions={{
+                  components: {
+                    code: (props: object) => (
+                      <code
+                        className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-1 m-1 rounded"
+                        {...props}
+                      />
+                    ),
+                    pre: (props: any) => <PreBlock {...props} />,
+                  },
+                }}>
+                {message.content}
+              </Remark>
             </div>
           ))}
-          {isLoading && streamingMessage && (
-            <div
-              className="bg-zinc-900 text-white p-4 rounded-lg mr-auto max-w-[80%] break-words"
-              style={{ overflowWrap: "break-word", wordWrap: "break-word", hyphens: "auto" }}>
-              <ReactMarkdown components={MarkdownComponents}>{streamingMessage}</ReactMarkdown>
-            </div>
-          )}
+          <div ref={messagesEndRef} />
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
@@ -210,7 +171,7 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
                   <h4 className="font-medium leading-none">Model</h4>
                   <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
                   {modelList.map((model) => (
                     <ModelCard
                       key={model.value}
@@ -238,15 +199,43 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
 }
 
 const modelList = [
-  { name: "GPT", variant: "4o-mini", value: "openai/gpt-4o-mini", icon: SiOpenai },
+  { name: "GPT", variant: "4o mini", value: "openai/gpt-4o-mini", icon: SiOpenai },
   { name: "GPT", variant: "4o", value: "openai/gpt-4o", icon: SiOpenai },
   {
     name: "Gemini",
-    variant: "2.0-flash-lite",
+    variant: "2.0 flash lite",
     value: "google/gemini-2.0-flash-lite-001",
     icon: SiGooglegemini,
   },
-  { name: "Gemini", variant: "2.0-flash", value: "google/gemini-2.0-flash-001", icon: SiGooglegemini },
+  { name: "Gemini", variant: "2.0 flash", value: "google/gemini-2.0-flash-001", icon: SiGooglegemini },
+  { name: "GPT", variant: "o3 mini", value: "openai/o3-mini", icon: SiOpenai },
+  {
+    name: "Gemini",
+    variant: "2.5 pro",
+    value: "google/gemini-2.5-pro-preview-03-25",
+    icon: SiGooglegemini,
+  },
+  { name: "Grok", variant: "3 mini", value: "x-ai/grok-3-mini-beta", icon: SiX },
+  { name: "Grok", variant: "3", value: "x-ai/grok-3-beta", icon: SiX },
+  {
+    name: "Claude",
+    variant: "3.5 sonnet",
+    value: "anthropic/claude-3.5-sonnet",
+    icon: SiAnthropic,
+  },
+  {
+    name: "Claude",
+    variant: "3.7 sonnet",
+    value: "anthropic/claude-3.7-sonnet",
+    icon: SiAnthropic,
+  },
+  {
+    name: "DeepSeek",
+    variant: "V3",
+    value: "deepseek/deepseek-chat-v3-0324",
+    icon: BiBrain,
+  },
+  { name: "DeepSeek", variant: "R1", value: "deepseek/deepseek-r1", icon: BiBrain },
 ];
 
 type Model = {
@@ -277,6 +266,47 @@ function ModelCard({ model, onClick, selected }: { model: Model; onClick: () => 
     </Card>
   );
 }
-function redirect(arg0: string) {
-  throw new Error("Function not implemented.");
+
+function PreBlock({ children, ...props }: { children: React.ReactNode } & Record<string, any>) {
+  const [copied, setCopied] = useState(false);
+  const preRef = useRef<HTMLPreElement>(null);
+
+  const copyToClipboard = async () => {
+    try {
+      if (!preRef.current) return;
+      const text = preRef.current.textContent || "";
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      toast({
+        title: "Copied",
+        description: "Code copied to clipboard",
+      });
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      toast({
+        title: "Error",
+        description: "Failed to copy to clipboard",
+        type: "destructive",
+      });
+    }
+  };
+
+  return (
+    <div className="relative">
+      <pre
+        ref={preRef}
+        className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 m-1 rounded-lg"
+        {...props}>
+        {children}
+      </pre>
+      <Button
+        size="icon"
+        variant="ghost"
+        className="absolute top-1 right-1 h-8 w-8 mx-1"
+        onClick={copyToClipboard}>
+        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      </Button>
+    </div>
+  );
 }

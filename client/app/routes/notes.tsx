@@ -14,7 +14,7 @@ import {
 } from "~/components/ui/dialog";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Textarea } from "~/components/ui/textarea";
 import { createNoteForm } from "~/lib/schema";
 import { ZodError } from "zod";
@@ -106,12 +106,21 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
 function NewNote() {
   const fetcher = useFetcher();
   const [open, setOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (fetcher.data?.ok) {
+    if (fetcher.state === "idle" && fetcher.data?.ok) {
       setOpen(false);
+      formRef.current?.reset();
     }
-  }, [fetcher.data?.ok]);
+  }, [fetcher.state, fetcher.data]);
+
+  const handleSubmit = () => {
+    if (formRef.current) {
+      const formData = new FormData(formRef.current);
+      fetcher.submit(formData, { method: "post" });
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -119,7 +128,15 @@ function NewNote() {
         <Button>Create</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" aria-describedby="create-note">
-        <fetcher.Form autoComplete="off" method="post">
+        <fetcher.Form 
+          ref={formRef} 
+          autoComplete="off" 
+          method="post"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Create new note</DialogTitle>
           </DialogHeader>
