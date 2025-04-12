@@ -16,7 +16,7 @@ A personal homelab of mini apps. Made up of a Web App built using Pocketbase & R
 - SMTP_PORT
 - SMTP_USERNAME
 - SMTP_PASSWORD
-- WEBILITI_SYSTEM_KEY
+- OPENROUTER_API_KEY
 
 ## CLI Packages / Commands
 
