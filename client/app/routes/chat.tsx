@@ -30,16 +30,14 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
       pb.authStore.clear();
       return redirect("/login");
     }
-    const keys = await pb.send("/api/keys", {});
-    return { keys };
+    return null;
   } catch (error) {
     console.error(error);
-    return { keys: null };
+    return null;
   }
 }
 
-export default function Chat({ loaderData }: Route.ComponentProps) {
-  const { keys } = loaderData as { keys: any };
+export default function Chat() {
   const { width } = useWindowSize();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -75,9 +73,9 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
     setStreamingMessage("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_WEBILITI_BASE_URL}/system/chat`, {
+      const response = await fetch(`${import.meta.env.VITE_POCKETBASE_URL}/api/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", "Webiliti-System-Key": keys.webiliti },
+        headers: { "Content-Type": "application/json", Authorization: pb.authStore.token },
         body: JSON.stringify({ model: chatModel, messages: [...messages, userMessage] }),
       });
       if (!response.ok) throw new Error("Failed to send message");
@@ -100,15 +98,6 @@ export default function Chat({ loaderData }: Route.ComponentProps) {
     } finally {
       setIsLoading(false);
     }
-  }
-
-  if (!keys) {
-    toast({
-      title: "Error",
-      description: "Failed to start chat service",
-      type: "destructive",
-    });
-    return null;
   }
 
   return (
