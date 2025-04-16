@@ -182,6 +182,8 @@ func Run() {
 		return se.Next()
 	})
 
+	runCron(app)
+
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
 	}
