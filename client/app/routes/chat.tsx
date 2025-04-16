@@ -86,7 +86,6 @@ export default function Chat() {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         const text = new TextDecoder().decode(value);
         fullMessage += text;
         setStreamingMessage(fullMessage);
