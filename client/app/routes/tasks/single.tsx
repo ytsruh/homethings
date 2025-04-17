@@ -23,6 +23,7 @@ import { toast } from "~/components/Toaster";
 import { ZodError } from "zod";
 import { taskForm } from "~/lib/schema";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Manage Task" }, { name: "description", content: "Update & manage a task" }];
@@ -71,7 +72,10 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
       pb.authStore.clear();
       return redirect("/login");
     }
-    const task = await pb.collection("tasks").getOne(params.id as string);
+    const task = await pb.collection("tasks").getOne(params.id as string, {
+      expand: "comments",
+      sort: "-created",
+    });
     return task;
   } catch (error) {
     console.error(error);
@@ -89,14 +93,17 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <PageHeader title={task.title} subtitle="Update & manage this task" />
+      <PageHeader title={task.title} subtitle="Manage this task" />
       <div className="flex items-center justify-between w-full">
         <Button variant="secondary" asChild>
           <Link to="/tasks">
             <ArrowLeft className="size-4" />
           </Link>
         </Button>
-        <DeleteTask id={task.id} />
+        <div className="flex items-center gap-1.5">
+          <CompleteTask id={task.id} />
+          <DeleteTask id={task.id} />
+        </div>
       </div>
       <fetcher.Form method="post" className="flex flex-col w-full max-w-xl items-center gap-4 py-5">
         <div className="grid w-full items-center gap-1.5">
@@ -128,12 +135,48 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex w-full items-center justify-between gap-1.5">
+        <div className="flex w-full items-center justify-start gap-1.5">
           {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Update</Button>}
-          <CompleteTask id={task.id} />
         </div>
       </fetcher.Form>
+      <div className="flex flex-col gap-2">
+        <form action="">
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="comment">Add a comment</Label>
+            <Textarea name="comment" placeholder="Comment..." className="w-full" />
+          </div>
+          <div className="flex w-full items-center justify-end gap-1.5 py-2">
+            <Button type="submit" variant="secondary">
+              Add
+            </Button>
+          </div>
+        </form>
+        {task.comments.length > 0 &&
+          task.expand?.comments.map((comment: any) => <CommentCard key={comment.id} comment={comment} />)}
+      </div>
     </>
+  );
+}
+
+function CommentCard({ comment }: { comment: any }) {
+  return (
+    <div className="flex flex-col w-full items-center justify-between gap-2 border rounded-md p-3 shadow-sm bg-zinc-100 dark:bg-zinc-800">
+      <div className="w-full prose dark:prose-invert" dangerouslySetInnerHTML={{ __html: comment.comment }} />
+      <div className="flex items-center justify-between w-full">
+        <p className="text-muted-foreground italic">
+          {new Date(comment.created).toLocaleString("en-Uk", {
+            year: "2-digit",
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          })}
+        </p>
+        <Button variant="destructive" size="sm">
+          Delete
+        </Button>
+      </div>
+    </div>
   );
 }
 
