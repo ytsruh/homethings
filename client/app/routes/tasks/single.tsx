@@ -23,7 +23,6 @@ import { toast } from "~/components/Toaster";
 import { ZodError } from "zod";
 import { taskForm } from "~/lib/schema";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Manage Task" }, { name: "description", content: "Update & manage a task" }];
