@@ -20,7 +20,9 @@ import { useNavigate } from "react-router";
 
 export default function AppLayout() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(pb.authStore.record as User | null);
+  const [user, setUser] = useState<User | null>(
+    pb.authStore.record as User | null
+  );
 
   useEffect(() => {
     // If the auth store is invalid, clear it and redirect to logout
@@ -40,11 +42,15 @@ export default function AppLayout() {
     <SidebarProvider defaultOpen={false}>
       <main className="min-h-screen w-full flex flex-col">
         <Navbar user={user as User | null} />
-        <div className="px-5 flex flex-col h-full">
+        <div className="px-1 sm:px-5 flex flex-col h-full">
           <BreadcrumbNav />
           <Separator />
           <div className="flex h-full">
-            <Sidebar variant="sidebar" collapsible="none" className="hidden lg:block bg-transparent">
+            <Sidebar
+              variant="sidebar"
+              collapsible="none"
+              className="hidden lg:block bg-transparent"
+            >
               <SidebarContent>
                 <SidebarGroup>
                   <SidebarGroupContent>
@@ -75,7 +81,7 @@ export default function AppLayout() {
                 </SidebarGroup>
               </SidebarContent>
             </Sidebar>
-            <div className="p-2 w-full">
+            <div className="p-0 md:p-2 w-full">
               <Outlet />
             </div>
           </div>
