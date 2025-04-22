@@ -4,10 +4,7 @@ import { pb } from "~/lib/utils";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
 
-export async function clientAction({
-  request,
-  params,
-}: Route.ClientActionArgs) {
+export async function clientAction({ request, params }: Route.ClientActionArgs) {
   try {
     const taskId = params.id as string;
     const formData = await request.formData();
@@ -28,7 +25,7 @@ export async function clientAction({
     };
     const commentRecord = await pb.collection("tasks_comments").create(data);
     await pb.collection("tasks").update(taskId, {
-      // prepend single comment
+      // append single comment
       "comments+": commentRecord.id,
       // append multiple comment at once
       //'comment+': ['ID1', 'ID2'],
