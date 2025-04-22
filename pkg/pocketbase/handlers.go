@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
+	"net/http"
 
 	"github.com/openai/openai-go"
 	"github.com/openai/openai-go/option"
@@ -53,7 +52,6 @@ func postChat(e *core.RequestEvent) error {
 	}
 
 	if err := json.NewDecoder(e.Request.Body).Decode(&requestBody); err != nil {
-		log.Printf("Error decoding request body: %v", err)
 		return apis.NewBadRequestError("Invalid request body", err)
 	}
 
@@ -65,55 +63,6 @@ func postChat(e *core.RequestEvent) error {
 		return apis.NewBadRequestError("Invalid model specified", nil)
 	}
 
-	// Create a pipe to connect the stream to the response
-	pr, pw := io.Pipe()
-
-	// Start streaming in a goroutine
-	go func() {
-		defer pw.Close()
-
-		// Convert request messages to OpenAI format
-		messages := make([]openai.ChatCompletionMessageParamUnion, len(requestBody.Messages))
-		for i, msg := range requestBody.Messages {
-			switch msg.Role {
-			case "user":
-				messages[i] = openai.UserMessage(msg.Content)
-			case "assistant":
-				messages[i] = openai.AssistantMessage(msg.Content)
-			case "system":
-				messages[i] = openai.SystemMessage(msg.Content)
-			default:
-				log.Printf("Unsupported message role: %s", msg.Role)
-				pw.CloseWithError(fmt.Errorf("unsupported message role: %s", msg.Role))
-				return
-			}
-		}
-
-		stream := client.Chat.Completions.NewStreaming(context.TODO(), openai.ChatCompletionNewParams{
-			Messages: messages,
-			Model:    requestBody.Model,
-		})
-
-		for stream.Next() {
-			chunk := stream.Current()
-			if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
-				content := chunk.Choices[0].Delta.Content
-				_, err := pw.Write([]byte(content))
-				if err != nil {
-					log.Printf("Error writing chunk: %v", err)
-					pw.CloseWithError(err)
-					return
-				}
-			}
-		}
-
-		if err := stream.Err(); err != nil {
-			log.Printf("Stream error: %v", err)
-			pw.CloseWithError(err)
-			return
-		}
-	}()
-
 	// Set streaming headers
 	e.Response.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	e.Response.Header().Set("Cache-Control", "no-cache")
@@ -121,5 +70,46 @@ func postChat(e *core.RequestEvent) error {
 	e.Response.Header().Set("Transfer-Encoding", "chunked")
 	e.Response.Header().Set("X-Content-Type-Options", "nosniff")
 
-	return e.Stream(200, "text/plain", pr)
+	// Convert request messages to OpenAI format
+	messages := make([]openai.ChatCompletionMessageParamUnion, len(requestBody.Messages))
+	for i, msg := range requestBody.Messages {
+		switch msg.Role {
+		case "user":
+			messages[i] = openai.UserMessage(msg.Content)
+		case "assistant":
+			messages[i] = openai.AssistantMessage(msg.Content)
+		case "system":
+			messages[i] = openai.SystemMessage(msg.Content)
+		default:
+			return fmt.Errorf("unsupported message role: %s", msg.Role)
+		}
+	}
+
+	stream := client.Chat.Completions.NewStreaming(context.TODO(), openai.ChatCompletionNewParams{
+		Messages: messages,
+		Model:    requestBody.Model,
+	})
+
+	// Use a standard response with a flusher and do not use e.Stream() which appears to buffer the response before returning
+	flusher, ok := e.Response.(http.Flusher)
+	if !ok {
+		return fmt.Errorf("streaming not supported")
+	}
+
+	for stream.Next() {
+		chunk := stream.Current()
+		if len(chunk.Choices) > 0 && chunk.Choices[0].Delta.Content != "" {
+			content := chunk.Choices[0].Delta.Content
+			if _, err := e.Response.Write([]byte(content)); err != nil {
+				return err
+			}
+			flusher.Flush()
+		}
+	}
+
+	if err := stream.Err(); err != nil {
+		return err
+	}
+
+	return nil
 }
