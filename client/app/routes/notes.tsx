@@ -91,7 +91,7 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
           <h2>No notes have been created</h2>
         </div>
       ) : (
-        <div className="overflow-y-auto overscroll-contain pb-5 md:pb-40 max-h-[calc(100vh-6rem)]">
+        <div className="overflow-y-auto overscroll-contain scrollbar-hide pb-5 md:pb-40 max-h-[calc(100vh-6rem)]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {notes
               .filter((note) => note.title.toLowerCase().includes(search.toLowerCase()))
