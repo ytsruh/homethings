@@ -102,7 +102,7 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader title={task.title} subtitle="Manage this task" />
-      <div className="flex items-center justify-between w-full">
+      <div className="flex items-center justify-between w-full pb-2">
         <Button variant="secondary" asChild>
           <Link to="/tasks">
             <ArrowLeft className="size-4" />
@@ -113,56 +113,58 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
           <DeleteTask id={task.id} />
         </div>
       </div>
-      <fetcher.Form method="post" className="flex flex-col w-full max-w-xl items-center gap-4 py-5">
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="title">Title</Label>
-          <Input name="title" defaultValue={task.title} />
-        </div>
-        <div className="grid w-full items-center gap-1.5">
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            rows={10}
-            name="description"
-            placeholder="Description"
-            defaultValue={task.description || ""}
-          />
-        </div>
-        <div className="grid w-full gap-2">
-          <Label htmlFor="priority" className="text-right">
-            Priority
-          </Label>
-          <Select defaultValue={task.priority || "medium"} name="priority">
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a priority" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="low">Low</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="urgent">Urgent</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex w-full items-center justify-start gap-1.5">
-          {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Update</Button>}
-        </div>
-      </fetcher.Form>
-      <div className="flex flex-col gap-2">
-        <fetcher.Form method="POST" action={`/tasks/${task.id}/comments`}>
+      <div className="flex-1 w-full mx-auto overflow-auto scrollbar-hide h-[calc(100vh-3.5rem)] md:h-[calc(100vh-13rem)] pb-10">
+        <fetcher.Form method="post" className="flex flex-col w-full items-center gap-4 py-5">
           <div className="grid w-full items-center gap-1.5">
-            <Label htmlFor="comment">Add a comment</Label>
-            <Textarea ref={commentRef} name="comment" placeholder="Comment..." className="w-full" />
+            <Label htmlFor="title">Title</Label>
+            <Input name="title" defaultValue={task.title} />
           </div>
-          <div className="flex w-full items-center justify-end gap-1.5 py-2">
-            <Button type="submit" variant="secondary">
-              Add
-            </Button>
+          <div className="grid w-full items-center gap-1.5">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              rows={10}
+              name="description"
+              placeholder="Description"
+              defaultValue={task.description || ""}
+            />
+          </div>
+          <div className="grid w-full gap-2">
+            <Label htmlFor="priority" className="text-right">
+              Priority
+            </Label>
+            <Select defaultValue={task.priority || "medium"} name="priority">
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a priority" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="low">Low</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="urgent">Urgent</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex w-full items-center justify-end gap-1.5">
+            {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Update</Button>}
           </div>
         </fetcher.Form>
-        {task.comments.length > 0 &&
-          task.expand?.comments
-            .sort((a: any, b: any) => b.created.localeCompare(a.created))
-            .map((comment: any) => <CommentCard key={comment.id} comment={comment} />)}
+        <div className="flex flex-col gap-2">
+          <fetcher.Form method="POST" action={`/tasks/${task.id}/comments`}>
+            <div className="grid w-full items-center gap-1.5">
+              <Label htmlFor="comment">Add a comment</Label>
+              <Textarea ref={commentRef} name="comment" placeholder="Comment..." className="w-full" />
+            </div>
+            <div className="flex w-full items-center justify-end gap-1.5 py-2">
+              <Button type="submit" variant="secondary">
+                Add
+              </Button>
+            </div>
+          </fetcher.Form>
+          {task.comments.length > 0 &&
+            task.expand?.comments
+              .sort((a: any, b: any) => b.created.localeCompare(a.created))
+              .map((comment: any) => <CommentCard key={comment.id} comment={comment} />)}
+        </div>
       </div>
     </>
   );
@@ -252,18 +254,20 @@ function DeleteTask({ id }: { id: string }) {
           Are you sure you want to delete this task? This action cannot be undone.
         </DialogDescription>
         <DialogFooter>
-          <Button variant="secondary" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <fetcher.Form autoComplete="off" method="post" action={`/tasks/${id}/delete`}>
-            {fetcher.state === "submitting" ? (
-              <LoadingSpinner />
-            ) : (
-              <Button className="cursor-pointer" variant="destructive" type="submit">
-                Delete
-              </Button>
-            )}
-          </fetcher.Form>
+          <div className="flex items-center justify-between gap-2">
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <fetcher.Form autoComplete="off" method="post" action={`/tasks/${id}/delete`}>
+              {fetcher.state === "submitting" ? (
+                <LoadingSpinner />
+              ) : (
+                <Button className="cursor-pointer" variant="destructive" type="submit">
+                  Delete
+                </Button>
+              )}
+            </fetcher.Form>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -291,20 +295,26 @@ function CompleteTask({ id }: { id: string }) {
         </DialogHeader>
         <DialogDescription>Confirm that you want to complete this task.</DialogDescription>
         <DialogFooter>
-          <Button variant="secondary" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <fetcher.Form autoComplete="off" method="post" action={`/tasks/${id}/complete`}>
-            {fetcher.state === "submitting" ? (
-              <LoadingSpinner />
-            ) : (
-              <Button className="cursor-pointer" type="submit">
-                Complete
-              </Button>
-            )}
-          </fetcher.Form>
+          <div className="flex items-center justify-between gap-2">
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <fetcher.Form autoComplete="off" method="post" action={`/tasks/${id}/complete`}>
+              {fetcher.state === "submitting" ? (
+                <LoadingSpinner />
+              ) : (
+                <Button className="cursor-pointer" type="submit">
+                  Complete
+                </Button>
+              )}
+            </fetcher.Form>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
+
+// If 'scrollbar-hide' is not available, add this to your global CSS:
+// .scrollbar-hide::-webkit-scrollbar { display: none; }
+// .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

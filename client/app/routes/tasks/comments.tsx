@@ -31,7 +31,7 @@ export async function clientAction({ request, params }: Route.ClientActionArgs) 
       //'comment+': ['ID1', 'ID2'],
     });
     toast({
-      description: "Task created",
+      description: "Comment created",
       title: "Success",
     });
     return { success: true, error: null };

@@ -19,6 +19,7 @@ import { createNoteForm } from "~/lib/schema";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
 import { pb } from "~/lib/utils";
+import { LuArrowLeft, LuTrash2 } from "react-icons/lu";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -81,9 +82,11 @@ export default function SingleNote({ loaderData }: Route.ComponentProps) {
   return (
     <div>
       <PageHeader title="Notes" subtitle="A personal space to jot down your thoughts" />
-      <div className="w-full flex items-center justify-between">
-        <Button asChild>
-          <Link to="/notes">Back</Link>
+      <div className="w-full flex items-center justify-between py-1">
+        <Button asChild variant="secondary">
+          <Link to="/notes">
+            <LuArrowLeft className="size-4" />
+          </Link>
         </Button>
         <DeleteNote id={note.id} />
       </div>
@@ -104,7 +107,7 @@ export default function SingleNote({ loaderData }: Route.ComponentProps) {
                 name="body"
                 placeholder="Note body"
                 defaultValue={note?.body}
-                className="w-full min-h-96"
+                className="w-full min-h-[calc(100vh-18rem)] md:min-h-96"
               />
             </div>
           </div>
@@ -132,7 +135,9 @@ function DeleteNote({ id }: { id: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild className="cursor-pointer">
-        <Button variant="destructive">Delete</Button>
+        <Button variant="destructive">
+          <LuTrash2 className="size-4" />
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -142,14 +147,16 @@ function DeleteNote({ id }: { id: string }) {
           Are you sure you want to delete this note? This action cannot be undone.
         </DialogDescription>
         <DialogFooter>
-          <Button variant="secondary" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <fetcher.Form autoComplete="off" method="post" action={`/notes/${id}/delete`}>
-            <Button className="cursor-pointer" variant="destructive" type="submit">
-              Delete
+          <div className="flex justify-between gap-2">
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              Cancel
             </Button>
-          </fetcher.Form>
+            <fetcher.Form autoComplete="off" method="post" action={`/notes/${id}/delete`}>
+              <Button className="cursor-pointer" variant="destructive" type="submit">
+                Delete
+              </Button>
+            </fetcher.Form>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
