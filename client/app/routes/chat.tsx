@@ -109,7 +109,7 @@ export default function Chat() {
     <>
       <PageHeader title="Chat" subtitle="Your personal AI assistant" />
       <div className="max-w-full mx-auto p-0 flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-13rem)]">
-        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4 mb-2 pr-2">
+        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2 md:space-y-4 mb-2 pr-2">
           {[
             ...messages,
             ...(isLoading && streamingMessage
@@ -120,8 +120,8 @@ export default function Chat() {
               key={i}
               className={`p-4 rounded-lg ${
                 message.role === "user"
-                  ? "bg-theme/90 dark:bg-theme/50 text-zinc-50 ml-auto max-w-[80%]"
-                  : "bg-zinc-100 dark:bg-zinc-800 mr-auto max-w-[80%]"
+                  ? "bg-theme/90 dark:bg-theme/50 text-zinc-50 ml-auto max-w-[95%] md:max-w-[80%]"
+                  : "bg-zinc-100 dark:bg-zinc-800 mr-auto max-w-[95%] md:max-w-[80%]"
               }`}>
               <Remark
                 rehypeReactOptions={{
@@ -160,12 +160,14 @@ export default function Chat() {
                   <Bot className="size-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="min-w-screen my-2" align={width < 640 ? "start" : "end"}>
+              <PopoverContent
+                className="min-w-screen sm:min-w-0 sm:w-[75vw] md:w-[50vw]"
+                align={width < 640 ? "start" : "end"}>
                 <div className="w-full pb-2">
                   <h4 className="font-medium leading-none">Model</h4>
                   <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-[calc(100vh-8.5rem)] overflow-y-auto scrollbar-hide">
                   {modelList.map((model) => (
                     <ModelCard
                       key={model.value}
@@ -263,7 +265,7 @@ function ModelCard({ model, onClick, selected }: { model: Model; onClick: () => 
   const Icon = model.icon;
   return (
     <Card
-      className={`w-full flex flex-col items-center justify-between cursor-pointer ${
+      className={`w-full flex flex-col items-center justify-between cursor-pointer text-center ${
         selected ? "border-zinc-900 dark:border-zinc-50" : ""
       }`}
       onClick={onClick}>

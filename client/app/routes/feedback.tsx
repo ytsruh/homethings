@@ -76,15 +76,14 @@ export default function Feedback() {
   return (
     <>
       <PageHeader title="Feedback" subtitle="Please give your feedback" />
-      <fetcher.Form 
+      <fetcher.Form
         ref={formRef}
-        method="post" 
-        className="flex flex-col w-full max-w-xl items-center gap-4"
+        method="post"
+        className="flex flex-col w-full max-w-xl items-center gap-4 py-2"
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
-        }}
-      >
+        }}>
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="title">Title</Label>
           <Input name="title" placeholder="Title" />
@@ -93,7 +92,7 @@ export default function Feedback() {
           <Label htmlFor="body">Body</Label>
           <Textarea name="body" placeholder="Body" />
         </div>
-        <div className="flex w-full items-center gap-1.5">
+        <div className="flex w-full justify-end gap-1.5">
           <Button type="submit">Submit</Button>
         </div>
       </fetcher.Form>

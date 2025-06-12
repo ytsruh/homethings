@@ -1,15 +1,5 @@
-import {
-  Home,
-  House,
-  Bot,
-  NotebookPen,
-  Menu,
-  User as UserIcon,
-  X,
-  BookOpenText,
-  ListTodo,
-} from "lucide-react";
-import { Link } from "react-router";
+import { Home, House, Bot, NotebookPen, Menu, User as UserIcon, X, ListTodo } from "lucide-react";
+import { Link, useLocation } from "react-router";
 import { useEffect, useRef } from "react";
 import {
   Sidebar,
@@ -35,9 +25,15 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { type User } from "~/lib/schema";
 
+function getFirstPathSegment(path: string): string {
+  // Remove leading slash, split by '/', and return the first segment
+  return path.replace(/^\/+/, "").split("/")[0];
+}
+
 export function Navbar({ user }: { user: User | null }) {
   const { toggleSidebar } = useSidebar();
-
+  let location = useLocation();
+  console.log("Current location:", location.pathname);
   return (
     <>
       <AppSidebar user={user} />
@@ -47,6 +43,9 @@ export function Navbar({ user }: { user: User | null }) {
           <House className="h-[1.4rem] w-[1.4rem]" />
           <p>Homethings</p>
         </Link>
+        <div className="text-theme capitalize justify-center items-center gap-2 flex lg:hidden mx-1">
+          {getFirstPathSegment(location.pathname) || "Home"}
+        </div>
         <div className="ml-auto flex items-center space-x-4">
           <ModeToggle />
           <DropdownMenu>

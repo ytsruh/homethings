@@ -70,7 +70,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader title="Profile" subtitle="Manage your profile" />
-      <fetcher.Form method="post" className="flex flex-col w-full max-w-xl items-center gap-4">
+      <fetcher.Form method="post" className="flex flex-col w-full max-w-xl items-center gap-4 py-2">
         <div className="grid w-full items-center gap-1.5">
           <Label htmlFor="email">Email</Label>
           <Input defaultValue={user?.email || ""} disabled />
@@ -93,7 +93,7 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
             <Switch defaultChecked={user?.showTasks || false} id="show_tasks" name="show_tasks" />
           </div>
         </div>
-        <div className="flex w-full items-center gap-1.5">
+        <div className="flex justify-end w-full gap-1.5">
           <Button type="submit">Update</Button>
         </div>
       </fetcher.Form>
