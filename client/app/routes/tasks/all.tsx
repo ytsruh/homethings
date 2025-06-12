@@ -84,7 +84,7 @@ export default function Tasks({ loaderData }: Route.ComponentProps) {
     <>
       <PageHeader title="Tasks" subtitle="Manage your tasks" />
       <NewTask />
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto py-0 md:py-5">
         <DataTable columns={columns} data={tasks as Task[]} />
       </div>
     </>
@@ -111,16 +111,20 @@ function NewTask() {
   };
 
   return (
-    <div className="flex items-center justify-end gap-x-2">
+    <div className="flex items-center justify-end gap-x-2 py-2">
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button>Create</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]" aria-describedby="create-note">
-          <fetcher.Form ref={formRef} autoComplete="off" method="post" onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}>
+          <fetcher.Form
+            ref={formRef}
+            autoComplete="off"
+            method="post"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}>
             <DialogHeader>
               <DialogTitle>Create new task</DialogTitle>
             </DialogHeader>
