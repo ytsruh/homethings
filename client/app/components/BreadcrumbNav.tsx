@@ -15,7 +15,7 @@ export function BreadcrumbNav() {
   const pathSegments = location.pathname.split("/").filter((segment) => segment !== "");
 
   return (
-    <Breadcrumb className="flex">
+    <Breadcrumb className="hidden md:flex">
       <BreadcrumbList className="my-3 ml-3">
         <BreadcrumbItem>
           <BreadcrumbLink asChild>

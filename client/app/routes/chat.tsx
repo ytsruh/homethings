@@ -2,17 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import type { Route } from "./+types/chat";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "~/components/ui/popover";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "~/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
+import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
 import { SiGooglegemini, SiOpenai, SiX, SiAnthropic } from "react-icons/si";
 import { BiBrain } from "react-icons/bi";
 import { Bot, Copy, Check } from "lucide-react";
@@ -29,10 +20,7 @@ type Message = {
 };
 
 export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Chat" },
-    { name: "description", content: "Welcome to Homethings" },
-  ];
+  return [{ title: "Chat" }, { name: "description", content: "Welcome to Homethings" }];
 }
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
@@ -85,20 +73,17 @@ export default function Chat() {
     setStreamingMessage("");
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_POCKETBASE_URL}/api/chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: pb.authStore.token,
-          },
-          body: JSON.stringify({
-            model: chatModel,
-            messages: [...messages, userMessage],
-          }),
-        }
-      );
+      const response = await fetch(`${import.meta.env.VITE_POCKETBASE_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: pb.authStore.token,
+        },
+        body: JSON.stringify({
+          model: chatModel,
+          messages: [...messages, userMessage],
+        }),
+      });
       if (!response.ok) throw new Error("Failed to send message");
 
       const reader = response.body?.getReader();
@@ -112,10 +97,7 @@ export default function Chat() {
         setStreamingMessage(fullMessage);
       }
       // Add assistant's message to the chat
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: fullMessage },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: fullMessage }]);
     } catch (error) {
       console.error("Chat error:", error);
     } finally {
@@ -126,7 +108,7 @@ export default function Chat() {
   return (
     <>
       <PageHeader title="Chat" subtitle="Your personal AI assistant" />
-      <div className="max-w-full mx-auto p-0 md:p-4 flex flex-col h-[calc(100vh-7rem)] sm:h-[calc(100vh-13rem)]">
+      <div className="max-w-full mx-auto p-0 flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-13rem)]">
         <div className="flex-1 overflow-y-auto space-y-4 mb-2 pr-2">
           {[
             ...messages,
@@ -140,8 +122,7 @@ export default function Chat() {
                 message.role === "user"
                   ? "bg-theme/90 dark:bg-theme/50 text-zinc-50 ml-auto max-w-[80%]"
                   : "bg-zinc-100 dark:bg-zinc-800 mr-auto max-w-[80%]"
-              }`}
-            >
+              }`}>
               <Remark
                 rehypeReactOptions={{
                   components: {
@@ -153,8 +134,7 @@ export default function Chat() {
                     ),
                     pre: (props: any) => <PreBlock {...props} />,
                   },
-                }}
-              >
+                }}>
                 {message.content}
               </Remark>
             </div>
@@ -162,10 +142,7 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col sm:flex-row gap-2"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
           <div className="w-full">
             <Input
               type="text"
@@ -183,15 +160,10 @@ export default function Chat() {
                   <Bot className="size-4" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent
-                className="min-w-screen my-2"
-                align={width < 640 ? "start" : "end"}
-              >
+              <PopoverContent className="min-w-screen my-2" align={width < 640 ? "start" : "end"}>
                 <div className="w-full pb-2">
                   <h4 className="font-medium leading-none">Model</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Set the model for the chat.
-                  </p>
+                  <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 max-h-[calc(100vh-10rem)] overflow-y-auto">
                   {modelList.map((model) => (
@@ -205,18 +177,11 @@ export default function Chat() {
                 </div>
               </PopoverContent>
             </Popover>
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="flex-1 sm:flex-initial"
-            >
+            <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-initial">
               {isLoading ? "Sending..." : "Send"}
             </Button>
             <Button variant="outline" asChild>
-              <div
-                onClick={() => setMessages([])}
-                className="flex-1 sm:flex-initial cursor-pointer"
-              >
+              <div onClick={() => setMessages([])} className="flex-1 sm:flex-initial cursor-pointer">
                 Clear
               </div>
             </Button>
@@ -294,23 +259,14 @@ type Model = {
   icon: React.ComponentType;
 };
 
-function ModelCard({
-  model,
-  onClick,
-  selected,
-}: {
-  model: Model;
-  onClick: () => void;
-  selected: boolean;
-}) {
+function ModelCard({ model, onClick, selected }: { model: Model; onClick: () => void; selected: boolean }) {
   const Icon = model.icon;
   return (
     <Card
       className={`w-full flex flex-col items-center justify-between cursor-pointer ${
         selected ? "border-zinc-900 dark:border-zinc-50" : ""
       }`}
-      onClick={onClick}
-    >
+      onClick={onClick}>
       <CardHeader className="flex items-center justify-center">
         <div className="text-4xl">
           <Icon />
@@ -325,10 +281,7 @@ function ModelCard({
   );
 }
 
-function PreBlock({
-  children,
-  ...props
-}: { children: React.ReactNode } & Record<string, any>) {
+function PreBlock({ children, ...props }: { children: React.ReactNode } & Record<string, any>) {
   const [copied, setCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -358,16 +311,14 @@ function PreBlock({
       <pre
         ref={preRef}
         className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 m-1 rounded-lg"
-        {...props}
-      >
+        {...props}>
         {children}
       </pre>
       <Button
         size="icon"
         variant="ghost"
         className="absolute top-1 right-1 h-8 w-8 mx-1"
-        onClick={copyToClipboard}
-      >
+        onClick={copyToClipboard}>
         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>
