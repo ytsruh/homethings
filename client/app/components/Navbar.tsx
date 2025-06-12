@@ -41,7 +41,7 @@ export function Navbar({ user }: { user: User | null }) {
   return (
     <>
       <AppSidebar user={user} />
-      <div className="flex h-16 items-center px-6">
+      <div className="flex min-h-12 md:min-h-16 items-center px-4 md:px-6 py-0 md:py-1">
         <Menu onClick={toggleSidebar} className="h-[1.4rem] w-[1.4rem] lg:hidden cursor-pointer" />
         <Link className="text-theme justify-center items-center gap-2 hidden lg:flex" to="/">
           <House className="h-[1.4rem] w-[1.4rem]" />

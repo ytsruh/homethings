@@ -82,7 +82,7 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader title="Notes" subtitle="A personal space to jot down your thoughts" />
-      <div className="flex items-center justify-between mb-5 gap-x-2">
+      <div className="flex items-center justify-between my-2 gap-x-2">
         <Input placeholder="Search notes..." value={search} onChange={(e) => setSearch(e.target.value)} />
         <NewNote />
       </div>
@@ -91,12 +91,14 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
           <h2>No notes have been created</h2>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-          {notes
-            .filter((note) => note.title.toLowerCase().includes(search.toLowerCase()))
-            .map((note, i) => (
-              <NoteCard key={i} data={note} />
-            ))}
+        <div className="overflow-y-auto overscroll-contain pb-5 md:pb-40 max-h-[calc(100vh-6rem)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
+            {notes
+              .filter((note) => note.title.toLowerCase().includes(search.toLowerCase()))
+              .map((note, i) => (
+                <NoteCard key={i} data={note} />
+              ))}
+          </div>
         </div>
       )}
     </>
@@ -128,15 +130,14 @@ function NewNote() {
         <Button>Create</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]" aria-describedby="create-note">
-        <fetcher.Form 
-          ref={formRef} 
-          autoComplete="off" 
+        <fetcher.Form
+          ref={formRef}
+          autoComplete="off"
           method="post"
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
-          }}
-        >
+          }}>
           <DialogHeader>
             <DialogTitle>Create new note</DialogTitle>
           </DialogHeader>
@@ -166,16 +167,16 @@ function NewNote() {
 
 function NoteCard({ data }: { data: any }) {
   return (
-    <Card className="w-full flex flex-col justify-between">
-      <CardHeader>
+    <Card className="w-full flex flex-col justify-between p-2">
+      <CardHeader className="p-1 md:p-2">
         <CardTitle>{data.title}</CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-1 md:p-2">
         <CardDescription className="min-h-12 sm:min-h-24 lg:min-h-32 break-words">
           {data.body?.length > 150 ? data.body?.substring(0, 150) + "..." : data.body}
         </CardDescription>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="p-1 md:p-2">
         <Button asChild className="w-full">
           <Link to={`/notes/${data.id}`}>View</Link>
         </Button>

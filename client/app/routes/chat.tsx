@@ -108,7 +108,7 @@ export default function Chat() {
   return (
     <>
       <PageHeader title="Chat" subtitle="Your personal AI assistant" />
-      <div className="max-w-full mx-auto p-0 flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-13rem)]">
+      <div className="max-w-full mx-auto p-0 flex flex-col h-[calc(100vh-3.5rem)] md:h-[calc(100vh-13rem)]">
         <div className="flex-1 overflow-y-auto space-y-4 mb-2 pr-2">
           {[
             ...messages,
