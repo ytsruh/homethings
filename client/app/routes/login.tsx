@@ -10,7 +10,10 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { pb } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Login to Homethings" }, { name: "description", content: "Login to view awesome things" }];
+  return [
+    { title: "Login to Homethings" },
+    { name: "description", content: "Login to view awesome things" },
+  ];
 }
 
 export async function clientAction({ request }: Route.ActionArgs) {
@@ -20,13 +23,15 @@ export async function clientAction({ request }: Route.ActionArgs) {
     let email = formData.get("email");
     let password = formData.get("password");
     loginForm.parse({ email: email as string, password: password as string });
-    const userData = await pb.collection("users").authWithPassword(email as string, password as string);
+    const userData = await pb
+      .collection("users")
+      .authWithPassword(email as string, password as string);
     if (userData) {
       toast({
         title: "Success",
         description: "You have successfully logged in",
       });
-      return redirect("/");
+      return redirect("/app");
     }
     toast({
       title: "Login error",
@@ -63,8 +68,14 @@ export default function Login() {
             <h1 className="text-5xl text-center py-2">
               Welcome to <span className="text-theme">Homethings</span>
             </h1>
-            <h2 className="text-2xl text-center py-2">Login to view awesome things</h2>
-            <fetcher.Form className="flex flex-col gap-y-5 w-full" autoComplete="off" method="post">
+            <h2 className="text-2xl text-center py-2">
+              Login to view awesome things
+            </h2>
+            <fetcher.Form
+              className="flex flex-col gap-y-5 w-full"
+              autoComplete="off"
+              method="post"
+            >
               <div className="flex flex-col">
                 <h3 className="py-2">Username</h3>
                 <Input placeholder="example@domain.com" name="email" />
@@ -75,12 +86,20 @@ export default function Login() {
               </div>
               <div className="flex items-center justify-between w-full gap-x-2">
                 <ModeToggle />
-                {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Login</Button>}
+                {fetcher.state === "submitting" ? (
+                  <LoadingSpinner />
+                ) : (
+                  <Button type="submit">Login</Button>
+                )}
               </div>
             </fetcher.Form>
           </div>
         </div>
-        <img src={"/img/login.webp"} alt="" className="w-96 hidden lg:block rounded-r-2xl" />
+        <img
+          src={"/img/login.webp"}
+          alt=""
+          className="w-96 hidden lg:block rounded-r-2xl"
+        />
       </div>
     </div>
   );
