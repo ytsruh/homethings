@@ -1,6 +1,6 @@
 # Homethings
 
-A personal homelab of mini apps. Made up of a Web App built using Pocketbase & React as well as a CLI built using Go, Cobra & Charm.
+A personal homelab of mini apps. Made up of a static personal website, a web App built using Pocketbase & React as well as a CLI built using Go, Cobra & Charm.
 
 ## WEB APP ENVIRONMENT VARIABLES
 

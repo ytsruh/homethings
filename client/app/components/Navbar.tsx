@@ -107,7 +107,7 @@ export function Navbar({ user }: { user: User | null }) {
 // Menu items.
 export const menuItems = [
   {
-    title: "Home",
+    title: "Dashboard",
     url: "/app",
     icon: Home,
   },
