@@ -174,7 +174,7 @@ export default function AppLayout() {
     <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
       <SidebarProvider defaultOpen={false}>
         {isNavigating ? (
-          <div className="flex items-center justify-center h-screen">
+          <div className="flex items-center justify-center h-screen w-screen">
             <LoadingSpinner />
           </div>
         ) : (
