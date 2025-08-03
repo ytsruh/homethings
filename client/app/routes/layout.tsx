@@ -83,7 +83,7 @@ export default function SiteLayout() {
             <ul className="py-3 text-center">
               <li className="my-2 text-lg">
                 <Link
-                  to="/app"
+                  to="/"
                   className={location.pathname === "/" ? "text-theme" : ""}
                 >
                   Home
@@ -91,7 +91,7 @@ export default function SiteLayout() {
               </li>
               <li className="my-2 text-lg">
                 <Link
-                  to="/app/projects"
+                  to="/projects"
                   className={
                     location.pathname.includes("/projects") ? "text-theme" : ""
                   }
@@ -101,7 +101,7 @@ export default function SiteLayout() {
               </li>
               <li className="my-2 text-lg">
                 <Link
-                  to="/appwork-history"
+                  to="/work-history"
                   className={
                     location.pathname === "/work-history" ? "text-theme" : ""
                   }
