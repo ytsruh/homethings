@@ -2,10 +2,18 @@ import { useState, useEffect, useRef } from "react";
 import type { Route } from "./+types/chat";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { Card, CardContent, CardFooter, CardHeader } from "~/components/ui/card";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/components/ui/popover";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "~/components/ui/card";
 import { SiGooglegemini, SiOpenai, SiX, SiAnthropic } from "react-icons/si";
-import { BiBrain } from "react-icons/bi";
 import { Bot, Copy, Check } from "lucide-react";
 import { toast } from "~/components/Toaster";
 import useWindowSize from "~/hooks/use-windowsize";
@@ -20,7 +28,10 @@ type Message = {
 };
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Chat" }, { name: "description", content: "Welcome to Homethings" }];
+  return [
+    { title: "Chat" },
+    { name: "description", content: "Welcome to Homethings" },
+  ];
 }
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
@@ -44,7 +55,7 @@ export default function Chat() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamingMessage, setStreamingMessage] = useState("");
-  const [chatModel, setChatModel] = useState("openai/gpt-4o-mini");
+  const [chatModel, setChatModel] = useState("google/gemini-2.5-flash");
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -73,18 +84,26 @@ export default function Chat() {
     setStreamingMessage("");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_POCKETBASE_URL}/api/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: pb.authStore.token,
+      const response = await fetch(
+        `${import.meta.env.VITE_POCKETBASE_URL}/api/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: pb.authStore.token,
+          },
+          body: JSON.stringify({
+            model: chatModel,
+            messages: [...messages, userMessage],
+          }),
         },
-        body: JSON.stringify({
-          model: chatModel,
-          messages: [...messages, userMessage],
-        }),
-      });
-      if (!response.ok) throw new Error("Failed to send message");
+      );
+
+      if (!response.ok) {
+        const ffff = await response.json();
+        console.log(ffff);
+        throw new Error("Failed to send message");
+      }
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No reader available");
@@ -97,7 +116,10 @@ export default function Chat() {
         setStreamingMessage(fullMessage);
       }
       // Add assistant's message to the chat
-      setMessages((prev) => [...prev, { role: "assistant", content: fullMessage }]);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: fullMessage },
+      ]);
     } catch (error) {
       console.error("Chat error:", error);
     } finally {
@@ -122,7 +144,8 @@ export default function Chat() {
                 message.role === "user"
                   ? "bg-theme/90 dark:bg-theme/50 text-zinc-50 ml-auto max-w-[95%] md:max-w-[80%]"
                   : "bg-zinc-100 dark:bg-zinc-800 mr-auto max-w-[95%] md:max-w-[80%]"
-              }`}>
+              }`}
+            >
               <Remark
                 rehypeReactOptions={{
                   components: {
@@ -134,7 +157,8 @@ export default function Chat() {
                     ),
                     pre: (props: any) => <PreBlock {...props} />,
                   },
-                }}>
+                }}
+              >
                 {message.content}
               </Remark>
             </div>
@@ -142,7 +166,10 @@ export default function Chat() {
           <div ref={messagesEndRef} />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-2">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col sm:flex-row gap-2"
+        >
           <div className="w-full">
             <Input
               type="text"
@@ -162,10 +189,13 @@ export default function Chat() {
               </PopoverTrigger>
               <PopoverContent
                 className="min-w-screen sm:min-w-0 sm:w-[75vw] md:w-[50vw]"
-                align={width < 640 ? "start" : "end"}>
+                align={width < 640 ? "start" : "end"}
+              >
                 <div className="w-full pb-2">
                   <h4 className="font-medium leading-none">Model</h4>
-                  <p className="text-sm text-muted-foreground">Set the model for the chat.</p>
+                  <p className="text-sm text-muted-foreground">
+                    Set the model for the chat.
+                  </p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 max-h-[calc(100vh-8.5rem)] overflow-y-auto scrollbar-hide">
                   {modelList.map((model) => (
@@ -179,11 +209,18 @@ export default function Chat() {
                 </div>
               </PopoverContent>
             </Popover>
-            <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-initial">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="flex-1 sm:flex-initial"
+            >
               {isLoading ? "Sending..." : "Send"}
             </Button>
             <Button variant="outline" asChild>
-              <div onClick={() => setMessages([])} className="flex-1 sm:flex-initial cursor-pointer">
+              <div
+                onClick={() => setMessages([])}
+                className="flex-1 sm:flex-initial cursor-pointer"
+              >
                 Clear
               </div>
             </Button>
@@ -196,38 +233,45 @@ export default function Chat() {
 
 const modelList = [
   {
+    name: "Gemini",
+    variant: "2.5 Flash",
+    value: "google/gemini-2.5-flash",
+    icon: SiGooglegemini,
+  },
+  {
+    name: "Gemini",
+    variant: "2.5 Pro",
+    value: "google/gemini-2.5-pro",
+    icon: SiGooglegemini,
+  },
+  {
+    name: "GPT",
+    variant: "4o",
+    value: "openai/gpt-4o",
+    icon: SiOpenai,
+  },
+  {
     name: "GPT",
     variant: "4o mini",
     value: "openai/gpt-4o-mini",
     icon: SiOpenai,
   },
-  { name: "GPT", variant: "4o", value: "openai/gpt-4o", icon: SiOpenai },
   {
-    name: "Gemini",
-    variant: "2.0 flash lite",
-    value: "google/gemini-2.0-flash-lite-001",
-    icon: SiGooglegemini,
+    name: "GPT",
+    variant: "4.1",
+    value: "openai/gpt-4.1",
+    icon: SiOpenai,
   },
   {
-    name: "Gemini",
-    variant: "2.0 flash",
-    value: "google/gemini-2.0-flash-001",
-    icon: SiGooglegemini,
+    name: "GPT",
+    variant: "4.1 mini",
+    value: "openai/gpt-4.1-mini",
+    icon: SiOpenai,
   },
-  { name: "GPT", variant: "o3 mini", value: "openai/o3-mini", icon: SiOpenai },
-  {
-    name: "Gemini",
-    variant: "2.5 pro",
-    value: "google/gemini-2.5-pro-preview-03-25",
-    icon: SiGooglegemini,
-  },
-  {
-    name: "Grok",
-    variant: "3 mini",
-    value: "x-ai/grok-3-mini-beta",
-    icon: SiX,
-  },
-  { name: "Grok", variant: "3", value: "x-ai/grok-3-beta", icon: SiX },
+  { name: "Grok", variant: "3", value: "x-ai/grok-3", icon: SiX },
+  { name: "Grok", variant: "3 mini", value: "x-ai/grok-3-mini", icon: SiX },
+
+  { name: "Grok", variant: "4", value: "x-ai/grok-4", icon: SiX },
   {
     name: "Claude",
     variant: "3.5 sonnet",
@@ -241,16 +285,16 @@ const modelList = [
     icon: SiAnthropic,
   },
   {
-    name: "DeepSeek",
-    variant: "V3",
-    value: "deepseek/deepseek-chat-v3-0324",
-    icon: BiBrain,
+    name: "Claude",
+    variant: "Opus 4",
+    value: "anthropic/claude-opus-4",
+    icon: SiAnthropic,
   },
   {
-    name: "DeepSeek",
-    variant: "R1",
-    value: "deepseek/deepseek-r1",
-    icon: BiBrain,
+    name: "Claude",
+    variant: "Sonnet 4",
+    value: "anthropic/claude-sonnet-4",
+    icon: SiAnthropic,
   },
 ];
 
@@ -261,14 +305,23 @@ type Model = {
   icon: React.ComponentType;
 };
 
-function ModelCard({ model, onClick, selected }: { model: Model; onClick: () => void; selected: boolean }) {
+function ModelCard({
+  model,
+  onClick,
+  selected,
+}: {
+  model: Model;
+  onClick: () => void;
+  selected: boolean;
+}) {
   const Icon = model.icon;
   return (
     <Card
       className={`w-full flex flex-col items-center justify-between cursor-pointer text-center ${
         selected ? "border-zinc-900 dark:border-zinc-50" : ""
       }`}
-      onClick={onClick}>
+      onClick={onClick}
+    >
       <CardHeader className="flex items-center justify-center">
         <div className="text-4xl">
           <Icon />
@@ -283,7 +336,10 @@ function ModelCard({ model, onClick, selected }: { model: Model; onClick: () => 
   );
 }
 
-function PreBlock({ children, ...props }: { children: React.ReactNode } & Record<string, any>) {
+function PreBlock({
+  children,
+  ...props
+}: { children: React.ReactNode } & Record<string, any>) {
   const [copied, setCopied] = useState(false);
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -313,14 +369,16 @@ function PreBlock({ children, ...props }: { children: React.ReactNode } & Record
       <pre
         ref={preRef}
         className="bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100 p-2 m-1 rounded-lg"
-        {...props}>
+        {...props}
+      >
         {children}
       </pre>
       <Button
         size="icon"
         variant="ghost"
         className="absolute top-1 right-1 h-8 w-8 mx-1"
-        onClick={copyToClipboard}>
+        onClick={copyToClipboard}
+      >
         {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
       </Button>
     </div>

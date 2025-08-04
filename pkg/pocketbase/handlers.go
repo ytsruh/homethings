@@ -23,18 +23,19 @@ func initClient() {
 
 // Map of allowed models for O(1) lookup
 var allowedModels = map[string]bool{
-	"openai/gpt-4o":                       true,
-	"openai/gpt-4o-mini":                  true,
-	"google/gemini-2.0-flash-lite-001":    true,
-	"google/gemini-2.0-flash-001":         true,
-	"x-ai/grok-3-mini-beta":               true,
-	"x-ai/grok-3-beta":                    true,
-	"google/gemini-2.5-pro-preview-03-25": true,
-	"deepseek/deepseek-chat-v3-0324":      true,
-	"deepseek/deepseek-r1":                true,
-	"openai/o3-mini":                      true,
-	"anthropic/claude-3.5-sonnet":         true,
-	"anthropic/claude-3.7-sonnet":         true,
+	"openai/gpt-4o":               true,
+	"openai/gpt-4o-mini":          true,
+	"openai/gpt-4.1":              true,
+	"openai/gpt-4.1-mini":         true,
+	"x-ai/grok-3-mini":            true,
+	"x-ai/grok-3":                 true,
+	"x-ai/grok-4":                 true,
+	"anthropic/claude-3.5-sonnet": true,
+	"anthropic/claude-3.7-sonnet": true,
+	"anthropic/claude-opus-4":     true,
+	"anthropic/claude-sonnet-4":   true,
+	"google/gemini-2.5-pro":       true,
+	"google/gemini-2.5-flash":     true,
 }
 
 func isValidModel(model string) bool {
@@ -50,7 +51,6 @@ func postChat(e *core.RequestEvent) error {
 			Content string `json:"content"`
 		} `json:"messages"`
 	}
-
 	if err := json.NewDecoder(e.Request.Body).Decode(&requestBody); err != nil {
 		return apis.NewBadRequestError("Invalid request body", err)
 	}
