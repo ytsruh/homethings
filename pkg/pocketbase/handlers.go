@@ -23,10 +23,10 @@ func initClient() {
 
 // Map of allowed models for O(1) lookup
 var allowedModels = map[string]bool{
-	"openai/gpt-4o":               true,
-	"openai/gpt-4o-mini":          true,
-	"openai/gpt-4.1":              true,
-	"openai/gpt-4.1-mini":         true,
+	"openai/gpt-5-chat":           true,
+	"openai/gpt-5":                true,
+	"openai/gpt-5-mini":           true,
+	"openai/gpt-5-nano":           true,
 	"x-ai/grok-3-mini":            true,
 	"x-ai/grok-3":                 true,
 	"x-ai/grok-4":                 true,
