@@ -4,9 +4,16 @@ WORKDIR /app
 RUN apk update && apk upgrade && apk add --no-cache ca-certificates
 RUN update-ca-certificates
 COPY . .
-RUN go mod download
-RUN go build -o homethings cmd/server/main.go
 
+# To persist your data you need to mount a volume at /pb/pb_data
+# Copy the local migrations dir into the pb directory
+COPY ./migrations /pb/pb_migrations
+
+# Download dependencies & run build
+RUN go mod download
+RUN go build -o pb/homethings cmd/server/main.go
+
+# Expose port & run pocketbase
 EXPOSE 8080
-ENTRYPOINT ["./homethings"]
+ENTRYPOINT ["./pb/homethings"]
 CMD ["serve", "--http=0.0.0.0:8080"]
