@@ -11,7 +11,7 @@ COPY ./migrations /pb/pb_migrations
 
 # Download dependencies & run build
 RUN go mod download
-RUN go build -o pb/homethings cmd/server/main.go
+RUN go build -o pb/homethings cmd/main.go
 
 # Expose port & run pocketbase
 EXPOSE 8080
