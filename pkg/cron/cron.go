@@ -20,4 +20,14 @@ func RunJobs(app *pocketbase.PocketBase) {
 		handleVixFile(app)
 	})
 
+	// UK SHORT UPLOAD - every weekday at 17:30
+	app.Cron().MustAdd("uploadUKShortFile", "30 17 * * 1-5", func() {
+		uploadUKShortFile(app)
+	})
+
+	// UK SHORT HANDLER - every weekday at 17:35
+	app.Cron().MustAdd("handleUKShortFile", "35 17 * * 1-5", func() {
+		handleUKShortFile(app)
+	})
+
 }

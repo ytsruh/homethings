@@ -72,7 +72,7 @@ func handleVixFile(app *pocketbase.PocketBase) {
 	}
 	defer file.Close()
 
-	// Read the file into memory and check the size
+	// Read the file into memory
 	b, err := io.ReadAll(file)
 	if err != nil {
 		fmt.Println("Error reading file")
