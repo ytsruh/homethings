@@ -9,14 +9,12 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
-	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
 	_ "github.com/homethings/migrations"
-	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
 
 // Config holds the application configuration
@@ -24,8 +22,6 @@ var Config *envvar
 
 type envvar struct {
 	ENV                   string
-	TURSO_TOKEN           string
-	TURSO_URL             string
 	STORAGE_KEY           string
 	STORAGE_SECRET        string
 	STORAGE_ENDPOINT      string
@@ -46,8 +42,6 @@ func init() {
 
 	env := envvar{
 		ENV:                   os.Getenv("ENV"),
-		TURSO_TOKEN:           os.Getenv("TURSO_TOKEN"),
-		TURSO_URL:             os.Getenv("TURSO_URL"),
 		STORAGE_KEY:           os.Getenv("STORAGE_KEY"),
 		STORAGE_SECRET:        os.Getenv("STORAGE_SECRET"),
 		STORAGE_ENDPOINT:      os.Getenv("STORAGE_ENDPOINT"),
@@ -67,27 +61,14 @@ func init() {
 
 	for i := 0; i < v.NumField(); i++ {
 		if v.Field(i).Kind() == reflect.String && v.Field(i).String() == "" {
-			log.Fatal(fmt.Sprintf("Missing environment variable: %s", v.Type().Field(i).Name))
+			log.Fatalf(fmt.Sprintf("Missing environment variable: %s", v.Type().Field(i).Name))
 		}
 	}
 	Config = &env
 }
 
-// register the libsql driver to use the same query builder implementation as the already existing sqlite3 builder
-func init() {
-	dbx.BuilderFuncMap["libsql"] = dbx.BuilderFuncMap["sqlite3"]
-}
-
 func Run() {
-	app := pocketbase.NewWithConfig(pocketbase.Config{
-		DBConnect: func(dbPath string) (*dbx.DB, error) {
-			if strings.Contains(dbPath, "data.db") {
-				return dbx.Open("libsql", fmt.Sprintf("%s?authToken=%s", Config.TURSO_URL, Config.TURSO_TOKEN))
-			}
-			// optionally for the logs (aka. pb_data/auxiliary.db) use the default local filesystem driver
-			return core.DefaultDBConnect(dbPath)
-		},
-	})
+	app := pocketbase.New()
 
 	// loosely check if it was executed using "go run"
 	isGoRun := strings.HasPrefix(os.Args[0], os.TempDir())
@@ -181,6 +162,9 @@ func Run() {
 
 		return se.Next()
 	})
+
+	// Start the cron jobs
+	runCron(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

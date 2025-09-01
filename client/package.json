@@ -50,5 +50,8 @@
     "typescript": "^5.9.2",
     "vite": "^5.4.19",
     "vite-tsconfig-paths": "^5.1.4"
-  }
+  },
+  "trustedDependencies": [
+    "@tailwindcss/oxide"
+  ]
 }
