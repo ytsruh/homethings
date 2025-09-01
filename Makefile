@@ -1,17 +1,12 @@
 # Build the application
 build:
 	@echo "Building..."
-	
-	@go build -o homethings-server ./cmd/server
-	@go build -o homethings-cli ./cmd/cli
+
+	@go build -o homethings ./cmd
 
 # Run the web application
 run:
-	@go run cmd/server/main.go serve
-
-# Run the cli application
-run-cli:
-	@go run cmd/cli/main.go
+	@go run cmd/main.go serve
 
 # Test the application
 test:
@@ -20,8 +15,8 @@ test:
 
 migration-snapshot:
 	@echo "Creating snapshot..."
-	@go run cmd/server/main.go migrate collections
-	@go run cmd/server/main.go migrate history-sync
+	@go run cmd/main.go migrate collections
+	@go run cmd/main.go migrate history-sync
 
 docker-build: # Build the docker image
 	docker build -t homethings .
@@ -32,4 +27,4 @@ docker-run: # Run the docker image
 docker-clean: # Clear the docker cache
 	docker builder prune
 
-.PHONY: build run run-cli test migration-snapshot docker-build docker-run docker-clean
+.PHONY: build run test migration-snapshot docker-build docker-run docker-clean
