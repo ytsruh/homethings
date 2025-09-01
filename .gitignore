@@ -8,11 +8,11 @@ tmp
 .pocketbase
 pb_data
 
-# Project build & test binary, built with "go test -c"
+# Project build, scripts & test binary
 *.test
 main
-homethings-server
-homethings-cli
+homethings
+scripts/data
 
 # React Router
 .react-router/

@@ -1,0 +1,100 @@
+export const terminal = [
+  { description: "Copy", command: "cp [source] [destination]" },
+  { description: "Copy", command: "cp -r [source] [destination]" },
+  { description: "Move", command: "mv [source] [destination]" },
+  { description: "Move", command: "mv -r [source] [destination]" },
+  { description: "Show current location", command: "pwd" },
+  { description: "Change Permissions", command: "chmod [permissions] [file]" },
+  { description: "Change Owner", command: "chown [user] [file]" },
+  { description: "Delete", command: "rm [file]" },
+  { description: "Delete directory", command: "rm -r [directory]" },
+  { description: "Create file", command: "touch [file]" },
+  { description: "Create directory", command: "mkdir [directory]" },
+  { description: "Check Processes", command: "top" },
+  { description: "Check Processes", command: "ps" },
+  { description: "Kill Process", command: "kill [PID]" },
+  { description: "Kill Process", command: "pkill [process name]" },
+  { description: "List homebrew", command: "brew ls" },
+  { description: "Update homebrew", command: "brew update" },
+  { description: "Upgrade homebrew packages", command: "brew upgrade" },
+  {
+    description: "Upgrade homebrew package",
+    command: "brew upgrade [package]",
+  },
+];
+
+export const nvim = [
+  { mode: "None", description: "Start a new session", command: "nvim" },
+  { mode: "None", description: "Command mode", command: "shift :" },
+  { mode: "None", description: "Delete character under cursor", command: "x" },
+  { mode: "None", description: "Enter insert mode", command: "i" },
+  { mode: "None", description: "Enter visual mode", command: "v" },
+  {
+    mode: "None",
+    description: "Exit any mode",
+    command: "esc",
+  },
+  {
+    mode: "None",
+    description: "Append after the end of the line",
+    command: "A",
+  },
+  { mode: "None", description: "Delete a word", command: "dw" },
+  { mode: "None", description: "Delete to end of line", command: "d$" },
+  { mode: "Command", description: "Quit", command: ":q" },
+  { mode: "Command", description: "Quit without saving", command: ":q!" },
+  { mode: "Command", description: "Save and quit", command: ":wq" },
+  {
+    mode: "Command",
+    description: "Save",
+    command: ":w",
+  },
+  { mode: "Command", description: "Save as", command: ":w [filename]" },
+  { mode: "Command", description: "LSP Help", command: ":help lsp" },
+  { mode: "Visual", description: "Select text", command: "" },
+  { mode: "Visual", description: "Copy/yank", command: "y" },
+  { mode: "Visual", description: "Copy/yank one word", command: "yw" },
+  { mode: "Visual", description: "Paste", command: "p" },
+];
+
+export const git = [
+  { description: "Get repo status", command: "git status" },
+  { description: "Add file", command: "git add [file]" },
+  {
+    description: "Add all changes",
+    command: "git add .",
+  },
+  { description: "Commit", command: "git commit -m [message]" },
+  {
+    description: "Push",
+    command: "git push",
+  },
+  { description: "Pull", command: "git pull" },
+  { description: "Show log", command: "git log" },
+  { description: "Show log with graph", command: "git log --graph" },
+  {
+    description: "Show log only commit messages",
+    command: "git log --oneline",
+  },
+  { description: "Diff", command: "git diff" },
+  { description: "Diff", command: "git diff [file]" },
+  { description: "List branches", command: "git branch" },
+  { description: "Change branch", command: "git checkout [branch]" },
+  { description: "Create branch", command: "git branch [branch]" },
+  { description: "Delete branch", command: "git branch -d [branch]" },
+  { description: "Merge branch", command: "git merge [branch]" },
+  { description: "Reset branch", command: "git reset [branch]" },
+];
+
+export const ghostty = [
+  { description: "List Themes", command: "ghostty +list-themes" },
+  { description: "Show Config", command: "ghostty +show-config" },
+  { description: "Reload Config", command: "shift + cmd + ," },
+  { description: "Split pane right", command: "cmd + d" },
+  { description: "Split pane down", command: "shift + cmd + d" },
+  {
+    description: "Change pane left/right",
+    command: "opt + command + [arrow key]",
+  },
+  { description: "Close pane", command: "cmd + w" },
+];

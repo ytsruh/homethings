@@ -15,6 +15,7 @@ import (
 	"github.com/pocketbase/pocketbase/plugins/migratecmd"
 
 	_ "github.com/homethings/migrations"
+	"github.com/homethings/pkg/cron"
 )
 
 // Config holds the application configuration
@@ -160,11 +161,11 @@ func Run() {
 		// register routes (allowed only for authenticated users)
 		se.Router.POST("/api/chat", postChat).Bind(apis.RequireAuth())
 
+		// Start the cron jobs here to ensure settings are loaded
+		cron.RunJobs(app)
+
 		return se.Next()
 	})
-
-	// Start the cron jobs
-	runCron(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
