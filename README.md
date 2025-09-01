@@ -5,8 +5,6 @@ A personal homelab of mini apps. Made up of a static personal website, a web App
 ## WEB APP ENVIRONMENT VARIABLES
 
 - ENV
-- TURSO_TOKEN
-- TURSO_URL
 - STORAGE_KEY
 - STORAGE_SECRET
 - STORAGE_ENDPOINT
