@@ -1,4 +1,4 @@
-package pocketbase
+package cron
 
 import (
 	"encoding/json"
@@ -13,13 +13,6 @@ import (
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
 )
-
-func runCron(app *pocketbase.PocketBase) {
-	// Get FX Rates at 1am every day
-	app.Cron().MustAdd("getFX", "0 1 * * *", func() {
-		getFXData(app)
-	})
-}
 
 type ExchangeRateResponse struct {
 	Result             string             `json:"result"`
