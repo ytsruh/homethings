@@ -2,7 +2,7 @@ import { pb } from "~/lib/utils";
 import type { Route } from "./+types/all";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
-import { Form, redirect, useFetcher } from "react-router";
+import { redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { useEffect, useState, useRef } from "react";
 import {
@@ -14,7 +14,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { Label } from "~/components/ui/label";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -25,7 +31,10 @@ import { taskForm, type Task } from "~/lib/schema";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Tasks" }, { name: "description", content: "Welcome to Homethings" }];
+  return [
+    { title: "Tasks" },
+    { name: "description", content: "Welcome to Homethings" },
+  ];
 }
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
@@ -69,7 +78,9 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
     }
     const records = await pb.collection("tasks").getFullList({
       sort: "-updated",
-      filter: `createdBy = '${(user?.id as string) || ""}' && completed = false`,
+      filter: `createdBy = '${
+        (user?.id as string) || ""
+      }' && completed = false`,
     });
     return { tasks: records };
   } catch (error) {
@@ -116,7 +127,10 @@ function NewTask() {
         <DialogTrigger asChild>
           <Button>Create</Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]" aria-describedby="create-note">
+        <DialogContent
+          className="sm:max-w-[425px]"
+          aria-describedby="create-note"
+        >
           <fetcher.Form
             ref={formRef}
             autoComplete="off"
@@ -124,7 +138,8 @@ function NewTask() {
             onSubmit={(e) => {
               e.preventDefault();
               handleSubmit();
-            }}>
+            }}
+          >
             <DialogHeader>
               <DialogTitle>Create new task</DialogTitle>
             </DialogHeader>
@@ -140,7 +155,12 @@ function NewTask() {
                 <Label htmlFor="description" className="text-right">
                   Description
                 </Label>
-                <Textarea rows={4} name="description" placeholder="Description" className="w-full" />
+                <Textarea
+                  rows={4}
+                  name="description"
+                  placeholder="Description"
+                  className="w-full"
+                />
               </div>
               <div className="grid w-full gap-2">
                 <Label htmlFor="priority" className="text-right">
@@ -160,7 +180,11 @@ function NewTask() {
               </div>
             </div>
             <DialogFooter>
-              {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Create</Button>}
+              {fetcher.state === "submitting" ? (
+                <LoadingSpinner />
+              ) : (
+                <Button type="submit">Create</Button>
+              )}
             </DialogFooter>
           </fetcher.Form>
         </DialogContent>

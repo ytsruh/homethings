@@ -11,7 +11,10 @@ import { pb } from "~/lib/utils";
 import { ThemeProvider } from "~/components/theme-provider";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Login to Homethings" }, { name: "description", content: "Login to view awesome things" }];
+  return [
+    { title: "Login to Homethings" },
+    { name: "description", content: "Login to view awesome things" },
+  ];
 }
 
 export async function clientAction({ request }: Route.ActionArgs) {
@@ -21,13 +24,15 @@ export async function clientAction({ request }: Route.ActionArgs) {
     let email = formData.get("email");
     let password = formData.get("password");
     loginForm.parse({ email: email as string, password: password as string });
-    const userData = await pb.collection("users").authWithPassword(email as string, password as string);
+    const userData = await pb
+      .collection("users")
+      .authWithPassword(email as string, password as string);
     if (userData) {
       toast({
         title: "Success",
         description: "You have successfully logged in",
       });
-      return redirect("/");
+      return redirect("/app");
     }
     toast({
       title: "Login error",
@@ -98,10 +103,6 @@ export default function Login() {
             className="w-96 hidden lg:block rounded-r-2xl"
           />
         </div>
-<<<<<<< HEAD
-        <img src={"/img/login.webp"} alt="" className="w-96 hidden lg:block rounded-r-2xl" />
-=======
->>>>>>> a118e7f (feat: added in static pages for personal site)
       </div>
     </ThemeProvider>
   );

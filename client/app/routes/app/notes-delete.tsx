@@ -1,30 +1,27 @@
-import type { Route } from "./+types/complete";
+import type { Route } from "./+types/notes-delete";
 import { redirect } from "react-router";
 import { pb } from "~/lib/utils";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
 
 export async function clientAction({ params }: Route.ClientActionArgs) {
-  const { id } = params;
-  if (!id) {
-    return { success: false, error: "Task not found" };
-  }
   try {
-    await pb.collection("tasks").update(id, { completed: true });
+    const id = params.id as string;
+    await pb.collection("notes").delete(id);
     toast({
-      description: "Task completed",
+      description: "Note deleted",
       title: "Success",
     });
-    return redirect("/tasks");
+    return redirect("/app/notes");
   } catch (error) {
     if (error instanceof ZodError) {
       toast({
         description: error.errors[0].message,
-        title: "Task not completed",
+        title: "Note not deleted",
         type: "destructive",
       });
-      return { success: false, error: error.errors[0].message };
+      return { ok: false, error: error.errors[0].message };
     }
-    return { success: false, error: error as string };
+    return { ok: false, error: error as string };
   }
 }

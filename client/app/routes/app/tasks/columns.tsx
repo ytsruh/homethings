@@ -11,14 +11,21 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: "title",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Title
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      return <div className="text-left mx-2">{stripHtmlAndTruncate(row.getValue("title"))}</div>;
+      return (
+        <div className="text-left mx-2">
+          {stripHtmlAndTruncate(row.getValue("title"))}
+        </div>
+      );
     },
     enableHiding: false, // disable column hiding for this column
   },
@@ -26,28 +33,42 @@ export const columns: ColumnDef<Task>[] = [
     accessorKey: "description",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Description
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      return <div className="text-left mx-2">{stripHtmlAndTruncate(row.getValue("description"))}</div>;
+      return (
+        <div className="text-left mx-2">
+          {stripHtmlAndTruncate(row.getValue("description"))}
+        </div>
+      );
     },
   },
   {
     accessorKey: "priority",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Priority
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      return <Badge className="text-left mx-2 capitalize">{row.getValue("priority")}</Badge>;
+      return (
+        <Badge className="text-left mx-2 capitalize">
+          {row.getValue("priority")}
+        </Badge>
+      );
     },
   },
   {
@@ -56,7 +77,7 @@ export const columns: ColumnDef<Task>[] = [
       const task = row.original;
       return (
         <Button variant="ghost" className="h-8 w-8 p-0" asChild>
-          <Link to={`/tasks/${task.id}`}>
+          <Link to={`/app/tasks/${task.id}`}>
             <span className="sr-only">Open menu</span>
             <ArrowRight className="h-4 w-4" />
           </Link>

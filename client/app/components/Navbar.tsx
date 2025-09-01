@@ -42,7 +42,6 @@ function getFirstPathSegment(path: string): string {
 export function Navbar({ user }: { user: User | null }) {
   const { toggleSidebar } = useSidebar();
   let location = useLocation();
-  console.log("Current location:", location.pathname);
   return (
     <>
       <AppSidebar user={user} />
@@ -53,7 +52,7 @@ export function Navbar({ user }: { user: User | null }) {
         />
         <Link
           className="text-theme justify-center items-center gap-2 hidden lg:flex"
-          to="/"
+          to="/app"
         >
           <House className="h-[1.4rem] w-[1.4rem]" />
           <p>Homethings</p>
@@ -82,17 +81,17 @@ export function Navbar({ user }: { user: User | null }) {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <Link to="/profile">
+              <Link to="/app/profile">
                 <DropdownMenuItem className="hover:cursor-pointer">
                   Profile
                 </DropdownMenuItem>
               </Link>
-              <Link to="/feedback">
+              <Link to="/app/feedback">
                 <DropdownMenuItem className="hover:cursor-pointer">
                   Feedback
                 </DropdownMenuItem>
               </Link>
-              <Link to="/logout">
+              <Link to="/app/logout">
                 <DropdownMenuItem className="hover:cursor-pointer">
                   Logout
                 </DropdownMenuItem>
@@ -114,22 +113,22 @@ export const menuItems = [
   },
   {
     title: "Chat",
-    url: "/chat",
+    url: "/app/chat",
     icon: Bot,
   },
   {
     title: "Tasks",
-    url: "/tasks",
+    url: "/app/tasks",
     icon: ListTodo,
   },
   {
     title: "Notes",
-    url: "/notes",
+    url: "/app/notes",
     icon: NotebookPen,
   },
   {
     title: "Profile",
-    url: "/profile",
+    url: "/app/profile",
     icon: UserIcon,
   },
 ];

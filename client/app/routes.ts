@@ -31,7 +31,7 @@ export default [
       route("tasks/:id/comments", "routes/app/tasks/comments.tsx"),
       route(
         "tasks/:taskid/comments/:commentid/delete",
-        "routes/app/tasks/comments-delete.tsx",
+        "routes/app/tasks/comments-delete.tsx"
       ),
       route("notes", "routes/app/notes.tsx"),
       route("notes/:id", "routes/app/notes-single.tsx"),

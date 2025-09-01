@@ -12,14 +12,16 @@ import {
 export function BreadcrumbNav() {
   let location = useLocation();
 
-  const pathSegments = location.pathname.split("/").filter((segment) => segment !== "");
+  const pathSegments = location.pathname.split("/").filter((segment) => {
+    return segment !== "" && segment !== "app";
+  });
 
   return (
     <Breadcrumb className="hidden md:flex">
       <BreadcrumbList className="my-3 ml-3">
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link to="/">Home</Link>
+            <Link to="/app">Home</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
         {pathSegments.map((segment, index) => {
@@ -31,10 +33,14 @@ export function BreadcrumbNav() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage>{segment.charAt(0).toUpperCase() + segment.slice(1)}</BreadcrumbPage>
+                  <BreadcrumbPage>
+                    {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                  </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
-                    <Link to={path}>{segment.charAt(0).toUpperCase() + segment.slice(1)}</Link>
+                    <Link to={"/app" + path}>
+                      {segment.charAt(0).toUpperCase() + segment.slice(1)}
+                    </Link>
                   </BreadcrumbLink>
                 )}
               </BreadcrumbItem>

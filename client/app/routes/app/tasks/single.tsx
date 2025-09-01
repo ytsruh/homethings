@@ -12,7 +12,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { Button } from "~/components/ui/button";
 import { Link } from "react-router";
 import { ArrowLeft } from "lucide-react";
@@ -26,10 +32,16 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { Trash } from "lucide-react";
 
 export function meta({}: Route.MetaArgs) {
-  return [{ title: "Manage Task" }, { name: "description", content: "Update & manage a task" }];
+  return [
+    { title: "Manage Task" },
+    { name: "description", content: "Update & manage a task" },
+  ];
 }
 
-export async function clientAction({ request, params }: Route.ClientActionArgs) {
+export async function clientAction({
+  request,
+  params,
+}: Route.ClientActionArgs) {
   const { id } = params;
   if (!id) {
     return { success: false, error: "Task not found" };
@@ -96,7 +108,11 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
   }, [fetcher]);
 
   if (!task) {
-    return <div className="w-full flex items-center justify-center">Task not found</div>;
+    return (
+      <div className="w-full flex items-center justify-center">
+        Task not found
+      </div>
+    );
   }
 
   return (
@@ -104,7 +120,7 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
       <PageHeader title={task.title} subtitle="Manage this task" />
       <div className="flex items-center justify-between w-full pb-2">
         <Button variant="secondary" asChild>
-          <Link to="/tasks">
+          <Link to="/app/tasks">
             <ArrowLeft className="size-4" />
           </Link>
         </Button>
@@ -114,7 +130,10 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
       <div className="flex-1 w-full mx-auto overflow-auto scrollbar-hide h-[calc(100vh-3.5rem)] md:h-[calc(100vh-13rem)] pb-10">
-        <fetcher.Form method="post" className="flex flex-col w-full items-center gap-4 py-5">
+        <fetcher.Form
+          method="post"
+          className="flex flex-col w-full items-center gap-4 py-5"
+        >
           <div className="grid w-full items-center gap-1.5">
             <Label htmlFor="title">Title</Label>
             <Input name="title" defaultValue={task.title} />
@@ -145,14 +164,23 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
             </Select>
           </div>
           <div className="flex w-full items-center justify-end gap-1.5">
-            {fetcher.state === "submitting" ? <LoadingSpinner /> : <Button type="submit">Update</Button>}
+            {fetcher.state === "submitting" ? (
+              <LoadingSpinner />
+            ) : (
+              <Button type="submit">Update</Button>
+            )}
           </div>
         </fetcher.Form>
         <div className="flex flex-col gap-2">
-          <fetcher.Form method="POST" action={`/tasks/${task.id}/comments`}>
+          <fetcher.Form method="POST" action={`/app/tasks/${task.id}/comments`}>
             <div className="grid w-full items-center gap-1.5">
               <Label htmlFor="comment">Add a comment</Label>
-              <Textarea ref={commentRef} name="comment" placeholder="Comment..." className="w-full" />
+              <Textarea
+                ref={commentRef}
+                name="comment"
+                placeholder="Comment..."
+                className="w-full"
+              />
             </div>
             <div className="flex w-full items-center justify-end gap-1.5 py-2">
               <Button type="submit" variant="secondary">
@@ -163,7 +191,9 @@ export default function SingleTask({ loaderData }: Route.ComponentProps) {
           {task.comments.length > 0 &&
             task.expand?.comments
               .sort((a: any, b: any) => b.created.localeCompare(a.created))
-              .map((comment: any) => <CommentCard key={comment.id} comment={comment} />)}
+              .map((comment: any) => (
+                <CommentCard key={comment.id} comment={comment} />
+              ))}
         </div>
       </div>
     </>
@@ -182,7 +212,10 @@ function CommentCard({ comment }: { comment: any }) {
 
   return (
     <div className="flex flex-col w-full items-center justify-between gap-2 border rounded-md p-3 shadow-sm bg-zinc-100 dark:bg-zinc-800">
-      <div className="w-full prose dark:prose-invert" dangerouslySetInnerHTML={{ __html: comment.comment }} />
+      <div
+        className="w-full prose dark:prose-invert"
+        dangerouslySetInnerHTML={{ __html: comment.comment }}
+      />
       <div className="flex items-center justify-between w-full">
         <p className="text-muted-foreground italic">
           {new Date(comment.created).toLocaleString("en-Uk", {
@@ -202,10 +235,13 @@ function CommentCard({ comment }: { comment: any }) {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle className="text-theme pb-2">Warning: Delete comment</DialogTitle>
+              <DialogTitle className="text-destructive pb-2">
+                Warning: Delete comment
+              </DialogTitle>
             </DialogHeader>
             <DialogDescription>
-              Are you sure you want to delete this comment? This action cannot be undone.
+              Are you sure you want to delete this comment? This action cannot
+              be undone.
             </DialogDescription>
             <DialogFooter>
               <Button variant="secondary" onClick={() => setOpen(false)}>
@@ -214,11 +250,16 @@ function CommentCard({ comment }: { comment: any }) {
               <fetcher.Form
                 autoComplete="off"
                 method="post"
-                action={`/tasks/${comment.task}/comments/${comment.id}/delete`}>
+                action={`/app/tasks/${comment.task}/comments/${comment.id}/delete`}
+              >
                 {fetcher.state === "submitting" ? (
                   <LoadingSpinner />
                 ) : (
-                  <Button className="cursor-pointer" variant="destructive" type="submit">
+                  <Button
+                    className="cursor-pointer"
+                    variant="destructive"
+                    type="submit"
+                  >
                     Delete
                   </Button>
                 )}
@@ -248,21 +289,32 @@ function DeleteTask({ id }: { id: string }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-theme pb-2">Warning: Delete task</DialogTitle>
+          <DialogTitle className="text-destructive pb-2">
+            Warning: Delete task
+          </DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Are you sure you want to delete this task? This action cannot be undone.
+          Are you sure you want to delete this task? This action cannot be
+          undone.
         </DialogDescription>
         <DialogFooter>
           <div className="flex items-center justify-between gap-2">
             <Button variant="secondary" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <fetcher.Form autoComplete="off" method="post" action={`/tasks/${id}/delete`}>
+            <fetcher.Form
+              autoComplete="off"
+              method="post"
+              action={`/app/tasks/${id}/delete`}
+            >
               {fetcher.state === "submitting" ? (
                 <LoadingSpinner />
               ) : (
-                <Button className="cursor-pointer" variant="destructive" type="submit">
+                <Button
+                  className="cursor-pointer"
+                  variant="destructive"
+                  type="submit"
+                >
                   Delete
                 </Button>
               )}
@@ -293,13 +345,19 @@ function CompleteTask({ id }: { id: string }) {
         <DialogHeader>
           <DialogTitle className="pb-2">Complete task</DialogTitle>
         </DialogHeader>
-        <DialogDescription>Confirm that you want to complete this task.</DialogDescription>
+        <DialogDescription>
+          Confirm that you want to complete this task.
+        </DialogDescription>
         <DialogFooter>
           <div className="flex items-center justify-between gap-2">
             <Button variant="secondary" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <fetcher.Form autoComplete="off" method="post" action={`/tasks/${id}/complete`}>
+            <fetcher.Form
+              autoComplete="off"
+              method="post"
+              action={`/app/tasks/${id}/complete`}
+            >
               {fetcher.state === "submitting" ? (
                 <LoadingSpinner />
               ) : (

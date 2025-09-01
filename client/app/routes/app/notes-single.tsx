@@ -24,11 +24,17 @@ import { LuArrowLeft, LuTrash2 } from "react-icons/lu";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Notes | Homethings" },
-    { name: "description", content: "A personal space to jot down your thoughts" },
+    {
+      name: "description",
+      content: "A personal space to jot down your thoughts",
+    },
   ];
 }
 
-export async function clientAction({ request, params }: Route.ClientActionArgs) {
+export async function clientAction({
+  request,
+  params,
+}: Route.ClientActionArgs) {
   try {
     const formData = await request.formData();
     const title = formData.get("title");
@@ -77,27 +83,43 @@ export default function SingleNote({ loaderData }: Route.ComponentProps) {
   const fetcher = useFetcher();
   const note = loaderData;
   if (!note) {
-    return <div className="w-full flex items-center justify-center">Note not found</div>;
+    return (
+      <div className="w-full flex items-center justify-center">
+        Note not found
+      </div>
+    );
   }
   return (
     <div>
-      <PageHeader title="Notes" subtitle="A personal space to jot down your thoughts" />
+      <PageHeader
+        title="Notes"
+        subtitle="A personal space to jot down your thoughts"
+      />
       <div className="w-full flex items-center justify-between py-1">
         <Button asChild variant="secondary">
-          <Link to="/notes">
+          <Link to="/app/notes">
             <LuArrowLeft className="size-4" />
           </Link>
         </Button>
         <DeleteNote id={note.id} />
       </div>
       <div className="w-full flex items-center justify-center">
-        <fetcher.Form autoComplete="off" method="post" className="w-full md:w-2/3 lg:w-1/2">
+        <fetcher.Form
+          autoComplete="off"
+          method="post"
+          className="w-full md:w-2/3 lg:w-1/2"
+        >
           <div className="flex flex-col space-y-5 my-5">
             <div className="grid w-full gap-2">
               <Label htmlFor="title" className="text-right">
                 Title
               </Label>
-              <Input name="title" placeholder="Note title" defaultValue={note?.title} className="w-full" />
+              <Input
+                name="title"
+                placeholder="Note title"
+                defaultValue={note?.title}
+                className="w-full"
+              />
             </div>
             <div className="grid w-full gap-2">
               <Label htmlFor="body" className="text-right">
@@ -141,18 +163,29 @@ function DeleteNote({ id }: { id: string }) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-theme pb-2">Warning: Delete note</DialogTitle>
+          <DialogTitle className="text-destructive pb-2">
+            Warning: Delete note
+          </DialogTitle>
         </DialogHeader>
         <DialogDescription>
-          Are you sure you want to delete this note? This action cannot be undone.
+          Are you sure you want to delete this note? This action cannot be
+          undone.
         </DialogDescription>
         <DialogFooter>
           <div className="flex justify-between gap-2">
             <Button variant="secondary" onClick={() => setOpen(false)}>
               Cancel
             </Button>
-            <fetcher.Form autoComplete="off" method="post" action={`/notes/${id}/delete`}>
-              <Button className="cursor-pointer" variant="destructive" type="submit">
+            <fetcher.Form
+              autoComplete="off"
+              method="post"
+              action={`/app/notes/${id}/delete`}
+            >
+              <Button
+                className="cursor-pointer"
+                variant="destructive"
+                type="submit"
+              >
                 Delete
               </Button>
             </fetcher.Form>

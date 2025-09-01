@@ -2,7 +2,14 @@ import type { Route } from "./+types/notes";
 import { Link, redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +31,10 @@ import { pb } from "~/lib/utils";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Notes | Homethings" },
-    { name: "description", content: "A personal space to jot down your thoughts" },
+    {
+      name: "description",
+      content: "A personal space to jot down your thoughts",
+    },
   ];
 }
 
@@ -81,9 +91,16 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
   const [search, setSearch] = useState("");
   return (
     <>
-      <PageHeader title="Notes" subtitle="A personal space to jot down your thoughts" />
+      <PageHeader
+        title="Notes"
+        subtitle="A personal space to jot down your thoughts"
+      />
       <div className="flex items-center justify-between my-2 gap-x-2">
-        <Input placeholder="Search notes..." value={search} onChange={(e) => setSearch(e.target.value)} />
+        <Input
+          placeholder="Search notes..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
         <NewNote />
       </div>
       {notes.length === 0 ? (
@@ -94,7 +111,9 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
         <div className="overflow-y-auto overscroll-contain scrollbar-hide pb-5 md:pb-40 max-h-[calc(100vh-6rem)]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {notes
-              .filter((note) => note.title.toLowerCase().includes(search.toLowerCase()))
+              .filter((note) =>
+                note.title.toLowerCase().includes(search.toLowerCase())
+              )
               .map((note, i) => (
                 <NoteCard key={i} data={note} />
               ))}
@@ -129,7 +148,10 @@ function NewNote() {
       <DialogTrigger asChild>
         <Button>Create</Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]" aria-describedby="create-note">
+      <DialogContent
+        className="sm:max-w-[425px]"
+        aria-describedby="create-note"
+      >
         <fetcher.Form
           ref={formRef}
           autoComplete="off"
@@ -137,7 +159,8 @@ function NewNote() {
           onSubmit={(e) => {
             e.preventDefault();
             handleSubmit();
-          }}>
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Create new note</DialogTitle>
           </DialogHeader>
@@ -153,7 +176,11 @@ function NewNote() {
               <Label htmlFor="body" className="text-right">
                 Body
               </Label>
-              <Textarea name="body" placeholder="Note body" className="w-full" />
+              <Textarea
+                name="body"
+                placeholder="Note body"
+                className="w-full"
+              />
             </div>
           </div>
           <DialogFooter>
@@ -173,12 +200,14 @@ function NoteCard({ data }: { data: any }) {
       </CardHeader>
       <CardContent className="p-1 md:p-2">
         <CardDescription className="min-h-12 sm:min-h-24 lg:min-h-32 break-words">
-          {data.body?.length > 150 ? data.body?.substring(0, 150) + "..." : data.body}
+          {data.body?.length > 150
+            ? data.body?.substring(0, 150) + "..."
+            : data.body}
         </CardDescription>
       </CardContent>
       <CardFooter className="p-1 md:p-2">
         <Button asChild className="w-full">
-          <Link to={`/notes/${data.id}`}>View</Link>
+          <Link to={`/app/notes/${data.id}`}>View</Link>
         </Button>
       </CardFooter>
     </Card>
