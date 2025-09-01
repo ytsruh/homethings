@@ -8,10 +8,11 @@ tmp
 .pocketbase
 pb_data
 
-# Project build & test binary
+# Project build, scripts & test binary
 *.test
 main
 homethings
+scripts/data
 
 # React Router
 .react-router/
