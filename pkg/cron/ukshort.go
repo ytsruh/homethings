@@ -139,7 +139,11 @@ func handleCurrentData(app *pocketbase.PocketBase, file *excelize.File, sheet st
 	}
 
 	// Range of the current data & insert into DB
-	for _, row := range rows {
+	for i, row := range rows {
+		// Skip the header row
+		if i == 0 {
+			continue
+		}
 		netShortPosition, err := strconv.ParseFloat(row[3], 64)
 		if err != nil {
 			fmt.Println("----------")
