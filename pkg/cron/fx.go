@@ -93,7 +93,6 @@ func getFXData(app *pocketbase.PocketBase) {
 			record.Set("INR", response.Rates["INR"])
 			record.Set("AUD", response.Rates["AUD"])
 			record.Set("NZD", response.Rates["NZD"])
-			record.Set("created", time.Now())
 
 			err = app.Save(record)
 			if err != nil {
