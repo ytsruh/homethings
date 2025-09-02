@@ -193,7 +193,11 @@ func handleHistoricalData(app *pocketbase.PocketBase, file *excelize.File, sheet
 
 	// Range over rows to find records for the last business day
 	var inserterr error
-	for _, row := range historicalRows {
+	for i, row := range historicalRows {
+		// Skip the header row
+		if i == 0 {
+			continue
+		}
 		// Check if date is last business day - Excel changes the format of the date to dd/mm/yyyy
 		if row[4] == lastBusinessDay {
 			netShortPosition, err := strconv.ParseFloat(row[3], 64)
