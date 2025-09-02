@@ -9,9 +9,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase"
+	"github.com/pocketbase/pocketbase/core"
 )
 
 type ExchangeRateResponse struct {
@@ -37,7 +36,6 @@ func getFXData(app *pocketbase.PocketBase) {
 	// Set error currencies
 	var errorCurrencies []string
 	var mu sync.Mutex
-	var dbMu sync.Mutex // Mutex to serialize DB writes
 	var wg sync.WaitGroup
 
 	// Get currencies from the exchange rate API concurrently
@@ -76,24 +74,28 @@ func getFXData(app *pocketbase.PocketBase) {
 				return
 			}
 
-			// Serialize the DB write with a mutex
-			dbMu.Lock()
-			_, err = app.DB().Insert("fx_rates", dbx.Params{
-				"id":            uuid.New().String(),
-				"base_currency": currency,
-				"date":          time.Now(),
-				"usd":           response.Rates["USD"],
-				"eur":           response.Rates["EUR"],
-				"jpy":           response.Rates["JPY"],
-				"gbp":           response.Rates["GBP"],
-				"cad":           response.Rates["CAD"],
-				"chf":           response.Rates["CHF"],
-				"cny":           response.Rates["CNY"],
-				"inr":           response.Rates["INR"],
-				"aud":           response.Rates["AUD"],
-				"nzd":           response.Rates["NZD"],
-			}).Execute()
-			dbMu.Unlock()
+			// Create a new VIX data entry
+			collection, err := app.FindCollectionByNameOrId("fx_rates")
+			if err != nil {
+				fmt.Println("error getting the fx_rates collection")
+				return
+			}
+			record := core.NewRecord(collection)
+			record.Set("base_currency", currency)
+			record.Set("date", time.Now())
+			record.Set("USD", response.Rates["USD"])
+			record.Set("EUR", response.Rates["EUR"])
+			record.Set("JPY", response.Rates["JPY"])
+			record.Set("GBP", response.Rates["GBP"])
+			record.Set("CAD", response.Rates["CAD"])
+			record.Set("CHF", response.Rates["CHF"])
+			record.Set("CNY", response.Rates["CNY"])
+			record.Set("INR", response.Rates["INR"])
+			record.Set("AUD", response.Rates["AUD"])
+			record.Set("NZD", response.Rates["NZD"])
+			record.Set("created", time.Now())
+
+			err = app.Save(record)
 			if err != nil {
 				fmt.Println("error creating FX entry for", currency)
 				mu.Lock()
