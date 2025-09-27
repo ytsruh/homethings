@@ -6,10 +6,19 @@ import {
   Menu,
   User as UserIcon,
   X,
-  ListTodo,
 } from "lucide-react";
-import { Link, useLocation } from "react-router";
 import { useEffect, useRef } from "react";
+import { Link } from "react-router";
+import { ModeToggle } from "~/components/theme-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -22,26 +31,11 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "~/components/ui/sidebar";
-import { ModeToggle } from "~/components/theme-toggle";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import { type User } from "~/lib/schema";
-
-function getFirstPathSegment(path: string): string {
-  // Remove leading slash, split by '/', and return the first segment
-  return path.replace(/^\/+/, "").split("/")[0];
-}
+import type { User } from "~/lib/schema";
 
 export function Navbar({ user }: { user: User | null }) {
   const { toggleSidebar } = useSidebar();
-  let location = useLocation();
+
   return (
     <>
       <AppSidebar user={user} />
@@ -58,7 +52,7 @@ export function Navbar({ user }: { user: User | null }) {
           <p>Homethings</p>
         </Link>
         <div className="text-theme capitalize justify-center items-center gap-2 flex lg:hidden mx-1">
-          {getFirstPathSegment(location.pathname) || "Home"}
+          Homethings
         </div>
         <div className="ml-auto flex items-center space-x-4">
           <ModeToggle />
@@ -117,11 +111,6 @@ export const menuItems = [
     icon: Bot,
   },
   {
-    title: "Tasks",
-    url: "/app/tasks",
-    icon: ListTodo,
-  },
-  {
     title: "Notes",
     url: "/app/notes",
     icon: NotebookPen,
@@ -178,8 +167,7 @@ function AppSidebar({ user }: { user: User | null }) {
                 {menuItems.map((item) => {
                   if (
                     (item.title === "Notes" && !user?.showNotes) ||
-                    (item.title === "Chat" && !user?.showChat) ||
-                    (item.title === "Tasks" && !user?.showTasks)
+                    (item.title === "Chat" && !user?.showChat)
                   ) {
                     return null;
                   }

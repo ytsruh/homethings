@@ -23,7 +23,7 @@ import { LoadingSpinner } from "~/components/LoadingSpinner";
 export default function AppLayout() {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(
-    pb.authStore.record as User | null
+    pb.authStore.record as User | null,
   );
 
   const navigation = useNavigation();
@@ -194,8 +194,7 @@ export default function AppLayout() {
                           {menuItems.map((item) => {
                             if (
                               (item.title === "Notes" && !user?.showNotes) ||
-                              (item.title === "Chat" && !user?.showChat) ||
-                              (item.title === "Tasks" && !user?.showTasks)
+                              (item.title === "Chat" && !user?.showChat)
                             ) {
                               return null;
                             }
