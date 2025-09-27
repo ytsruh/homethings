@@ -112,7 +112,7 @@ export default function Notes({ loaderData }: Route.ComponentProps) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-5">
             {notes
               .filter((note) =>
-                note.title.toLowerCase().includes(search.toLowerCase())
+                note.title.toLowerCase().includes(search.toLowerCase()),
               )
               .map((note, i) => (
                 <NoteCard key={i} data={note} />
@@ -148,10 +148,7 @@ function NewNote() {
       <DialogTrigger asChild>
         <Button>Create</Button>
       </DialogTrigger>
-      <DialogContent
-        className="sm:max-w-[425px]"
-        aria-describedby="create-note"
-      >
+      <DialogContent aria-describedby="create-note">
         <fetcher.Form
           ref={formRef}
           autoComplete="off"
@@ -179,7 +176,8 @@ function NewNote() {
               <Textarea
                 name="body"
                 placeholder="Note body"
-                className="w-full"
+                className="w-full overflow-y-auto"
+                rows={10}
               />
             </div>
           </div>

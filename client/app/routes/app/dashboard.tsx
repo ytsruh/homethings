@@ -4,7 +4,7 @@ import { pb } from "~/lib/utils";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
+    { title: "Homethings" },
     { name: "description", content: "Welcome to Homethings" },
   ];
 }
