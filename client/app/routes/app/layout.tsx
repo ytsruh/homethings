@@ -173,7 +173,7 @@ export default function AppLayout() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="ui-theme">
       <SidebarProvider defaultOpen={false}>
-        <main className="h-screen w-screen overflow-hidden flex flex-col">
+        <main className="min-h-screen min-w-screen flex flex-col">
           <Navbar user={user as User | null} />
           <div className="px-1 sm:px-5 flex flex-col h-full">
             <BreadcrumbNav />

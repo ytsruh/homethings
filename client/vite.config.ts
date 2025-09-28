@@ -13,4 +13,7 @@ export default defineConfig({
             "react-dom/server": "react-dom/server.node",
           },
         },
+  esbuild: {
+    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+  },
 });

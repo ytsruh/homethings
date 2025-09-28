@@ -1633,18 +1633,31 @@ func init() {
 						"type": "text"
 					},
 					{
-						"autogeneratePattern": "",
 						"hidden": false,
-						"id": "text2192106337",
-						"max": 0,
-						"min": 0,
-						"name": "file_path",
-						"pattern": "",
+						"id": "file2359244304",
+						"maxSelect": 1,
+						"maxSize": 0,
+						"mimeTypes": [],
+						"name": "file",
 						"presentable": false,
-						"primaryKey": false,
+						"protected": false,
+						"required": true,
+						"system": false,
+						"thumbs": [],
+						"type": "file"
+					},
+					{
+						"cascadeDelete": false,
+						"collectionId": "_pb_users_auth_",
+						"hidden": false,
+						"id": "relation1542800728",
+						"maxSelect": 1,
+						"minSelect": 0,
+						"name": "field",
+						"presentable": false,
 						"required": false,
 						"system": false,
-						"type": "text"
+						"type": "relation"
 					},
 					{
 						"hidden": false,

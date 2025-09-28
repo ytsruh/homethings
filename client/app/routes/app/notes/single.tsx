@@ -1,4 +1,4 @@
-import type { Route } from "./+types/notes-single";
+import type { Route } from "./+types/single";
 import { Link, redirect, useFetcher } from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { Button } from "~/components/ui/button";
@@ -15,6 +15,7 @@ import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { useEffect, useState } from "react";
 import { Textarea } from "~/components/ui/textarea";
+import { NewFile } from "~/components/notes/NewFile";
 import { createNoteForm } from "~/lib/schema";
 import { ZodError } from "zod";
 import { toast } from "~/components/Toaster";
@@ -71,7 +72,10 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
       pb.authStore.clear();
       return redirect("/login");
     }
-    const note = await pb.collection("notes").getOne(params.id as string);
+    const note = await pb
+      .collection("notes")
+      .getOne(params.id as string, { expand: "files" });
+    console.log(note);
     return note;
   } catch (error) {
     console.error(error);
@@ -95,7 +99,7 @@ export default function SingleNote({ loaderData }: Route.ComponentProps) {
         title="Notes"
         subtitle="A personal space to jot down your thoughts"
       />
-      <div className="w-full flex items-center justify-between py-1">
+      <div className="w-full flex items-center justify-between pt-1 pb-5">
         <Button asChild variant="secondary">
           <Link to="/app/notes">
             <LuArrowLeft className="size-4" />
@@ -103,42 +107,62 @@ export default function SingleNote({ loaderData }: Route.ComponentProps) {
         </Button>
         <DeleteNote id={note.id} />
       </div>
-      <div className="w-full flex items-center justify-center">
-        <fetcher.Form
-          autoComplete="off"
-          method="post"
-          className="w-full md:w-2/3 lg:w-1/2"
-        >
-          <div className="flex flex-col space-y-5 my-5">
-            <div className="grid w-full gap-2">
-              <Label htmlFor="title" className="text-right">
-                Title
-              </Label>
-              <Input
-                name="title"
-                placeholder="Note title"
-                defaultValue={note?.title}
-                className="w-full"
-              />
+      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <h2 className="text-xl font-semibold mb-5">Overview</h2>
+          <fetcher.Form autoComplete="off" method="post" className="w-full">
+            <div className="flex flex-col space-y-5 my-5">
+              <div className="grid w-full gap-2">
+                <Label htmlFor="title" className="text-right">
+                  Title
+                </Label>
+                <Input
+                  name="title"
+                  placeholder="Note title"
+                  defaultValue={note?.title}
+                  className="w-full"
+                />
+              </div>
+              <div className="grid w-full gap-2">
+                <Label htmlFor="body" className="text-right">
+                  Body
+                </Label>
+                <Textarea
+                  name="body"
+                  placeholder="Note body"
+                  defaultValue={note?.body}
+                  className="w-full min-h-[calc(100vh-18rem)] md:min-h-96"
+                />
+              </div>
             </div>
-            <div className="grid w-full gap-2">
-              <Label htmlFor="body" className="text-right">
-                Body
-              </Label>
-              <Textarea
-                name="body"
-                placeholder="Note body"
-                defaultValue={note?.body}
-                className="w-full min-h-[calc(100vh-18rem)] md:min-h-96"
-              />
-            </div>
+            <DialogFooter>
+              <Button className="cursor-pointer" type="submit">
+                Update
+              </Button>
+            </DialogFooter>
+          </fetcher.Form>
+        </div>
+        <div>
+          <div className="flex justify-between items-center w-full mb-5">
+            <h2 className="text-xl">Files</h2>
+            <NewFile noteId={note?.id} />
           </div>
-          <DialogFooter>
-            <Button className="cursor-pointer" type="submit">
-              Update
-            </Button>
-          </DialogFooter>
-        </fetcher.Form>
+          {note?.files.length > 0 && (
+            <div className="flex flex-col gap-2">
+              {note?.expand?.files.map((file) => (
+                <div key={file.id}>File name:{file.name}</div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      <div>
+        <div className="flex justify-between items-center w-full mb-5">
+          <h2 className="text-xl">Comments</h2>
+          <Button className="cursor-pointer" type="submit">
+            Add
+          </Button>
+        </div>
       </div>
     </div>
   );
