@@ -7,4 +7,4 @@ preview_urls = false
 
 [assets]
 not_found_handling = "single-page-application"
-directory = "./build/client"
+pages_build_output_dir = "./build/client"
