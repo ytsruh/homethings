@@ -302,12 +302,12 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 - [x] Create auth middleware with specific error messages using macro pattern
 
 ### Phase 4: Storage Layer
-- [ ] Implement R2 storage service with Bun's native S3 support
-- [ ] Implement presigned URL generation function
-- [ ] Add file type validation (images, PDF, Excel, PPT, Docs)
-- [ ] Add file size validation (max 10MB)
-- [ ] Implement upload function
-- [ ] Implement delete function (single + batch)
+- [x] Implement R2 storage service with Bun's native S3 support
+- [x] Implement presigned URL generation function
+- [x] Add file type validation (images, PDF, Excel, PPT, Docs)
+- [x] Add file size validation (max 10MB)
+- [x] Implement upload function
+- [x] Implement delete function (single + batch)
 
 ### Phase 5: Main App
 - [ ] Configure CORS for client
