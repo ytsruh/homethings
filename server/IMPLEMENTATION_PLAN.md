@@ -6,7 +6,7 @@
 |-----------|------------|---------|
 | **API Framework** | ElysiaJS | Fast, type-safe routes |
 | **Validation** | Zod | Schema validation with Elysia integration |
-| **API Docs** | Scalar UI (dev only) | Modern, beautiful API documentation at `/docs` |
+| **API Docs** | Scalar UI | Modern, beautiful API documentation at `/docs` |
 | **Database** | SQLite (local/Turso) | Primary data store for notes, comments, feedback |
 | **ORM** | Drizzle | Type-safe database queries with migrations |
 | **File Storage** | Cloudflare R2 | S3-compatible object storage via Bun's native S3 support |
@@ -188,9 +188,9 @@ server/
 ### Chat
 - `POST /api/chat` - Stream AI responses
 
-### Documentation (Dev Only, Auth Required)
-- `GET /docs` - Scalar UI (returns 404 in production)
-- `GET /json` - OpenAPI specification (public for client SDKs)
+### Documentation
+- `GET /docs` - Scalar UI (public)
+- `GET /json` - OpenAPI specification (public)
 
 ---
 
@@ -225,7 +225,7 @@ XAI_API_KEY=xai-...
 
 # Server
 PORT=3000
-NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
+NODE_ENV=development  # Optional: Set to 'production' for production environment
 ```
 
 ---
@@ -246,11 +246,6 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 - **Server-side Upload**: Direct to R2 (no presigned URL needed for upload)
 - **Download**: Presigned URLs (1-hour expiration)
 - **No Public URLs**: Store only `fileKey` in database (not public URL)
-
-### Documentation Access
-- **Development**: `/docs` available, requires valid session
-- **Production**: `/docs` returns 404 immediately (no auth check)
-- **Theme**: Scalar UI 'kepler' theme (default)
 
 ### Authentication Error Handling
 - **Specific Error Messages**:
@@ -273,8 +268,6 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 | **Presigned URLs** | 1-hour expiration, Content-Type restriction | Prevents URL abuse |
 | **No public URLs** | Store only fileKey in DB | Compromised DB doesn't expose files |
 | **Ownership verification** | Check note before allowing attachment deletion | Prevents unauthorized deletions |
-| **Dev-only docs** | Returns 404 in production | Hides API structure from public |
-| **Auth required for docs** | Verify session even in dev | Prevents accidental exposure |
 | **Specific error messages** | Session expired, invalid token, missing token | Better UX, easier debugging |
 | **CORS configuration** | Specific origin + credentials | Prevents CSRF attacks |
 
@@ -310,13 +303,10 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 - [x] Implement delete function (single + batch)
 
 ### Phase 5: Main App
-- [ ] Configure CORS for client
-- [ ] Set up OpenAPI generation with Zod schemas
-- [ ] Implement `/docs` route with dev-only + auth-required logic
-- [ ] Return 404 for `/docs` in production
-- [ ] Mount BetterAuth handler
-- [ ] Apply auth middleware to protected routes
-- [ ] Add error handling middleware
+- [x] Configure CORS for client
+- [x] Set up OpenAPI generation
+- [x] Mount BetterAuth handler
+- [x] Add error handling middleware
 
 ### Phase 6: Notes API
 - [ ] Implement GET `/api/notes` (list with presigned URLs)
@@ -327,6 +317,7 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 - [ ] Implement PATCH `/api/notes/:id/complete` (toggle completion)
 - [ ] Add Zod validation schemas to all endpoints
 - [ ] Add OpenAPI documentation to all endpoints
+- [ ] Apply auth middleware to protected routes
 
 ### Phase 7: Attachments API
 - [ ] Implement DELETE `/api/notes/:noteId/attachments/:attachmentId`
@@ -361,12 +352,11 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 - [ ] Create comprehensive `.env.example`
 - [ ] Add package.json scripts (dev, start, db:generate, db:migrate)
 - [ ] Configure Railway deployment settings
-- [ ] Test all endpoints locally
-- [ ] Verify presigned URL generation
-- [ ] Test file upload/download flow
-- [ ] Verify `/docs` returns 404 in production
-- [ ] Test auth error messages
-- [ ] Verify attachment deletion doesn't update note
+  - [ ] Test all endpoints locally
+  - [ ] Verify presigned URL generation
+  - [ ] Test file upload/download flow
+  - [ ] Test auth error messages
+  - [ ] Verify attachment deletion doesn't update note
 
 ---
 
@@ -435,10 +425,8 @@ CMD ["bun", "run", "start"]
 - Theme: 'kepler' (default modern theme)
 
 ### Production Deployment (Railway)
-- Set `NODE_ENV=production` to hide `/docs` endpoint
 - Configure CORS origin to Railway domain
 - Use Railway's PORT environment variable
-- No need for `/docs` in production (auto 404)
 
 ---
 
@@ -486,16 +474,10 @@ CMD ["bun", "run", "start"]
    - [ ] Upload PDF file
    - [ ] Upload Excel file
    - [ ] Upload PowerPoint file
-   - [ ] Test invalid file type rejection
-   - [ ] Test file size limit (>10MB rejection)
+- [ ] Test invalid file type rejection
+  - [ ] Test file size limit (>10MB rejection)
 
-8. **Documentation**
-   - [ ] Access `/docs` in dev with valid session
-   - [ ] Try accessing `/docs` without auth (should get 401)
-   - [ ] Verify `/docs` returns 404 in production
-   - [ ] Verify OpenAPI spec at `/json` is accessible
-
-9. **Error Handling**
+8. **Error Handling**
    - [ ] Test validation errors
    - [ ] Test not found errors
    - [ ] Test unauthorized access
@@ -513,8 +495,6 @@ CMD ["bun", "run", "start"]
 - ✅ Comments work on notes
 - ✅ Feedback submission works
 - ✅ AI chat streaming works (all 4 providers)
-- ✅ Scalar UI is accessible in dev (auth required)
-- ✅ `/docs` returns 404 in production
 - ✅ CORS is configured correctly
 - ✅ All endpoints have OpenAPI documentation
 - ✅ Attachment deletion doesn't update note `updatedAt`
