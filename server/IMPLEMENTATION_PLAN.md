@@ -4,8 +4,8 @@
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **API Framework** | ElysiaJS | Fast, type-safe routes with built-in validation |
-| **Validation** | Elysia's `t` schemas | Automatic validation + OpenAPI documentation |
+| **API Framework** | ElysiaJS | Fast, type-safe routes |
+| **Validation** | Zod | Schema validation with Elysia integration |
 | **API Docs** | Scalar UI (dev only) | Modern, beautiful API documentation at `/docs` |
 | **Database** | Turso (SQLite) | Primary data store for notes, comments, feedback |
 | **ORM** | Drizzle | Type-safe database queries with migrations |
@@ -299,10 +299,8 @@ bun add -d @types/bun drizzle-kit
 - [x] Create directory structure
 
 ### Phase 2: Database Setup
-- [ ] Configure Drizzle with Turso
-- [ ] Define database schema (notes, note_attachments, notes_comments, feedback, users)
-- [ ] Generate migrations: `bunx drizzle-kit generate`
-- [ ] Run migrations: `bunx drizzle-kit migrate`
+- [x] Configure Drizzle with Turso
+- [x] Define database schema (notes, note_attachments, notes_comments, feedback, users)
 
 ### Phase 3: Authentication
 - [ ] Configure BetterAuth with Drizzle adapter
@@ -321,7 +319,7 @@ bun add -d @types/bun drizzle-kit
 
 ### Phase 5: Main App
 - [ ] Configure CORS for client
-- [ ] Set up OpenAPI generation with Elysia schemas
+- [ ] Set up OpenAPI generation with Zod schemas
 - [ ] Implement `/docs` route with dev-only + auth-required logic
 - [ ] Return 404 for `/docs` in production
 - [ ] Mount BetterAuth handler
@@ -335,7 +333,7 @@ bun add -d @types/bun drizzle-kit
 - [ ] Implement PATCH `/api/notes/:id` (update with uploads)
 - [ ] Implement DELETE `/api/notes/:id` (delete with R2 cleanup)
 - [ ] Implement PATCH `/api/notes/:id/complete` (toggle completion)
-- [ ] Add Elysia validation schemas to all endpoints
+- [ ] Add Zod validation schemas to all endpoints
 - [ ] Add OpenAPI documentation to all endpoints
 
 ### Phase 7: Attachments API
@@ -349,12 +347,12 @@ bun add -d @types/bun drizzle-kit
 ### Phase 8: Comments API
 - [ ] Implement POST `/api/notes/:noteId/comments` (create comment)
 - [ ] Implement DELETE `/api/notes/:noteId/comments/:commentId` (delete comment)
-- [ ] Add Elysia validation schemas
+- [ ] Add Zod validation schemas
 - [ ] Add OpenAPI documentation
 
 ### Phase 9: Feedback API
 - [ ] Implement POST `/api/feedback` (submit feedback)
-- [ ] Add Elysia validation schema
+- [ ] Add Zod validation schema
 - [ ] Add OpenAPI documentation
 
 ### Phase 10: Chat API
