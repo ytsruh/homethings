@@ -7,7 +7,7 @@
 | **API Framework** | ElysiaJS | Fast, type-safe routes |
 | **Validation** | Zod | Schema validation with Elysia integration |
 | **API Docs** | Scalar UI (dev only) | Modern, beautiful API documentation at `/docs` |
-| **Database** | Turso (SQLite) | Primary data store for notes, comments, feedback |
+| **Database** | SQLite (local/Turso) | Primary data store for notes, comments, feedback |
 | **ORM** | Drizzle | Type-safe database queries with migrations |
 | **File Storage** | Cloudflare R2 | S3-compatible object storage via Bun's native S3 support |
 | **Authentication** | BetterAuth | Email/password with session management |
@@ -40,7 +40,7 @@ server/
 │   │   ├── error.ts               # Global error handler
 │   │   └── auth.ts                # Auth middleware with specific error messages
 │   └── types.ts                 # Shared TypeScript types
-├── drizzle.config.ts              # Drizzle kit configuration
+├── drizzle.config.ts              # Drizzle kit configuration + local SQLite URL
 ├── package.json
 ├── tsconfig.json
 ├── Dockerfile                     # Railway deployment
@@ -197,13 +197,15 @@ server/
 ## Environment Variables
 
 ```env
-# Database (Turso)
-TURSO_DATABASE_URL=libsql://your-database.turso.io
-TURSO_AUTH_TOKEN=your-turso-auth-token
+# Database
+TURSO_DATABASE_URL=file:local.db  # For local SQLite
+# TURSO_DATABASE_URL=libsql://your-database.turso.io  # For Turso production
+TURSO_AUTH_TOKEN=your-turso-auth-token  # Only needed for Turso
 
 # BetterAuth
 BETTER_AUTH_SECRET=your-random-secret-key-min-32-chars
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=https://your-domain.com
+COOKIE_DOMAIN=.your-domain.com  # For cross-domain cookies
 
 # Cloudflare R2 Storage
 CF_ACCOUNT_ID=your-cloudflare-account-id
@@ -276,19 +278,6 @@ NODE_ENV=development  # CRITICAL: Set to 'production' to hide /docs endpoint
 | **Specific error messages** | Session expired, invalid token, missing token | Better UX, easier debugging |
 | **CORS configuration** | Specific origin + credentials | Prevents CSRF attacks |
 
----
-
-## Dependencies
-
-```bash
-# Core dependencies
-bun add elysia @elysiajs/cors @elysiajs/openapi better-auth drizzle-orm @libsql/client zod
-
-# Type definitions
-bun add -d @types/bun drizzle-kit
-```
-
----
 
 ## Implementation Checklist
 
@@ -299,15 +288,18 @@ bun add -d @types/bun drizzle-kit
 - [x] Create directory structure
 
 ### Phase 2: Database Setup
-- [x] Configure Drizzle with Turso
+- [x] Configure Drizzle with local SQLite + Turso support
 - [x] Define database schema (notes, note_attachments, notes_comments, feedback, users)
+- [x] Generate migrations
+- [x] Run migrations to local SQLite database
 
 ### Phase 3: Authentication
-- [ ] Configure BetterAuth with Drizzle adapter
-- [ ] Add custom user fields (avatar, showChat, showNotes, showTasks)
-- [ ] Set up email/password authentication
-- [ ] Configure base URL and secret
-- [ ] Create auth middleware with specific error messages
+- [x] Configure BetterAuth with Drizzle adapter
+- [x] Add custom user fields (avatar, showChat, showNotes, showTasks) in schema
+- [x] Set up email/password authentication (no social providers)
+- [x] Configure base URL and secret
+- [x] Configure cross-domain cookies for subdomain access
+- [x] Create auth middleware with specific error messages using macro pattern
 
 ### Phase 4: Storage Layer
 - [ ] Implement R2 storage service with Bun's native S3 support
@@ -459,6 +451,7 @@ CMD ["bun", "run", "start"]
    - [ ] Sign out
    - [ ] Test expired token error message
    - [ ] Test invalid token error message
+   - [ ] Test cross-domain cookie behavior
 
 2. **Notes CRUD**
    - [ ] Create note without attachments
