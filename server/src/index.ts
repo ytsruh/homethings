@@ -2,11 +2,12 @@ import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { auth } from "./auth/config";
+import { betterAuth } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
+import { routes } from "./routes";
 
 const app = new Elysia()
 	.use(errorHandler)
-	.mount(auth.handler)
 	.use(
 		cors({
 			origin: process.env.CLIENT_URL || "http://localhost:3000",
@@ -15,6 +16,7 @@ const app = new Elysia()
 			allowedHeaders: ["Content-Type", "Authorization"],
 		}),
 	)
+	.mount(auth.handler)
 	.use(
 		openapi({
 			path: "/docs",
@@ -25,9 +27,11 @@ const app = new Elysia()
 		}),
 	)
 	.group("/api", (route) =>
-		route.get("/", () => ({ message: "Homethings API" }), {
-			detail: { tags: ["Health"] },
-		}),
+		route
+			.get("/", () => ({ message: "Homethings API" }), {
+				detail: { tags: ["Health"] },
+			})
+			.use(routes.notes),
 	)
 	.listen(process.env.PORT || 3000);
 

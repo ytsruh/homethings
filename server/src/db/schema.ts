@@ -114,8 +114,13 @@ export const notes = sqliteTable("notes", {
 	createdBy: text("created_by")
 		.notNull()
 		.references(() => users.id, { onDelete: "cascade" }),
-	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+	createdAt: integer("created_at", { mode: "timestamp" })
+		.notNull()
+		.$defaultFn(() => new Date()),
+	updatedAt: integer("updated_at", { mode: "timestamp" })
+		.notNull()
+		.$defaultFn(() => new Date())
+		.$onUpdate(() => new Date()),
 });
 
 export const noteAttachments = sqliteTable("note_attachments", {
@@ -129,6 +134,21 @@ export const noteAttachments = sqliteTable("note_attachments", {
 	fileSize: integer("file_size").notNull(),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+export const notesRelations = relations(notes, ({ one, many }) => ({
+	creator: one(users, {
+		fields: [notes.createdBy],
+		references: [users.id],
+	}),
+	attachments: many(noteAttachments),
+}));
+
+export const noteAttachmentsRelations = relations(noteAttachments, ({ one }) => ({
+	note: one(notes, {
+		fields: [noteAttachments.noteId],
+		references: [notes.id],
+	}),
+}));
 
 export const notesComments = sqliteTable("notes_comments", {
 	id: text("id").primaryKey(),

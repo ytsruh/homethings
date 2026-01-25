@@ -309,15 +309,15 @@ NODE_ENV=development  # Optional: Set to 'production' for production environment
 - [x] Add error handling middleware
 
 ### Phase 6: Notes API
-- [ ] Implement GET `/api/notes` (list with presigned URLs)
-- [ ] Implement GET `/api/notes/:id` (single with presigned URLs)
-- [ ] Implement POST `/api/notes` (create with multiple file uploads)
-- [ ] Implement PATCH `/api/notes/:id` (update with uploads)
-- [ ] Implement DELETE `/api/notes/:id` (delete with R2 cleanup)
-- [ ] Implement PATCH `/api/notes/:id/complete` (toggle completion)
-- [ ] Add Zod validation schemas to all endpoints
-- [ ] Add OpenAPI documentation to all endpoints
-- [ ] Apply auth middleware to protected routes
+- [x] Implement GET `/api/notes` (list with presigned URLs)
+- [x] Implement GET `/api/notes/:id` (single with presigned URLs)
+- [x] Implement POST `/api/notes` (create with multiple file uploads)
+- [x] Implement PATCH `/api/notes/:id` (update with uploads)
+- [x] Implement DELETE `/api/notes/:id` (delete with R2 cleanup)
+- [x] Implement PATCH `/api/notes/:id/complete` (toggle completion)
+- [x] Add Zod validation schemas to all endpoints
+- [x] Add OpenAPI documentation to all endpoints
+- [x] Apply auth middleware to protected routes
 
 ### Phase 7: Attachments API
 - [ ] Implement DELETE `/api/notes/:noteId/attachments/:attachmentId`
@@ -411,6 +411,30 @@ CMD ["bun", "run", "start"]
 - Default expiration: 1 hour (3600 seconds)
 - Restricts Content-Type to match uploaded file type
 - No need for AWS SDK (built with Node.js crypto)
+
+### Environment Variable Validation
+**WARNING:** Do NOT add startup validation in `index.ts` that throws errors for missing env vars.
+
+Proper approach for future implementations:
+- Only validate truly critical vars (e.g., `BETTER_AUTH_SECRET`) - log warnings for optional ones
+- Allow graceful degradation for non-critical features (e.g., R2 uploads)
+- Use environment-specific defaults where possible
+- Document required vs optional env vars in `.env.example`
+
+Example pattern to follow:
+```typescript
+// Critical: fail with clear error
+if (!process.env.BETTER_AUTH_SECRET) {
+  console.error('CRITICAL: BETTER_AUTH_SECRET is required');
+  process.exit(1);
+}
+
+// Optional: log warning and handle gracefully
+if (!process.env.R2_BUCKET_NAME) {
+  console.warn('WARNING: R2_BUCKET_NAME not set, file uploads disabled');
+  // Set flag to disable upload features
+}
+```
 
 ### Bun's Native S3 Support
 - No heavy AWS SDK dependency
