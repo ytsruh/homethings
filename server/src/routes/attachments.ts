@@ -27,11 +27,9 @@ const attachmentsRoutes = new Elysia({
 				throw new Error("Note not found");
 			}
 
-const formData = await request.formData();
-		const files = formData.getAll("files");
-				const validFiles = files.filter((file) =>
-					file instanceof File,
-				) as File[];
+			const formData = await request.formData();
+			const files = formData.getAll("files");
+			const validFiles = files.filter((file) => file instanceof File) as File[];
 
 			if (validFiles.length === 0) {
 				throw new Error("At least one file is required");

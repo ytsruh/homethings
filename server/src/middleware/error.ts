@@ -1,5 +1,5 @@
+import { writeFileSync } from "node:fs";
 import { Elysia } from "elysia";
-import { writeFileSync } from "fs";
 
 export const errorHandler = new Elysia({ name: "error.handler" }).onError(
 	({ code, error, set }) => {

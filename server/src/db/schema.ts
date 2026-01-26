@@ -135,21 +135,6 @@ export const noteAttachments = sqliteTable("note_attachments", {
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
-export const notesRelations = relations(notes, ({ one, many }) => ({
-	creator: one(users, {
-		fields: [notes.createdBy],
-		references: [users.id],
-	}),
-	attachments: many(noteAttachments),
-}));
-
-export const noteAttachmentsRelations = relations(noteAttachments, ({ one }) => ({
-	note: one(notes, {
-		fields: [noteAttachments.noteId],
-		references: [notes.id],
-	}),
-}));
-
 export const notesComments = sqliteTable("notes_comments", {
 	id: text("id").primaryKey(),
 	comment: text("comment").notNull(),
@@ -158,6 +143,32 @@ export const notesComments = sqliteTable("notes_comments", {
 		.references(() => notes.id, { onDelete: "cascade" }),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+export const notesRelations = relations(notes, ({ one, many }) => ({
+	creator: one(users, {
+		fields: [notes.createdBy],
+		references: [users.id],
+	}),
+	attachments: many(noteAttachments),
+	comments: many(notesComments),
+}));
+
+export const noteAttachmentsRelations = relations(
+	noteAttachments,
+	({ one }) => ({
+		note: one(notes, {
+			fields: [noteAttachments.noteId],
+			references: [notes.id],
+		}),
+	}),
+);
+
+export const notesCommentsRelations = relations(notesComments, ({ one }) => ({
+	note: one(notes, {
+		fields: [notesComments.noteId],
+		references: [notes.id],
+	}),
+}));
 
 export const feedback = sqliteTable("feedback", {
 	id: text("id").primaryKey(),

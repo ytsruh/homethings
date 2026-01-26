@@ -1,37 +1,37 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.12/schema.json",
-  "vcs": {
-    "enabled": false,
-    "clientKind": "git"
-  },
-  "files": {
-    "ignoreUnknown": false,
-    "includes": ["src/**"],
-    "experimentalScannerIgnores": ["drizzle/**"]
-  },
-  "formatter": {
-    "enabled": true,
-    "indentStyle": "tab"
-  },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "suspicious": { "noUnknownAtRules": "off" },
-      "style": {
-        "useConst": "error",
-        "noParameterAssign": "warn"
-      },
-      "correctness": {
-        "noUnusedVariables": "error"
-      },
-      "performance": {
-        "noDelete": "warn"
-      }
-    }
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "double"
-    }
-  }
+	"$schema": "https://biomejs.dev/schemas/2.3.12/schema.json",
+	"vcs": {
+		"enabled": false,
+		"clientKind": "git"
+	},
+	"files": {
+		"ignoreUnknown": false,
+		"includes": ["src/**"],
+		"experimentalScannerIgnores": ["drizzle/**"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab"
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"suspicious": { "noUnknownAtRules": "off" },
+			"style": {
+				"useConst": "error",
+				"noParameterAssign": "warn"
+			},
+			"correctness": {
+				"noUnusedVariables": "error"
+			},
+			"performance": {
+				"noDelete": "warn"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double"
+		}
+	}
 }

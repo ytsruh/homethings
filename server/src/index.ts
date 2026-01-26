@@ -31,7 +31,8 @@ const app = new Elysia()
 				detail: { tags: ["Health"] },
 			})
 			.use(routes.notes)
-			.use(routes.attachments),
+			.use(routes.attachments)
+			.use(routes.comments),
 	)
 	.listen(process.env.PORT || 3000);
 

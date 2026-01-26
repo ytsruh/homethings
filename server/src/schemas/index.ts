@@ -69,3 +69,19 @@ export const AttachmentUploadResponseSchema = z.array(
 export const DeleteResponseSchema = z.object({
 	message: z.string(),
 });
+
+export const CommentPathSchema = z.object({
+	id: z.string().uuid("Invalid note ID format"),
+	commentId: z.string().uuid("Invalid comment ID format"),
+});
+
+export const CreateCommentRequestSchema = z.object({
+	comment: z.string().min(1, "Comment is required"),
+});
+
+export const CommentResponseSchema = z.object({
+	id: z.string(),
+	comment: z.string(),
+	noteId: z.string(),
+	createdAt: z.date(),
+});
