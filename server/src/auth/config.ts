@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { openAPI } from "better-auth/plugins";
 import { database } from "../db";
 
 export const auth = betterAuth({
@@ -25,4 +26,5 @@ export const auth = betterAuth({
 	baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
 	secret: process.env.BETTER_AUTH_SECRET || "dev-secret-change-in-production",
 	debug: true,
+	plugins: [openAPI({ path: "/api/auth/reference" })],
 });

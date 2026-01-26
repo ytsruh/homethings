@@ -19,7 +19,18 @@ const app = new Elysia()
 	.use(
 		openapi({
 			path: "/docs",
-			specPath: "/json",
+			scalar: {
+				sources: [
+					{
+						url: "/docs/json",
+						title: "Homethings",
+					},
+					{
+						url: "/api/auth/open-api/generate-schema",
+						title: "Auth",
+					},
+				],
+			},
 			documentation: {
 				info: { title: "Homethings API", version: "1.0.0" },
 			},
