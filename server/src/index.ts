@@ -2,7 +2,6 @@ import { cors } from "@elysiajs/cors";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia } from "elysia";
 import { auth } from "./auth/config";
-import { betterAuth } from "./middleware/auth";
 import { errorHandler } from "./middleware/error";
 import { routes } from "./routes";
 
@@ -31,7 +30,8 @@ const app = new Elysia()
 			.get("/", () => ({ message: "Homethings API" }), {
 				detail: { tags: ["Health"] },
 			})
-			.use(routes.notes),
+			.use(routes.notes)
+			.use(routes.attachments),
 	)
 	.listen(process.env.PORT || 3000);
 

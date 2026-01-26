@@ -167,16 +167,18 @@ server/
 - `GET /api/auth/session` - Get current session
 
 ### Notes
-- `GET /api/notes` - List notes (filter by completed, includes presigned URLs for attachments)
-- `GET /api/notes/:id` - Get single note with presigned URLs
-- `POST /api/notes` - Create note (with multiple file uploads)
-- `PATCH /api/notes/:id` - Update note (add files, update fields)
-- `DELETE /api/notes/:id` - Delete note (cleanup R2 files, no note updatedAt update)
+- `GET /api/notes` - List notes (filter by completed, note-level data only)
+- `GET /api/notes/:id` - Get single note (note-level data only)
+- `POST /api/notes` - Create note (title, priority, createdBy)
+- `PATCH /api/notes/:id` - Update note (title, body, priority only)
+- `DELETE /api/notes/:id` - Delete note (cleanup R2 files for all attachments)
 - `PATCH /api/notes/:id/complete` - Toggle completion
 
 ### Attachments
-- `DELETE /api/notes/:noteId/attachments/:attachmentId` - Delete single attachment (verifies note ownership first)
-- `GET /api/notes/:noteId/attachments/:attachmentId/presigned` - Generate fresh presigned URL
+- `POST /api/notes/:noteId/attachments` - Upload files to a note (multipart/form-data, multiple files supported)
+- `GET /api/notes/:noteId/attachments` - List all attachments for a note (with presigned URLs)
+- `DELETE /api/notes/:noteId/attachments/:id` - Delete single attachment (verifies note ownership first)
+- `GET /api/notes/:noteId/attachments/:id/presigned` - Generate fresh presigned URL
 
 ### Comments
 - `POST /api/notes/:noteId/comments` - Create comment
@@ -319,13 +321,15 @@ NODE_ENV=development  # Optional: Set to 'production' for production environment
 - [x] Add OpenAPI documentation to all endpoints
 - [x] Apply auth middleware to protected routes
 
-### Phase 7: Attachments API
-- [ ] Implement DELETE `/api/notes/:noteId/attachments/:attachmentId`
-- [ ] Verify note ownership first (before attachment check)
-- [ ] Verify attachment belongs to note (second check)
-- [ ] Delete from R2 and database
-- [ ] Do NOT update note `updatedAt`
-- [ ] Implement GET `/api/notes/:noteId/attachments/:attachmentId/presigned`
+### Phase 7: Attachments API (Refactored)
+- [x] Create `server/src/routes/attachments.ts`
+- [x] Implement POST `/api/notes/:noteId/attachments` (upload files with multipart/form-data)
+- [x] Implement GET `/api/notes/:noteId/attachments` (list with presigned URLs)
+- [x] Implement DELETE `/api/notes/:noteId/attachments/:id` (delete single attachment)
+- [x] Implement GET `/api/notes/:noteId/attachments/:id/presigned` (fresh presigned URL)
+- [x] Refactor `notes.ts` to remove attachment logic from notes endpoints
+- [x] Update notes.ts DELETE to call attachments service for cleanup
+- [x] Update `routes/index.ts` to export attachment routes
 
 ### Phase 8: Comments API
 - [ ] Implement POST `/api/notes/:noteId/comments` (create comment)

@@ -1,31 +1,25 @@
 import { and, eq } from "drizzle-orm";
 import { Elysia } from "elysia";
-import { z } from "zod";
 import { betterAuth } from "~/middleware/auth";
-import { deleteFiles, generatePresignedUrl, uploadFile } from "~/storage/r2";
+import {
+	CompleteNoteRequestSchema,
+	CreateNoteRequestSchema,
+	ListNotesQuerySchema,
+	NotePathSchema,
+	NoteResponseSchema,
+	NotesListResponseSchema,
+	UpdateNoteRequestSchema,
+} from "~/schemas";
+import { deleteFiles } from "~/storage/r2";
 import { database } from "../db";
-import { noteAttachments, notes } from "../db/schema";
-
-const CreateNoteSchema = z.object({
-	title: z.string().min(1, "Title is required"),
-});
-
-const UpdateNoteSchema = z.object({
-	title: z.string().optional(),
-	body: z.string().optional(),
-	priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
-});
-
-const CompleteNoteSchema = z.object({
-	completed: z.boolean(),
-});
+import { notes } from "../db/schema";
 
 const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 	.use(betterAuth)
 	.post(
 		"/",
 		async ({ user, body }) => {
-			const validated = CreateNoteSchema.parse(body);
+			const validated = CreateNoteRequestSchema.parse(body);
 			const now = new Date();
 			const noteId = crypto.randomUUID();
 			await database.insert(notes).values({
@@ -44,10 +38,15 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 				.where(eq(notes.id, noteId))
 				.limit(1);
 
+			if (!createdNote[0]) {
+				throw new Error("Failed to create note");
+			}
+
 			return createdNote[0];
 		},
 		{
-			body: CreateNoteSchema,
+			body: CreateNoteRequestSchema,
+			response: NoteResponseSchema,
 			auth: true,
 			detail: {
 				tags: ["Notes"],
@@ -63,32 +62,13 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 					eq(notes.completed, query.completed),
 					eq(notes.createdBy, user.id),
 				),
-				with: { attachments: true },
 			});
 
-			const bucketName = process.env.R2_BUCKET_NAME ?? "";
-			const notesWithUrls = await Promise.all(
-				userNotes.map(async (note) => ({
-					...note,
-					attachments: await Promise.all(
-						note.attachments.map(async (att) => ({
-							...att,
-							presignedUrl: await generatePresignedUrl(
-								bucketName,
-								att.fileKey,
-								att.fileType,
-							),
-						})),
-					),
-				})),
-			);
-
-			return notesWithUrls;
+			return userNotes;
 		},
 		{
-			query: z.object({
-				completed: z.coerce.boolean(),
-			}),
+			query: ListNotesQuerySchema,
+			response: NotesListResponseSchema,
 			auth: true,
 			detail: {
 				tags: ["Notes"],
@@ -101,31 +81,17 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 		async ({ user, params }) => {
 			const note = await database.query.notes.findFirst({
 				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-				with: { attachments: true },
 			});
 
 			if (!note) {
 				throw new Error("Note not found");
 			}
 
-			const bucketName = process.env.R2_BUCKET_NAME ?? "";
-			const noteWithUrls = {
-				...note,
-				attachments: await Promise.all(
-					note.attachments.map(async (att) => ({
-						...att,
-						presignedUrl: await generatePresignedUrl(
-							bucketName,
-							att.fileKey,
-							att.fileType,
-						),
-					})),
-				),
-			};
-
-			return noteWithUrls;
+			return note;
 		},
 		{
+			params: NotePathSchema,
+			response: NoteResponseSchema,
 			auth: true,
 			detail: {
 				tags: ["Notes"],
@@ -135,7 +101,7 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 	)
 	.patch(
 		"/:id",
-		async ({ user, params, request }) => {
+		async ({ user, params, body }) => {
 			const note = await database.query.notes.findFirst({
 				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
 			});
@@ -144,40 +110,7 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 				throw new Error("Note not found");
 			}
 
-			const formData = await request.formData();
-			const files = formData.getAll("files");
-			const validFiles = files.filter((file) => file instanceof File);
-
-			if (validFiles.length === 0) {
-				throw new Error("At least one file is required");
-			}
-
-			const title = formData.get("title");
-			const body = formData.get("body");
-			const priority = formData.get("priority");
-
-			const validatedData = UpdateNoteSchema.parse({
-				title: title ?? undefined,
-				body: body ?? undefined,
-				priority: priority ?? undefined,
-			});
-
-			const now = new Date();
-			await Promise.all(
-				validFiles.map(async (file) => {
-					const attachmentId = crypto.randomUUID();
-					const uploaded = await uploadFile(file, user.id);
-					await database.insert(noteAttachments).values({
-						id: attachmentId,
-						noteId: note.id,
-						fileKey: uploaded.fileKey,
-						fileName: uploaded.fileName,
-						fileType: uploaded.fileType,
-						fileSize: uploaded.fileSize,
-						createdAt: now,
-					});
-				}),
-			);
+			const validatedData = UpdateNoteRequestSchema.parse(body);
 
 			await database
 				.update(notes)
@@ -190,16 +123,22 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 
 			const updated = await database.query.notes.findFirst({
 				where: eq(notes.id, note.id),
-				with: { attachments: true },
 			});
+
+			if (!updated) {
+				throw new Error("Failed to update note");
+			}
 
 			return updated;
 		},
 		{
+			params: NotePathSchema,
+			body: UpdateNoteRequestSchema,
+			response: NoteResponseSchema,
 			auth: true,
 			detail: {
 				tags: ["Notes"],
-				description: "Update note (at least one file required)",
+				description: "Update note",
 			},
 		},
 	)
@@ -215,7 +154,9 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 				throw new Error("Note not found");
 			}
 
-			const fileKeys = note.attachments.map((att) => att.fileKey);
+			const fileKeys = note.attachments.map(
+				(att: { fileKey: string }) => att.fileKey,
+			);
 			await deleteFiles(fileKeys);
 
 			await database.delete(notes).where(eq(notes.id, params.id));
@@ -223,6 +164,7 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 			return { message: "Note deleted" };
 		},
 		{
+			params: NotePathSchema,
 			auth: true,
 			detail: {
 				tags: ["Notes"],
@@ -248,13 +190,18 @@ const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
 
 			const updated = await database.query.notes.findFirst({
 				where: eq(notes.id, params.id),
-				with: { attachments: true },
 			});
+
+			if (!updated) {
+				throw new Error("Failed to update note");
+			}
 
 			return updated;
 		},
 		{
-			body: CompleteNoteSchema,
+			params: NotePathSchema,
+			body: CompleteNoteRequestSchema,
+			response: NoteResponseSchema,
 			auth: true,
 			detail: {
 				tags: ["Notes"],
