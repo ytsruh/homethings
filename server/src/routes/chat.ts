@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { ai, type ChatOptions } from "~/ai";
 import { aiConfig, allModels, isModelAvailable } from "~/ai/config";
+import { throwBadRequest } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
@@ -21,8 +22,7 @@ chat.post("/chat", createValidator(chatSchema), async (c) => {
 	const body = c.req.valid("json");
 
 	if (body.model && !isModelAvailable(body.model)) {
-		return c.json({
-			error: `Model '${body.model}' is not available`,
+		throwBadRequest(`Model '${body.model}' is not available`, {
 			code: "INVALID_MODEL",
 			availableModels: allModels,
 		});
@@ -47,8 +47,7 @@ chat.post("/chat/stream", createValidator(chatSchema), async (c) => {
 	const body = c.req.valid("json");
 
 	if (body.model && !isModelAvailable(body.model)) {
-		return c.json({
-			error: `Model '${body.model}' is not available`,
+		throwBadRequest(`Model '${body.model}' is not available`, {
 			code: "INVALID_MODEL",
 			availableModels: allModels,
 		});

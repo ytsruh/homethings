@@ -2,6 +2,11 @@ import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { database } from "~/db";
 import { notes, notesComments } from "~/db/schema";
+import {
+	throwBadRequest,
+	throwNotFound,
+	throwServerError,
+} from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 import { CreateCommentRequestSchema } from "~/schemas";
@@ -21,7 +26,8 @@ commentsRoutes.post(
 		});
 
 		if (!note) {
-			return c.json({ error: "Note not found" }, 404);
+			throwNotFound("Note not found");
+			return;
 		}
 
 		const now = new Date();
@@ -39,7 +45,8 @@ commentsRoutes.post(
 		});
 
 		if (!createdComment) {
-			return c.json({ error: "Failed to create comment" }, 500);
+			throwServerError();
+			return;
 		}
 
 		return c.json(createdComment);
@@ -55,7 +62,8 @@ commentsRoutes.delete("/notes/:id/comments/:commentId", async (c) => {
 	});
 
 	if (!note) {
-		return c.json({ error: "Note not found" }, 404);
+		throwNotFound("Note not found");
+		return;
 	}
 
 	const comment = await database.query.notesComments.findFirst({
@@ -63,11 +71,13 @@ commentsRoutes.delete("/notes/:id/comments/:commentId", async (c) => {
 	});
 
 	if (!comment) {
-		return c.json({ error: "Comment not found" }, 404);
+		throwNotFound("Comment not found");
+		return;
 	}
 
 	if (comment.noteId !== params.id) {
-		return c.json({ error: "Comment does not belong to this note" }, 400);
+		throwBadRequest("Comment does not belong to this note");
+		return;
 	}
 
 	await database

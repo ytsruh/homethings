@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { database } from "~/db";
 import { notes } from "~/db/schema";
+import { throwNotFound, throwServerError } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 import {
@@ -42,7 +43,8 @@ notesRoutes.post(
 			.limit(1);
 
 		if (!createdNote[0]) {
-			return c.json({ error: "Failed to create note" }, 500);
+			throwServerError();
+			return;
 		}
 
 		return c.json(createdNote[0]);
@@ -51,7 +53,7 @@ notesRoutes.post(
 
 notesRoutes.get(
 	"/notes",
-	zValidator("query", ListNotesQuerySchema),
+	createValidator(ListNotesQuerySchema, "query"),
 	async (c) => {
 		const user = c.get("user");
 		const query = c.req.valid("query");
@@ -79,7 +81,8 @@ notesRoutes.get(
 		});
 
 		if (!note) {
-			return c.json({ error: "Note not found" }, 404);
+			throwNotFound("Note not found");
+			return;
 		}
 
 		return c.json(note);
@@ -100,7 +103,8 @@ notesRoutes.patch(
 		});
 
 		if (!note) {
-			return c.json({ error: "Note not found" }, 404);
+			throwNotFound("Note not found");
+			return;
 		}
 
 		await database
@@ -117,7 +121,8 @@ notesRoutes.patch(
 		});
 
 		if (!updated) {
-			return c.json({ error: "Failed to update note" }, 500);
+			throwServerError();
+			return;
 		}
 
 		return c.json(updated);
@@ -129,7 +134,7 @@ notesRoutes.delete(
 	zValidator("param", NotePathSchema),
 	async (c) => {
 		const user = c.get("user");
-		const params = c.req.valid("param");
+		const params = c.req.param();
 
 		const note = await database.query.notes.findFirst({
 			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
@@ -137,7 +142,8 @@ notesRoutes.delete(
 		});
 
 		if (!note) {
-			return c.json({ error: "Note not found" }, 404);
+			throwNotFound("Note not found");
+			return;
 		}
 
 		const fileKeys = note.attachments.map((att) => att.fileKey);
@@ -163,7 +169,8 @@ notesRoutes.patch(
 		});
 
 		if (!note) {
-			return c.json({ error: "Note not found" }, 404);
+			throwNotFound("Note not found");
+			return;
 		}
 
 		await database
@@ -176,7 +183,8 @@ notesRoutes.patch(
 		});
 
 		if (!updated) {
-			return c.json({ error: "Failed to update note" }, 500);
+			throwServerError();
+			return;
 		}
 
 		return c.json(updated);

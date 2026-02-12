@@ -1,10 +1,33 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { HTTPException } from "hono/http-exception";
 import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
 import { auth } from "./routes/auth";
 
 const app = new Hono();
+
+app.onError((error, c) => {
+	if (error instanceof HTTPException) {
+		console.error(
+			`[${error.status}] ${(error as any).code || "ERROR"}: ${error.message}`,
+			error.cause ? `Cause: ${JSON.stringify(error.cause)}` : "",
+		);
+		const response = error.getResponse();
+		return new Response(response.body, {
+			status: error.status,
+			headers: {
+				...Object.fromEntries(c.res?.headers || []),
+				...Object.fromEntries(response.headers),
+			},
+		});
+	}
+	console.error("Unexpected error:", error);
+	return c.json(
+		{ error: "Internal server error", code: "INTERNAL_ERROR" },
+		500,
+	);
+});
 
 app.use(
 	"*",

@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { database } from "~/db";
 import { noteAttachments, notes } from "~/db/schema";
+import { throwBadRequest, throwNotFound } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { deleteFiles, generatePresignedUrl, uploadFile } from "~/storage/r2";
 
@@ -17,7 +18,8 @@ attachmentsRoutes.post("/notes/:id/attachments", async (c) => {
 	});
 
 	if (!note) {
-		return c.json({ error: "Note not found" }, 404);
+		throwNotFound("Note not found");
+		return;
 	}
 
 	const formData = await request.formData();
@@ -25,7 +27,8 @@ attachmentsRoutes.post("/notes/:id/attachments", async (c) => {
 	const validFiles = files.filter((file) => file instanceof File) as File[];
 
 	if (validFiles.length === 0) {
-		return c.json({ error: "At least one file is required" }, 400);
+		throwBadRequest("At least one file is required");
+		return;
 	}
 
 	const now = new Date();
@@ -67,7 +70,8 @@ attachmentsRoutes.get("/notes/:id/attachments", async (c) => {
 	});
 
 	if (!note) {
-		return c.json({ error: "Note not found" }, 404);
+		throwNotFound("Note not found");
+		return;
 	}
 
 	const bucketName = process.env.R2_BUCKET_NAME ?? "";
@@ -94,7 +98,8 @@ attachmentsRoutes.delete("/notes/:id/attachments/:attachmentId", async (c) => {
 	});
 
 	if (!note) {
-		return c.json({ error: "Note not found" }, 404);
+		throwNotFound("Note not found");
+		return;
 	}
 
 	const attachment = await database.query.noteAttachments.findFirst({
@@ -102,11 +107,13 @@ attachmentsRoutes.delete("/notes/:id/attachments/:attachmentId", async (c) => {
 	});
 
 	if (!attachment) {
-		return c.json({ error: "Attachment not found" }, 404);
+		throwNotFound("Attachment not found");
+		return;
 	}
 
 	if (attachment.noteId !== params.id) {
-		return c.json({ error: "Attachment does not belong to this note" }, 400);
+		throwBadRequest("Attachment does not belong to this note");
+		return;
 	}
 
 	await deleteFiles([attachment.fileKey]);
@@ -129,7 +136,8 @@ attachmentsRoutes.get(
 		});
 
 		if (!note) {
-			return c.json({ error: "Note not found" }, 404);
+			throwNotFound("Note not found");
+			return;
 		}
 
 		const attachment = await database.query.noteAttachments.findFirst({
@@ -137,11 +145,13 @@ attachmentsRoutes.get(
 		});
 
 		if (!attachment) {
-			return c.json({ error: "Attachment not found" }, 404);
+			throwNotFound("Attachment not found");
+			return;
 		}
 
 		if (attachment.noteId !== params.id) {
-			return c.json({ error: "Attachment does not belong to this note" }, 400);
+			throwBadRequest("Attachment does not belong to this note");
+			return;
 		}
 
 		const bucketName = process.env.R2_BUCKET_NAME ?? "";

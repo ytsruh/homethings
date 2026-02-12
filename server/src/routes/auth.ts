@@ -6,6 +6,12 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import type { z } from "zod";
 import { database } from "~/db";
 import { users } from "~/db/schema";
+import {
+	throwBadRequest,
+	throwConflict,
+	throwServerError,
+	throwUnauthorized,
+} from "~/middleware/http-exception";
 import { type JWTPayload, signJWT, verifyJWT } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 import { LoginSchema, RegisterSchema, UpdateUserSchema } from "~/schemas";
@@ -34,12 +40,14 @@ auth.post("/auth/login", createValidator(loginSchema), async (c) => {
 	});
 
 	if (!user) {
-		return c.json({ error: "Invalid email or password" }, 401);
+		throwUnauthorized("Invalid email or password");
+		return;
 	}
 
 	const validPassword = await bcrypt.compare(body.password, user.passwordHash);
 	if (!validPassword) {
-		return c.json({ error: "Invalid email or password" }, 401);
+		throwUnauthorized("Invalid email or password");
+		return;
 	}
 
 	const token = signJWT({ userId: user.id, email: user.email });
@@ -66,7 +74,8 @@ auth.post("/auth/register", createValidator(registerSchema), async (c) => {
 	});
 
 	if (existing) {
-		return c.json({ error: "Email already registered" }, 409);
+		throwConflict("Email already registered");
+		return;
 	}
 
 	const passwordHash = await bcrypt.hash(body.password, 10);
@@ -105,7 +114,8 @@ auth.post("/auth/logout", (c) => {
 auth.get("/auth/me", async (c) => {
 	const userPayload = c.get("user");
 	if (!userPayload) {
-		return c.json({ error: "Not authenticated" }, 401);
+		throwUnauthorized("Not authenticated");
+		return;
 	}
 
 	const user = await database.query.users.findFirst({
@@ -113,7 +123,8 @@ auth.get("/auth/me", async (c) => {
 	});
 
 	if (!user) {
-		return c.json({ error: "User not found" }, 401);
+		throwUnauthorized("User not found");
+		return;
 	}
 
 	return c.json({
