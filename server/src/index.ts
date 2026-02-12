@@ -1,7 +1,9 @@
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { authMiddleware } from "./middleware/auth";
+import { openApiSpec } from "./openapi/spec";
 import { routes } from "./routes";
 import { auth } from "./routes/auth";
 
@@ -43,6 +45,9 @@ app.use("/api/*", authMiddleware);
 
 app.route("/api", routes);
 app.route("/", auth);
+
+app.get("/openapi.json", (c) => c.json(openApiSpec));
+app.get("/docs", Scalar({ url: "/openapi.json" }));
 
 console.log(`Hono is running on port ${process.env.PORT || 3000}`);
 

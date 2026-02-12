@@ -1,3 +1,4 @@
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import attachmentsRoutes from "./attachments";
 import { chat as chatRoutes } from "./chat";

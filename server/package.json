@@ -21,6 +21,7 @@
 		"@hono/zod-validator": "^0.7.6",
 		"@libsql/client": "^0.15.15",
 		"@openrouter/ai-sdk-provider": "^2.2.3",
+		"@scalar/hono-api-reference": "^0.9.40",
 		"ai": "^6.0.82",
 		"drizzle-orm": "^0.45.1",
 		"hono": "^4.6.0",
