@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export { LoginSchema, RegisterSchema } from "./auth";
+export { UpdateUserSchema } from "./user";
+
 // ============ Path Parameter Schemas ============
 
 export const NotePathSchema = z.object({

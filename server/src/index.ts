@@ -21,7 +21,7 @@ app.use("/api/*", authMiddleware);
 app.route("/api", routes);
 app.route("/", auth);
 
-console.log(`🦊 Hono is running on port ${process.env.PORT || 3000}`);
+console.log(`Hono is running on port ${process.env.PORT || 3000}`);
 
 export default {
 	port: parseInt(process.env.PORT || "3000", 10),

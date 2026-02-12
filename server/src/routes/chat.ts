@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ai, type ChatOptions } from "~/ai";
 import { aiConfig, allModels, isModelAvailable } from "~/ai/config";
 import type { JWTPayload } from "~/middleware/jwt";
+import { createValidator } from "~/middleware/validator";
 
 const chatSchema = z.object({
 	message: z.string().min(1).max(10000),
@@ -15,56 +16,52 @@ const tokensSchema = z.object({
 
 export const chat = new Hono<{ Variables: { user: JWTPayload } }>();
 
-chat.post("/chat", async (c) => {
+chat.post("/chat", createValidator(chatSchema), async (c) => {
 	const _user = c.get("user");
-	const body = await c.req.json();
+	const body = c.req.valid("json");
 
-	const parsed = chatSchema.parse(body);
-
-	if (parsed.model && !isModelAvailable(parsed.model)) {
+	if (body.model && !isModelAvailable(body.model)) {
 		return c.json({
-			error: `Model '${parsed.model}' is not available`,
+			error: `Model '${body.model}' is not available`,
 			code: "INVALID_MODEL",
 			availableModels: allModels,
 		});
 	}
 
 	const options: ChatOptions = {
-		model: parsed.model || aiConfig.defaultModel,
+		model: body.model || aiConfig.defaultModel,
 		temperature: aiConfig.temperature,
 		maxTokens: aiConfig.maxTokens,
 	};
 
 	const response = await ai.chat(
-		[{ role: "user", content: parsed.message }],
+		[{ role: "user", content: body.message }],
 		options,
 	);
 
 	return c.json({ response });
 });
 
-chat.post("/chat/stream", async (c) => {
+chat.post("/chat/stream", createValidator(chatSchema), async (c) => {
 	const _user = c.get("user");
-	const body = await c.req.json();
+	const body = c.req.valid("json");
 
-	const parsed = chatSchema.parse(body);
-
-	if (parsed.model && !isModelAvailable(parsed.model)) {
+	if (body.model && !isModelAvailable(body.model)) {
 		return c.json({
-			error: `Model '${parsed.model}' is not available`,
+			error: `Model '${body.model}' is not available`,
 			code: "INVALID_MODEL",
 			availableModels: allModels,
 		});
 	}
 
 	const options: ChatOptions = {
-		model: parsed.model || aiConfig.defaultModel,
+		model: body.model || aiConfig.defaultModel,
 		temperature: aiConfig.temperature,
 		maxTokens: aiConfig.maxTokens,
 	};
 
 	const stream = ai.chatStream(
-		[{ role: "user", content: parsed.message }],
+		[{ role: "user", content: body.message }],
 		options,
 	);
 
@@ -95,10 +92,8 @@ chat.get("/chat/models", (c) => {
 	});
 });
 
-chat.post("/chat/tokens", async (c) => {
-	const body = await c.req.json();
-	const parsed = tokensSchema.parse(body);
-
-	const count = await ai.countTokens(parsed.text);
+chat.post("/chat/tokens", createValidator(tokensSchema), async (c) => {
+	const body = c.req.valid("json");
+	const count = await ai.countTokens(body.text);
 	return c.json({ count });
 });

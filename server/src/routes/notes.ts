@@ -5,6 +5,7 @@ import { z } from "zod";
 import { database } from "~/db";
 import { notes } from "~/db/schema";
 import type { JWTPayload } from "~/middleware/jwt";
+import { createValidator } from "~/middleware/validator";
 import {
 	CreateNoteRequestSchema,
 	ListNotesQuerySchema,
@@ -17,7 +18,7 @@ const notesRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 
 notesRoutes.post(
 	"/notes",
-	zValidator("json", CreateNoteRequestSchema),
+	createValidator(CreateNoteRequestSchema),
 	async (c) => {
 		const user = c.get("user");
 		const body = c.req.valid("json");
@@ -88,7 +89,7 @@ notesRoutes.get(
 notesRoutes.patch(
 	"/notes/:id",
 	zValidator("param", NotePathSchema),
-	zValidator("json", UpdateNoteRequestSchema),
+	createValidator(UpdateNoteRequestSchema),
 	async (c) => {
 		const user = c.get("user");
 		const params = c.req.valid("param");
@@ -151,7 +152,7 @@ notesRoutes.delete(
 notesRoutes.patch(
 	"/notes/:id/complete",
 	zValidator("param", NotePathSchema),
-	zValidator("json", z.object({ completed: z.boolean() })),
+	createValidator(z.object({ completed: z.boolean() })),
 	async (c) => {
 		const user = c.get("user");
 		const params = c.req.valid("param");
