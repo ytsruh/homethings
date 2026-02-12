@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import type { JWTPayload } from "~/auth/jwt";
 import { database } from "~/db";
 import { feedback } from "~/db/schema";
+import type { JWTPayload } from "~/middleware/jwt";
 import { CreateFeedbackRequestSchema } from "~/schemas";
 
-const feedbackRoutes = new Hono();
+const feedbackRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 
 feedbackRoutes.post("/feedback", async (c) => {
 	const user = c.get("user");
@@ -26,9 +26,3 @@ feedbackRoutes.post("/feedback", async (c) => {
 });
 
 export default feedbackRoutes;
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}

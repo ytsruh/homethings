@@ -2,9 +2,9 @@ import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
-import type { JWTPayload } from "~/auth/jwt";
 import { database } from "~/db";
 import { notes } from "~/db/schema";
+import type { JWTPayload } from "~/middleware/jwt";
 import {
 	CreateNoteRequestSchema,
 	ListNotesQuerySchema,
@@ -13,7 +13,7 @@ import {
 } from "~/schemas";
 import { deleteFiles } from "~/storage/r2";
 
-const notesRoutes = new Hono();
+const notesRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 
 notesRoutes.post(
 	"/notes",
@@ -183,9 +183,3 @@ notesRoutes.patch(
 );
 
 export default notesRoutes;
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}

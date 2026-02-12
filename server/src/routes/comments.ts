@@ -1,11 +1,11 @@
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
-import type { JWTPayload } from "~/auth/jwt";
 import { database } from "~/db";
 import { notes, notesComments } from "~/db/schema";
+import type { JWTPayload } from "~/middleware/jwt";
 import { CreateCommentRequestSchema } from "~/schemas";
 
-const commentsRoutes = new Hono();
+const commentsRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 
 commentsRoutes.post("/notes/:id/comments", async (c) => {
 	const user = c.get("user");
@@ -74,9 +74,3 @@ commentsRoutes.delete("/notes/:id/comments/:commentId", async (c) => {
 });
 
 export default commentsRoutes;
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}

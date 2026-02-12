@@ -1,12 +1,6 @@
 import type { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
-import { type JWTPayload, verifyJWT } from "~/auth/jwt";
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}
+import { type JWTPayload, verifyJWT } from "~/middleware/jwt";
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
 	const token = getCookie(c, "auth_token");

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { ai, type ChatOptions } from "~/ai";
 import { aiConfig, allModels, isModelAvailable } from "~/ai/config";
-import type { JWTPayload } from "~/auth/jwt";
+import type { JWTPayload } from "~/middleware/jwt";
 
 const chatSchema = z.object({
 	message: z.string().min(1).max(10000),
@@ -13,7 +13,7 @@ const tokensSchema = z.object({
 	text: z.string().min(1),
 });
 
-export const chat = new Hono();
+export const chat = new Hono<{ Variables: { user: JWTPayload } }>();
 
 chat.post("/chat", async (c) => {
 	const _user = c.get("user");
@@ -102,9 +102,3 @@ chat.post("/chat/tokens", async (c) => {
 	const count = await ai.countTokens(parsed.text);
 	return c.json({ count });
 });
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}

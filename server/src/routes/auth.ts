@@ -4,16 +4,16 @@ import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
-import { type JWTPayload, signJWT, verifyJWT } from "~/auth/jwt";
 import { database } from "~/db";
 import { users } from "~/db/schema";
+import { type JWTPayload, signJWT, verifyJWT } from "~/middleware/jwt";
 
 const loginSchema = z.object({
 	email: z.string().email("Invalid email format"),
 	password: z.string().min(1, "Password is required"),
 });
 
-export const auth = new Hono();
+export const auth = new Hono<{ Variables: { user: JWTPayload } }>();
 
 auth.use("/auth/*", async (c, next) => {
 	const token = getCookie(c, "auth_token");
@@ -82,9 +82,3 @@ auth.get("/auth/me", async (c) => {
 		user: { id: user.id, email: user.email, name: user.name },
 	});
 });
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}

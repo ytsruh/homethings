@@ -1,11 +1,11 @@
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
-import type { JWTPayload } from "~/auth/jwt";
 import { database } from "~/db";
 import { noteAttachments, notes } from "~/db/schema";
+import type { JWTPayload } from "~/middleware/jwt";
 import { deleteFiles, generatePresignedUrl, uploadFile } from "~/storage/r2";
 
-const attachmentsRoutes = new Hono();
+const attachmentsRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 
 attachmentsRoutes.post("/notes/:id/attachments", async (c) => {
 	const user = c.get("user");
@@ -159,9 +159,3 @@ attachmentsRoutes.get(
 );
 
 export default attachmentsRoutes;
-
-declare module "hono" {
-	interface ContextVariableMap {
-		user: JWTPayload;
-	}
-}
