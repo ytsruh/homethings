@@ -1,9 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
-import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import type { z } from "zod";
 import { database } from "~/db";
 import { users } from "~/db/schema";
 import {
@@ -19,12 +17,12 @@ import { LoginSchema, RegisterSchema, UpdateUserSchema } from "~/schemas";
 const loginSchema = LoginSchema;
 const registerSchema = RegisterSchema;
 
-export const auth = new Hono<{ Variables: { user: JWTPayload } }>();
+export const auth = new Hono<{ Variables: { user: JWTPayload | null } }>();
 
 auth.use("/auth/*", async (c, next) => {
 	const token = getCookie(c, "auth_token");
 	if (token) {
-		const payload = verifyJWT(token);
+		const payload = await verifyJWT(token);
 		if (payload) {
 			c.set("user", payload);
 		}
@@ -44,13 +42,16 @@ auth.post("/auth/login", createValidator(loginSchema), async (c) => {
 		return;
 	}
 
-	const validPassword = await bcrypt.compare(body.password, user.passwordHash);
+	const validPassword = await Bun.password.verify(
+		body.password,
+		user.passwordHash,
+	);
 	if (!validPassword) {
 		throwUnauthorized("Invalid email or password");
 		return;
 	}
 
-	const token = signJWT({ userId: user.id, email: user.email });
+	const token = await signJWT({ userId: user.id, email: user.email });
 
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
@@ -78,7 +79,7 @@ auth.post("/auth/register", createValidator(registerSchema), async (c) => {
 		return;
 	}
 
-	const passwordHash = await bcrypt.hash(body.password, 10);
+	const passwordHash = await Bun.password.hash(body.password);
 	const id = crypto.randomUUID();
 
 	await database.insert(users).values({
@@ -89,7 +90,7 @@ auth.post("/auth/register", createValidator(registerSchema), async (c) => {
 		createdAt: new Date(),
 	});
 
-	const token = signJWT({ userId: id, email: body.email });
+	const token = await signJWT({ userId: id, email: body.email });
 
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
@@ -134,13 +135,17 @@ auth.get("/auth/me", async (c) => {
 
 auth.patch("/auth/me", createValidator(UpdateUserSchema), async (c) => {
 	const userPayload = c.get("user");
+	if (!userPayload) {
+		throwUnauthorized("Not authenticated");
+		return;
+	}
 	const body = c.req.valid("json");
 
 	const updates: Partial<typeof users.$inferInsert> = {};
 	if (body.name) updates.name = body.name;
 	if (body.email) updates.email = body.email;
 	if (body.password)
-		updates.passwordHash = await bcrypt.hash(body.password, 10);
+		updates.passwordHash = await Bun.password.hash(body.password);
 
 	await database
 		.update(users)

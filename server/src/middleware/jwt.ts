@@ -1,21 +1,21 @@
-import jwt from "jsonwebtoken";
+import { sign, verify } from "hono/jwt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
-const JWT_EXPIRY = "7d";
 
 export interface JWTPayload {
 	userId: string;
 	email: string;
+	[k: string]: unknown;
 }
 
-export function signJWT(payload: JWTPayload): string {
-	return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+export async function signJWT(payload: JWTPayload): Promise<string> {
+	return await sign(payload, JWT_SECRET);
 }
 
-export function verifyJWT(token: string): JWTPayload | null {
+export async function verifyJWT(token: string): Promise<JWTPayload | null> {
 	try {
-		const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
-		return decoded;
+		const decoded = await verify(token, JWT_SECRET, "HS256");
+		return decoded as unknown as JWTPayload;
 	} catch {
 		return null;
 	}
