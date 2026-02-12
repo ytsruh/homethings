@@ -85,3 +85,8 @@ export const CommentResponseSchema = z.object({
 	noteId: z.string(),
 	createdAt: z.date(),
 });
+
+export const CreateFeedbackRequestSchema = z.object({
+	title: z.string().min(5, "Title must be at least 5 characters"),
+	body: z.string().min(5, "Body must be at least 5 characters"),
+});

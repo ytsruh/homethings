@@ -43,7 +43,8 @@ const app = new Elysia()
 			})
 			.use(routes.notes)
 			.use(routes.attachments)
-			.use(routes.comments),
+			.use(routes.comments)
+			.use(routes.feedback),
 	)
 	.listen(process.env.PORT || 3000);
 
