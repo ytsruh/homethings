@@ -2,8 +2,8 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
+import { openApiSpec } from "./lib/openapi/spec";
 import { authMiddleware } from "./middleware/auth";
-import { openApiSpec } from "./openapi/spec";
 import { routes } from "./routes";
 import { auth } from "./routes/auth";
 

@@ -1,9 +1,9 @@
 import { Hono } from "hono";
 import { database } from "~/db";
 import { feedback } from "~/db/schema";
+import { CreateFeedbackRequestSchema } from "~/lib/schemas";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
-import { CreateFeedbackRequestSchema } from "~/schemas";
 
 const feedbackRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 

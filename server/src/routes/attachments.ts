@@ -2,9 +2,13 @@ import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { database } from "~/db";
 import { noteAttachments, notes } from "~/db/schema";
+import {
+	deleteFiles,
+	generatePresignedUrl,
+	uploadFile,
+} from "~/lib/storage/r2";
 import { throwBadRequest, throwNotFound } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
-import { deleteFiles, generatePresignedUrl, uploadFile } from "~/storage/r2";
 
 const attachmentsRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 

@@ -4,6 +4,7 @@ import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { database } from "~/db";
 import { users } from "~/db/schema";
+import { LoginSchema, RegisterSchema, UpdateUserSchema } from "~/lib/schemas";
 import {
 	throwBadRequest,
 	throwConflict,
@@ -12,7 +13,6 @@ import {
 } from "~/middleware/http-exception";
 import { type JWTPayload, signJWT, verifyJWT } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
-import { LoginSchema, RegisterSchema, UpdateUserSchema } from "~/schemas";
 
 const loginSchema = LoginSchema;
 const registerSchema = RegisterSchema;

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { ai, type ChatOptions } from "~/ai";
-import { aiConfig, allModels, isModelAvailable } from "~/ai/config";
+import { ai, type ChatOptions } from "~/lib/ai";
+import { aiConfig, allModels, isModelAvailable } from "~/lib/ai/config";
 import { throwBadRequest } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";

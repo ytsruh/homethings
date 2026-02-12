@@ -4,16 +4,16 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { database } from "~/db";
 import { notes } from "~/db/schema";
-import { throwNotFound, throwServerError } from "~/middleware/http-exception";
-import type { JWTPayload } from "~/middleware/jwt";
-import { createValidator } from "~/middleware/validator";
 import {
 	CreateNoteRequestSchema,
 	ListNotesQuerySchema,
 	NotePathSchema,
 	UpdateNoteRequestSchema,
-} from "~/schemas";
-import { deleteFiles } from "~/storage/r2";
+} from "~/lib/schemas";
+import { deleteFiles } from "~/lib/storage/r2";
+import { throwNotFound, throwServerError } from "~/middleware/http-exception";
+import type { JWTPayload } from "~/middleware/jwt";
+import { createValidator } from "~/middleware/validator";
 
 const notesRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 

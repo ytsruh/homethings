@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { database } from "~/db";
 import { notes, notesComments } from "~/db/schema";
+import { CreateCommentRequestSchema } from "~/lib/schemas";
 import {
 	throwBadRequest,
 	throwNotFound,
@@ -9,7 +10,6 @@ import {
 } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
-import { CreateCommentRequestSchema } from "~/schemas";
 
 const commentsRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
 
