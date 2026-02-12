@@ -43,6 +43,7 @@ const app = new Elysia()
 			})
 			.use(routes.notes)
 			.use(routes.attachments)
+			.use(routes.chat)
 			.use(routes.comments)
 			.use(routes.feedback),
 	)
