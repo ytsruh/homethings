@@ -1,39 +1,34 @@
-import { Elysia } from "elysia";
-import { betterAuth } from "~/middleware/auth";
+import { Hono } from "hono";
+import type { JWTPayload } from "~/auth/jwt";
+import { database } from "~/db";
+import { feedback } from "~/db/schema";
 import { CreateFeedbackRequestSchema } from "~/schemas";
-import { database } from "../db";
-import { feedback } from "../db/schema";
 
-const feedbackRoutes = new Elysia({
-	name: "feedback",
-	prefix: "",
-})
-	.use(betterAuth)
-	.post(
-		"/feedback",
-		async ({ user, body }) => {
-			const validated = CreateFeedbackRequestSchema.parse(body);
-			const now = new Date();
-			const feedbackId = crypto.randomUUID();
+const feedbackRoutes = new Hono();
 
-			await database.insert(feedback).values({
-				id: feedbackId,
-				title: validated.title,
-				body: validated.body,
-				createdBy: user.id,
-				createdAt: now,
-			});
+feedbackRoutes.post("/feedback", async (c) => {
+	const user = c.get("user");
+	const body = await c.req.json();
 
-			return { message: "Feedback submitted" };
-		},
-		{
-			body: CreateFeedbackRequestSchema,
-			auth: true,
-			detail: {
-				tags: ["Feedback"],
-				description: "Submit feedback",
-			},
-		},
-	);
+	const validated = CreateFeedbackRequestSchema.parse(body);
+	const now = new Date();
+	const feedbackId = crypto.randomUUID();
+
+	await database.insert(feedback).values({
+		id: feedbackId,
+		title: validated.title,
+		body: validated.body,
+		createdBy: user.userId,
+		createdAt: now,
+	});
+
+	return c.json({ message: "Feedback submitted" });
+});
 
 export default feedbackRoutes;
+
+declare module "hono" {
+	interface ContextVariableMap {
+		user: JWTPayload;
+	}
+}

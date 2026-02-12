@@ -1,54 +1,29 @@
-import { cors } from "@elysiajs/cors";
-import { openapi } from "@elysiajs/openapi";
-import { Elysia } from "elysia";
-import { auth } from "./auth/config";
-import { errorHandler } from "./middleware/error";
+import { Hono } from "hono";
+import { cors } from "hono/cors";
+import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
+import { auth } from "./routes/auth";
 
-const app = new Elysia()
-	.use(errorHandler)
-	.use(
-		cors({
-			origin: process.env.CLIENT_URL || "http://localhost:3000",
-			credentials: true,
-			methods: ["GET", "POST", "PATCH", "DELETE"],
-			allowedHeaders: ["Content-Type", "Authorization"],
-		}),
-	)
-	.mount(auth.handler)
-	.use(
-		openapi({
-			path: "/docs",
-			scalar: {
-				sources: [
-					{
-						url: "/docs/json",
-						title: "Homethings",
-					},
-					{
-						url: "/api/auth/open-api/generate-schema",
-						title: "Auth",
-					},
-				],
-			},
-			documentation: {
-				info: { title: "Homethings API", version: "1.0.0" },
-			},
-		}),
-	)
-	.group("/api", (route) =>
-		route
-			.get("/", () => ({ message: "Homethings API" }), {
-				detail: { tags: ["Health"] },
-			})
-			.use(routes.notes)
-			.use(routes.attachments)
-			.use(routes.chat)
-			.use(routes.comments)
-			.use(routes.feedback),
-	)
-	.listen(process.env.PORT || 3000);
+const app = new Hono();
 
-console.log(
-	`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`,
+app.use(
+	"*",
+	cors({
+		origin: process.env.CLIENT_URL || "http://localhost:3000",
+		credentials: true,
+		allowMethods: ["GET", "POST", "PATCH", "DELETE"],
+		allowHeaders: ["Content-Type", "Authorization"],
+	}),
 );
+
+app.use("/api/*", authMiddleware);
+
+app.route("/api", routes);
+app.route("/", auth);
+
+console.log(`🦊 Hono is running on port ${process.env.PORT || 3000}`);
+
+export default {
+	port: parseInt(process.env.PORT || "3000", 10),
+	fetch: app.fetch,
+};

@@ -6,21 +6,23 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.12",
 		"@types/bun": "latest",
+		"@types/bcryptjs": "^2.4.6",
+		"@types/jsonwebtoken": "^9.0.7",
 		"drizzle-kit": "^0.31.8"
 	},
 	"peerDependencies": {
 		"typescript": "^5"
 	},
 	"dependencies": {
-		"@elysiajs/cors": "^1.4.1",
-		"@elysiajs/openapi": "^1.4.13",
+		"@hono/zod-validator": "^0.7.6",
 		"@libsql/client": "^0.15.15",
 		"@openrouter/ai-sdk-provider": "^2.2.3",
 		"ai": "^6.0.82",
-		"better-auth": "^1.4.10",
+		"bcryptjs": "^2.4.3",
 		"drizzle-orm": "^0.45.1",
-		"elysia": "^1.4.19",
-		"zod": "^4.3.4"
+		"hono": "^4.6.0",
+		"jsonwebtoken": "^9.0.2",
+		"zod": "^3.23.8"
 	},
 	"scripts": {
 		"dev": "bun --hot src/index.ts",

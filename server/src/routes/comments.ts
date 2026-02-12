@@ -1,101 +1,82 @@
 import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
-import { betterAuth } from "~/middleware/auth";
-import {
-	CommentPathSchema,
-	CommentResponseSchema,
-	CreateCommentRequestSchema,
-	DeleteResponseSchema,
-} from "~/schemas";
-import { database } from "../db";
-import { notes, notesComments } from "../db/schema";
+import { Hono } from "hono";
+import type { JWTPayload } from "~/auth/jwt";
+import { database } from "~/db";
+import { notes, notesComments } from "~/db/schema";
+import { CreateCommentRequestSchema } from "~/schemas";
 
-const commentsRoutes = new Elysia({
-	name: "comments",
-	prefix: "/notes",
-})
-	.use(betterAuth)
-	.post(
-		"/:id/comments",
-		async ({ user, params, body }) => {
-			const note = await database.query.notes.findFirst({
-				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-			});
+const commentsRoutes = new Hono();
 
-			if (!note) {
-				throw new Error("Note not found");
-			}
+commentsRoutes.post("/notes/:id/comments", async (c) => {
+	const user = c.get("user");
+	const params = c.req.param();
+	const body = await c.req.json();
 
-			const validated = CreateCommentRequestSchema.parse(body);
-			const now = new Date();
-			const commentId = crypto.randomUUID();
+	const note = await database.query.notes.findFirst({
+		where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+	});
 
-			await database.insert(notesComments).values({
-				id: commentId,
-				comment: validated.comment,
-				noteId: note.id,
-				createdAt: now,
-			});
+	if (!note) {
+		return c.json({ error: "Note not found" }, 404);
+	}
 
-			const createdComment = await database.query.notesComments.findFirst({
-				where: eq(notesComments.id, commentId),
-			});
+	const validated = CreateCommentRequestSchema.parse(body);
+	const now = new Date();
+	const commentId = crypto.randomUUID();
 
-			if (!createdComment) {
-				throw new Error("Failed to create comment");
-			}
+	await database.insert(notesComments).values({
+		id: commentId,
+		comment: validated.comment,
+		noteId: note.id,
+		createdAt: now,
+	});
 
-			return createdComment;
-		},
-		{
-			params: CommentPathSchema.pick({ id: true }),
-			body: CreateCommentRequestSchema,
-			response: CommentResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Comments"],
-				description: "Create a comment on a note",
-			},
-		},
-	)
-	.delete(
-		"/:id/comments/:commentId",
-		async ({ user, params }) => {
-			const note = await database.query.notes.findFirst({
-				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-			});
+	const createdComment = await database.query.notesComments.findFirst({
+		where: eq(notesComments.id, commentId),
+	});
 
-			if (!note) {
-				throw new Error("Note not found");
-			}
+	if (!createdComment) {
+		return c.json({ error: "Failed to create comment" }, 500);
+	}
 
-			const comment = await database.query.notesComments.findFirst({
-				where: eq(notesComments.id, params.commentId),
-			});
+	return c.json(createdComment);
+});
 
-			if (!comment) {
-				throw new Error("Comment not found");
-			}
+commentsRoutes.delete("/notes/:id/comments/:commentId", async (c) => {
+	const user = c.get("user");
+	const params = c.req.param();
 
-			if (comment.noteId !== params.id) {
-				throw new Error("Comment does not belong to this note");
-			}
+	const note = await database.query.notes.findFirst({
+		where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+	});
 
-			await database
-				.delete(notesComments)
-				.where(eq(notesComments.id, params.commentId));
+	if (!note) {
+		return c.json({ error: "Note not found" }, 404);
+	}
 
-			return { message: "Comment deleted" };
-		},
-		{
-			params: CommentPathSchema,
-			response: DeleteResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Comments"],
-				description: "Delete a comment from a note",
-			},
-		},
-	);
+	const comment = await database.query.notesComments.findFirst({
+		where: eq(notesComments.id, params.commentId),
+	});
+
+	if (!comment) {
+		return c.json({ error: "Comment not found" }, 404);
+	}
+
+	if (comment.noteId !== params.id) {
+		return c.json({ error: "Comment does not belong to this note" }, 400);
+	}
+
+	await database
+		.delete(notesComments)
+		.where(eq(notesComments.id, params.commentId));
+
+	return c.json({ message: "Comment deleted" });
+});
 
 export default commentsRoutes;
+
+declare module "hono" {
+	interface ContextVariableMap {
+		user: JWTPayload;
+	}
+}

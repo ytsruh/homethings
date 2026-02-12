@@ -1,213 +1,191 @@
+import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
-import { betterAuth } from "~/middleware/auth";
+import { Hono } from "hono";
+import { z } from "zod";
+import type { JWTPayload } from "~/auth/jwt";
+import { database } from "~/db";
+import { notes } from "~/db/schema";
 import {
-	CompleteNoteRequestSchema,
 	CreateNoteRequestSchema,
 	ListNotesQuerySchema,
 	NotePathSchema,
-	NoteResponseSchema,
-	NotesListResponseSchema,
 	UpdateNoteRequestSchema,
 } from "~/schemas";
 import { deleteFiles } from "~/storage/r2";
-import { database } from "../db";
-import { notes } from "../db/schema";
 
-const notesRoutes = new Elysia({ name: "notes", prefix: "/notes" })
-	.use(betterAuth)
-	.post(
-		"/",
-		async ({ user, body }) => {
-			const validated = CreateNoteRequestSchema.parse(body);
-			const now = new Date();
-			const noteId = crypto.randomUUID();
-			await database.insert(notes).values({
-				id: noteId,
-				title: validated.title,
-				priority: "medium",
-				completed: false,
-				createdBy: user.id,
-				createdAt: now,
-				updatedAt: now,
-			});
+const notesRoutes = new Hono();
 
-			const createdNote = await database
-				.select()
-				.from(notes)
-				.where(eq(notes.id, noteId))
-				.limit(1);
+notesRoutes.post(
+	"/notes",
+	zValidator("json", CreateNoteRequestSchema),
+	async (c) => {
+		const user = c.get("user");
+		const body = c.req.valid("json");
+		const now = new Date();
+		const noteId = crypto.randomUUID();
 
-			if (!createdNote[0]) {
-				throw new Error("Failed to create note");
-			}
+		await database.insert(notes).values({
+			id: noteId,
+			title: body.title,
+			priority: "medium",
+			completed: false,
+			createdBy: user.userId,
+			createdAt: now,
+			updatedAt: now,
+		});
 
-			return createdNote[0];
-		},
-		{
-			body: CreateNoteRequestSchema,
-			response: NoteResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Notes"],
-				description: "Create a note",
-			},
-		},
-	)
-	.get(
-		"/",
-		async ({ user, query }) => {
-			const userNotes = await database.query.notes.findMany({
-				where: and(
-					eq(notes.completed, query.completed),
-					eq(notes.createdBy, user.id),
-				),
-			});
+		const createdNote = await database
+			.select()
+			.from(notes)
+			.where(eq(notes.id, noteId))
+			.limit(1);
 
-			return userNotes;
-		},
-		{
-			query: ListNotesQuerySchema,
-			response: NotesListResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Notes"],
-				description: "List notes (completed query parameter required)",
-			},
-		},
-	)
-	.get(
-		"/:id",
-		async ({ user, params }) => {
-			const note = await database.query.notes.findFirst({
-				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-			});
+		if (!createdNote[0]) {
+			return c.json({ error: "Failed to create note" }, 500);
+		}
 
-			if (!note) {
-				throw new Error("Note not found");
-			}
+		return c.json(createdNote[0]);
+	},
+);
 
-			return note;
-		},
-		{
-			params: NotePathSchema,
-			response: NoteResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Notes"],
-				description: "Get single note",
-			},
-		},
-	)
-	.patch(
-		"/:id",
-		async ({ user, params, body }) => {
-			const note = await database.query.notes.findFirst({
-				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-			});
+notesRoutes.get(
+	"/notes",
+	zValidator("query", ListNotesQuerySchema),
+	async (c) => {
+		const user = c.get("user");
+		const query = c.req.valid("query");
 
-			if (!note) {
-				throw new Error("Note not found");
-			}
+		const userNotes = await database.query.notes.findMany({
+			where: and(
+				eq(notes.completed, query.completed),
+				eq(notes.createdBy, user.userId),
+			),
+		});
 
-			const validatedData = UpdateNoteRequestSchema.parse(body);
+		return c.json(userNotes);
+	},
+);
 
-			await database
-				.update(notes)
-				.set({
-					title: validatedData.title ?? note.title,
-					body: validatedData.body ?? note.body,
-					priority: validatedData.priority ?? note.priority,
-				})
-				.where(eq(notes.id, note.id));
+notesRoutes.get(
+	"/notes/:id",
+	zValidator("param", NotePathSchema),
+	async (c) => {
+		const user = c.get("user");
+		const params = c.req.valid("param");
 
-			const updated = await database.query.notes.findFirst({
-				where: eq(notes.id, note.id),
-			});
+		const note = await database.query.notes.findFirst({
+			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+		});
 
-			if (!updated) {
-				throw new Error("Failed to update note");
-			}
+		if (!note) {
+			return c.json({ error: "Note not found" }, 404);
+		}
 
-			return updated;
-		},
-		{
-			params: NotePathSchema,
-			body: UpdateNoteRequestSchema,
-			response: NoteResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Notes"],
-				description: "Update note",
-			},
-		},
-	)
-	.delete(
-		"/:id",
-		async ({ user, params }) => {
-			const note = await database.query.notes.findFirst({
-				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-				with: { attachments: true },
-			});
+		return c.json(note);
+	},
+);
 
-			if (!note) {
-				throw new Error("Note not found");
-			}
+notesRoutes.patch(
+	"/notes/:id",
+	zValidator("param", NotePathSchema),
+	zValidator("json", UpdateNoteRequestSchema),
+	async (c) => {
+		const user = c.get("user");
+		const params = c.req.valid("param");
+		const body = c.req.valid("json");
 
-			const fileKeys = note.attachments.map(
-				(att: { fileKey: string }) => att.fileKey,
-			);
-			await deleteFiles(fileKeys);
+		const note = await database.query.notes.findFirst({
+			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+		});
 
-			await database.delete(notes).where(eq(notes.id, params.id));
+		if (!note) {
+			return c.json({ error: "Note not found" }, 404);
+		}
 
-			return { message: "Note deleted" };
-		},
-		{
-			params: NotePathSchema,
-			auth: true,
-			detail: {
-				tags: ["Notes"],
-				description: "Delete note",
-			},
-		},
-	)
-	.patch(
-		"/:id/complete",
-		async ({ user, params, body }) => {
-			const note = await database.query.notes.findFirst({
-				where: and(eq(notes.id, params.id), eq(notes.createdBy, user.id)),
-			});
+		await database
+			.update(notes)
+			.set({
+				title: body.title ?? note.title,
+				body: body.body ?? note.body,
+				priority: body.priority ?? note.priority,
+			})
+			.where(eq(notes.id, note.id));
 
-			if (!note) {
-				throw new Error("Note not found");
-			}
+		const updated = await database.query.notes.findFirst({
+			where: eq(notes.id, note.id),
+		});
 
-			await database
-				.update(notes)
-				.set({ completed: body.completed })
-				.where(eq(notes.id, params.id));
+		if (!updated) {
+			return c.json({ error: "Failed to update note" }, 500);
+		}
 
-			const updated = await database.query.notes.findFirst({
-				where: eq(notes.id, params.id),
-			});
+		return c.json(updated);
+	},
+);
 
-			if (!updated) {
-				throw new Error("Failed to update note");
-			}
+notesRoutes.delete(
+	"/notes/:id",
+	zValidator("param", NotePathSchema),
+	async (c) => {
+		const user = c.get("user");
+		const params = c.req.valid("param");
 
-			return updated;
-		},
-		{
-			params: NotePathSchema,
-			body: CompleteNoteRequestSchema,
-			response: NoteResponseSchema,
-			auth: true,
-			detail: {
-				tags: ["Notes"],
-				description: "Toggle note completion",
-			},
-		},
-	);
+		const note = await database.query.notes.findFirst({
+			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+			with: { attachments: true },
+		});
+
+		if (!note) {
+			return c.json({ error: "Note not found" }, 404);
+		}
+
+		const fileKeys = note.attachments.map((att) => att.fileKey);
+		await deleteFiles(fileKeys);
+
+		await database.delete(notes).where(eq(notes.id, params.id));
+
+		return c.json({ message: "Note deleted" });
+	},
+);
+
+notesRoutes.patch(
+	"/notes/:id/complete",
+	zValidator("param", NotePathSchema),
+	zValidator("json", z.object({ completed: z.boolean() })),
+	async (c) => {
+		const user = c.get("user");
+		const params = c.req.valid("param");
+		const body = c.req.valid("json");
+
+		const note = await database.query.notes.findFirst({
+			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+		});
+
+		if (!note) {
+			return c.json({ error: "Note not found" }, 404);
+		}
+
+		await database
+			.update(notes)
+			.set({ completed: body.completed })
+			.where(eq(notes.id, params.id));
+
+		const updated = await database.query.notes.findFirst({
+			where: eq(notes.id, params.id),
+		});
+
+		if (!updated) {
+			return c.json({ error: "Failed to update note" }, 500);
+		}
+
+		return c.json(updated);
+	},
+);
 
 export default notesRoutes;
+
+declare module "hono" {
+	interface ContextVariableMap {
+		user: JWTPayload;
+	}
+}

@@ -1,19 +1,24 @@
-import { Elysia } from "elysia";
-import { auth } from "../auth/config";
+import type { MiddlewareHandler } from "hono";
+import { getCookie } from "hono/cookie";
+import { type JWTPayload, verifyJWT } from "~/auth/jwt";
 
-export const betterAuth = new Elysia({ name: "better-auth" }).macro({
-	auth: {
-		async resolve({ status, request: { headers } }) {
-			const session = await auth.api.getSession({
-				headers,
-			});
+declare module "hono" {
+	interface ContextVariableMap {
+		user: JWTPayload;
+	}
+}
 
-			if (!session) return status(401);
+export const authMiddleware: MiddlewareHandler = async (c, next) => {
+	const token = getCookie(c, "auth_token");
+	if (!token) {
+		return c.json({ error: "Unauthorized" }, 401);
+	}
 
-			return {
-				user: session.user,
-				session: session.session,
-			};
-		},
-	},
-});
+	const payload = verifyJWT(token);
+	if (!payload) {
+		return c.json({ error: "Invalid token" }, 401);
+	}
+
+	c.set("user", payload);
+	await next();
+};
