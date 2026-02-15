@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 import { database } from "~/db";
-import { notes } from "~/db/schema";
+import { notes, notesComments } from "~/db/schema";
 import {
 	CreateNoteRequestSchema,
 	ListNotesQuerySchema,
@@ -79,6 +79,11 @@ notesRoutes.get(
 
 		const note = await database.query.notes.findFirst({
 			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
+			with: {
+				comments: {
+					orderBy: (comments, { desc }) => [desc(comments.createdAt)],
+				},
+			},
 		});
 
 		if (!note) {

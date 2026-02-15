@@ -25,6 +25,7 @@ export interface Note {
 	completed: boolean;
 	createdAt: string;
 	updatedAt: string;
+	comments?: Comment[];
 }
 
 export interface Attachment {
@@ -44,63 +45,6 @@ export interface Comment {
 	noteId: string;
 	createdAt: string;
 }
-
-const mockNotes: Note[] = [
-	{
-		id: "1",
-		title: "Project Planning",
-		body: "Need to outline the scope for the Q2 project. Key stakeholders: marketing, engineering, product. Timeline: 6 weeks.",
-		priority: "high",
-		completed: false,
-		createdAt: "2026-02-15T10:00:00Z",
-		updatedAt: "2026-02-15T10:00:00Z",
-	},
-	{
-		id: "2",
-		title: "Buy groceries",
-		body: "Milk, eggs, bread, butter, cheese, apples, bananas",
-		priority: "low",
-		completed: false,
-		createdAt: "2026-02-14T08:30:00Z",
-		updatedAt: "2026-02-14T08:30:00Z",
-	},
-	{
-		id: "3",
-		title: "Fix critical bug",
-		body: "Users reporting login issues on mobile. Investigate OAuth flow.",
-		priority: "urgent",
-		completed: false,
-		createdAt: "2026-02-15T14:00:00Z",
-		updatedAt: "2026-02-15T14:00:00Z",
-	},
-	{
-		id: "4",
-		title: "Team meeting notes",
-		body: "Discussed sprint planning. Action items: update Jira, schedule code review, review PRs.",
-		priority: "medium",
-		completed: true,
-		createdAt: "2026-02-13T11:00:00Z",
-		updatedAt: "2026-02-14T09:00:00Z",
-	},
-	{
-		id: "5",
-		title: "Research new tools",
-		body: "Look into alternatives for current analytics platform. Options: Mixpanel, Amplitude, PostHog.",
-		priority: "medium",
-		completed: false,
-		createdAt: "2026-02-12T16:00:00Z",
-		updatedAt: "2026-02-12T16:00:00Z",
-	},
-	{
-		id: "6",
-		title: "Book flight",
-		body: null,
-		priority: "low",
-		completed: false,
-		createdAt: "2026-02-10T12:00:00Z",
-		updatedAt: "2026-02-10T12:00:00Z",
-	},
-];
 
 const mockAttachments: Attachment[] = [
 	{
@@ -135,63 +79,6 @@ const mockAttachments: Attachment[] = [
 	},
 ];
 
-const mockComments: Comment[] = [
-	{
-		id: "c1",
-		comment: "Let's schedule a meeting to discuss this further.",
-		noteId: "1",
-		createdAt: "2026-02-15T12:00:00Z",
-	},
-	{
-		id: "c2",
-		comment: "I've updated the priority based on latest feedback.",
-		noteId: "1",
-		createdAt: "2026-02-15T13:00:00Z",
-	},
-	{
-		id: "c3",
-		comment: "This is blocking the release, please prioritize.",
-		noteId: "3",
-		createdAt: "2026-02-15T15:00:00Z",
-	},
-	{
-		id: "c3",
-		comment: "This is blocking the release, please prioritize.",
-		noteId: "3",
-		createdAt: "2026-02-15T15:00:00Z",
-	},
-	{
-		id: "c3",
-		comment: "This is blocking the release, please prioritize.",
-		noteId: "3",
-		createdAt: "2026-02-15T15:00:00Z",
-	},
-	{
-		id: "c3",
-		comment: "This is blocking the release, please prioritize.",
-		noteId: "3",
-		createdAt: "2026-02-15T15:00:00Z",
-	},
-	{
-		id: "c3",
-		comment: "This is blocking the release, please prioritize.",
-		noteId: "3",
-		createdAt: "2026-02-15T15:00:00Z",
-	},
-	{
-		id: "c3",
-		comment: "This is blocking the release, please prioritize.",
-		noteId: "3",
-		createdAt: "2026-02-15T15:00:00Z",
-	},
-];
-
-const _notes = [...mockNotes];
-
-function generateId(): string {
-	return Math.random().toString(36).substring(2, 15);
-}
-
 export async function getNotes(completed?: boolean): Promise<Note[]> {
 	let url = getApiUrl("/api/notes");
 	if (completed !== undefined) {
@@ -222,11 +109,17 @@ export async function getNote(id: string): Promise<Note | null> {
 			return null;
 		}
 
-		const note = await handleResponse<Note>(response);
+		const note = await handleResponse<Note & { comments?: Comment[] }>(
+			response,
+		);
 		return {
 			...note,
 			createdAt: note.createdAt.toString(),
 			updatedAt: note.updatedAt.toString(),
+			comments: note.comments?.map((c) => ({
+				...c,
+				createdAt: c.createdAt.toString(),
+			})),
 		};
 	} catch {
 		return null;
@@ -290,59 +183,43 @@ export async function getAttachments(noteId: string): Promise<Attachment[]> {
 	return mockAttachments.filter((att) => att.noteId === noteId);
 }
 
-export async function getNoteComments(noteId: string): Promise<Comment[]> {
-	await new Promise((resolve) => setTimeout(resolve, 200));
-	return mockComments
-		.filter((comment) => comment.noteId === noteId)
-		.sort(
-			(a, b) =>
-				new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-		);
-}
-
 export async function addComment(
 	noteId: string,
 	commentText: string,
 ): Promise<Comment> {
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	const newComment: Comment = {
-		id: generateId(),
-		comment: commentText,
-		noteId,
-		createdAt: new Date().toISOString(),
+	const response = await fetch(getApiUrl(`/api/notes/${noteId}/comments`), {
+		method: "POST",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ comment: commentText }),
+	});
+
+	const comment = await handleResponse<Comment>(response);
+	return {
+		...comment,
+		createdAt: comment.createdAt.toString(),
 	};
-	mockComments.push(newComment);
-	return newComment;
 }
 
 export async function deleteComment(
 	noteId: string,
 	commentId: string,
 ): Promise<{ message: string }> {
-	await new Promise((resolve) => setTimeout(resolve, 200));
-	const index = mockComments.findIndex(
-		(comment) => comment.id === commentId && comment.noteId === noteId,
+	const response = await fetch(
+		getApiUrl(`/api/notes/${noteId}/comments/${commentId}`),
+		{
+			method: "DELETE",
+			credentials: "include",
+		},
 	);
-	if (index === -1) {
-		throw new Error("Comment not found");
-	}
-	mockComments.splice(index, 1);
-	return { message: "Comment deleted" };
+
+	return handleResponse<{ message: string }>(response);
 }
 
 export function formatFileSize(bytes: number): string {
 	if (bytes < 1024) return `${bytes} B`;
 	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
 	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-export function getFileIcon(fileType: string): string {
-	if (fileType.startsWith("image/")) return "🖼️";
-	if (fileType === "application/pdf") return "📄";
-	if (fileType.includes("word") || fileType.includes("document")) return "📝";
-	if (fileType.includes("spreadsheet") || fileType.includes("excel"))
-		return "📊";
-	if (fileType.includes("text")) return "📃";
-	if (fileType.includes("zip") || fileType.includes("archive")) return "📦";
-	return "📎";
 }

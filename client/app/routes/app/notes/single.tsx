@@ -37,7 +37,6 @@ import {
 	formatFileSize,
 	getAttachments,
 	getNote,
-	getNoteComments,
 	type NotePriority,
 	updateNote,
 } from "~/lib/notes";
@@ -61,7 +60,7 @@ export async function clientLoader({
 			throw redirect("/app/notes");
 		}
 		const attachments = await getAttachments(noteId);
-		const comments = await getNoteComments(noteId);
+		const comments = note.comments || [];
 		return { note, attachments, comments };
 	} catch {
 		throw redirect("/app/notes");
@@ -94,21 +93,6 @@ export async function clientAction({
 	if (intent === "delete") {
 		await deleteNote(noteId);
 		throw redirect("/app/notes");
-	}
-
-	if (intent === "addComment") {
-		const commentText = formData.get("comment") as string;
-		if (!commentText?.trim()) {
-			return { success: false, error: "Comment cannot be empty" };
-		}
-		const comment = await addComment(noteId, commentText);
-		return { success: true, comment };
-	}
-
-	if (intent === "deleteComment") {
-		const commentId = formData.get("commentId") as string;
-		await deleteComment(noteId, commentId);
-		return { success: true };
 	}
 
 	return { success: false, error: "Unknown action" };
@@ -159,6 +143,8 @@ export default function NoteDetailPage({
 	const [newComment, setNewComment] = useState("");
 	const [isAddingComment, setIsAddingComment] = useState(false);
 	const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+	const [isDeleteCommentOpen, setIsDeleteCommentOpen] = useState(false);
+	const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
 	useEffect(() => {
 		setNote(initialNote);
@@ -218,23 +204,10 @@ export default function NoteDetailPage({
 
 		setIsAddingComment(true);
 		try {
-			const formData = new FormData();
-			formData.set("intent", "addComment");
-			formData.set("comment", newComment);
-
-			const response = await fetch("", {
-				method: "POST",
-				body: formData,
-			});
-			const result = await response.json();
-
-			if (result.success) {
-				setComments((prev) => [result.comment, ...prev]);
-				setNewComment("");
-				toast.success("Comment added");
-			} else {
-				toast.error(result.error || "Failed to add comment");
-			}
+			const comment = await addComment(note.id, newComment);
+			setComments((prev) => [comment, ...prev]);
+			setNewComment("");
+			toast.success("Comment added");
 		} catch (error) {
 			console.error("Failed to add comment:", error);
 			toast.error("Failed to add comment");
@@ -243,26 +216,24 @@ export default function NoteDetailPage({
 		}
 	}
 
-	async function handleDeleteComment(commentId: string) {
-		if (!confirm("Delete this comment?")) {
-			return;
-		}
+	function openDeleteCommentDialog(commentId: string) {
+		setCommentToDelete(commentId);
+		setIsDeleteCommentOpen(true);
+	}
+
+	async function handleDeleteComment() {
+		if (!commentToDelete) return;
 
 		try {
-			const formData = new FormData();
-			formData.set("intent", "deleteComment");
-			formData.set("commentId", commentId);
-
-			await fetch("", {
-				method: "POST",
-				body: formData,
-			});
-
-			setComments((prev) => prev.filter((c) => c.id !== commentId));
+			await deleteComment(note.id, commentToDelete);
+			setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
 			toast.success("Comment deleted");
 		} catch (error) {
 			console.error("Failed to delete comment:", error);
 			toast.error("Failed to delete comment");
+		} finally {
+			setIsDeleteCommentOpen(false);
+			setCommentToDelete(null);
 		}
 	}
 
@@ -380,7 +351,7 @@ export default function NoteDetailPage({
 														variant="ghost"
 														size="sm"
 														className="h-6 text-xs text-destructive hover:text-destructive"
-														onClick={() => handleDeleteComment(comment.id)}
+														onClick={() => openDeleteCommentDialog(comment.id)}
 													>
 														Delete
 													</Button>
@@ -443,6 +414,29 @@ export default function NoteDetailPage({
 							Cancel
 						</Button>
 						<Button variant="destructive" onClick={handleDelete}>
+							Delete
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			<Dialog open={isDeleteCommentOpen} onOpenChange={setIsDeleteCommentOpen}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle>Delete Comment</DialogTitle>
+						<DialogDescription>
+							Are you sure you want to delete this comment? This action cannot
+							be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<Button
+							variant="outline"
+							onClick={() => setIsDeleteCommentOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button variant="destructive" onClick={handleDeleteComment}>
 							Delete
 						</Button>
 					</DialogFooter>
