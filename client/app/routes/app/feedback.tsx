@@ -9,7 +9,7 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import type { Route } from "./+types/feedback";
 
-export function meta({}: Route.MetaArgs) {
+export function meta() {
 	return [
 		{ title: "Feedback | HomeThings" },
 		{ name: "description", content: "Please give your feedback" },
