@@ -29,7 +29,8 @@ notesRoutes.post(
 		await database.insert(notes).values({
 			id: noteId,
 			title: body.title,
-			priority: "medium",
+			body: body.body || "",
+			priority: body.priority || "medium",
 			completed: false,
 			createdBy: user.userId,
 			createdAt: now,

@@ -13,6 +13,8 @@ export const NotePathSchema = z.object({
 
 export const CreateNoteRequestSchema = z.object({
 	title: z.string().min(1, "Title is required"),
+	body: z.string().optional(),
+	priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
 });
 
 export const UpdateNoteRequestSchema = z.object({

@@ -1,3 +1,20 @@
+const API_BASE_URL =
+	import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+
+function getApiUrl(endpoint: string): string {
+	return `${API_BASE_URL}${endpoint}`;
+}
+
+async function handleResponse<T>(response: Response): Promise<T> {
+	if (!response.ok) {
+		const error = (await response.json().catch(() => ({
+			error: "An unexpected error occurred",
+		}))) as { error: string };
+		throw new Error(error.error || "Request failed");
+	}
+	return response.json() as Promise<T>;
+}
+
 export type NotePriority = "low" | "medium" | "high" | "urgent";
 
 export interface Note {
@@ -169,26 +186,51 @@ const mockComments: Comment[] = [
 	},
 ];
 
-let notes = [...mockNotes];
+const notes = [...mockNotes];
 
 function generateId(): string {
 	return Math.random().toString(36).substring(2, 15);
 }
 
 export async function getNotes(completed?: boolean): Promise<Note[]> {
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	let result = [...notes].sort(
-		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-	);
+	let url = getApiUrl("/api/notes");
 	if (completed !== undefined) {
-		result = result.filter((note) => note.completed === completed);
+		url += `?completed=${completed}`;
 	}
-	return result;
+
+	const response = await fetch(url, {
+		method: "GET",
+		credentials: "include",
+	});
+
+	const notes = await handleResponse<Note[]>(response);
+	return notes.map((note) => ({
+		...note,
+		createdAt: note.createdAt.toString(),
+		updatedAt: note.updatedAt.toString(),
+	}));
 }
 
 export async function getNote(id: string): Promise<Note | null> {
-	await new Promise((resolve) => setTimeout(resolve, 200));
-	return notes.find((note) => note.id === id) || null;
+	try {
+		const response = await fetch(getApiUrl(`/api/notes/${id}`), {
+			method: "GET",
+			credentials: "include",
+		});
+
+		if (response.status === 404) {
+			return null;
+		}
+
+		const note = await handleResponse<Note>(response);
+		return {
+			...note,
+			createdAt: note.createdAt.toString(),
+			updatedAt: note.updatedAt.toString(),
+		};
+	} catch {
+		return null;
+	}
 }
 
 export async function createNote(
@@ -196,19 +238,21 @@ export async function createNote(
 	priority: NotePriority = "medium",
 	body: string | null = null,
 ): Promise<Note> {
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	const now = new Date().toISOString();
-	const newNote: Note = {
-		id: generateId(),
-		title,
-		body,
-		priority,
-		completed: false,
-		createdAt: now,
-		updatedAt: now,
+	const response = await fetch(getApiUrl("/api/notes"), {
+		method: "POST",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({ title, body, priority }),
+	});
+
+	const note = await handleResponse<Note>(response);
+	return {
+		...note,
+		createdAt: note.createdAt.toString(),
+		updatedAt: note.updatedAt.toString(),
 	};
-	notes = [newNote, ...notes];
-	return newNote;
 }
 
 export async function updateNote(
@@ -246,13 +290,12 @@ export async function setNoteComplete(
 }
 
 export async function deleteNote(id: string): Promise<{ message: string }> {
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	const index = notes.findIndex((note) => note.id === id);
-	if (index === -1) {
-		throw new Error("Note not found");
-	}
-	notes = notes.filter((note) => note.id !== id);
-	return { message: "Note deleted" };
+	const response = await fetch(getApiUrl(`/api/notes/${id}`), {
+		method: "DELETE",
+		credentials: "include",
+	});
+
+	return handleResponse<{ message: string }>(response);
 }
 
 export async function getAttachments(noteId: string): Promise<Attachment[]> {

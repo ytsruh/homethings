@@ -101,7 +101,7 @@ export async function clientAction({
 
 	if (intent === "delete") {
 		await deleteNote(noteId);
-		return redirect("/app/notes");
+		throw redirect("/app/notes");
 	}
 
 	if (intent === "addComment") {
@@ -230,19 +230,9 @@ export default function NoteDetailPage({
 	}
 
 	async function handleDelete() {
-		if (!confirm("Are you sure you want to delete this note?")) {
-			return;
-		}
-
 		try {
-			const formData = new FormData();
-			formData.set("intent", "delete");
-
-			await fetch("", {
-				method: "POST",
-				body: formData,
-			});
-
+			await deleteNote(note.id);
+			toast.success("Note deleted");
 			navigate("/app/notes");
 		} catch (error) {
 			console.error("Failed to delete note:", error);
