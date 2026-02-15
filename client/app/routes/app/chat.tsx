@@ -165,6 +165,11 @@ export default function Chat() {
 		}
 	}
 
+	function handleClearChat() {
+		setMessages([]);
+		messageIdRef.current = 0;
+	}
+
 	return (
 		<div className="flex flex-col h-full px-2 mx-auto">
 			<div className="flex items-center gap-4 pb-4">
@@ -181,6 +186,13 @@ export default function Chat() {
 						))}
 					</SelectContent>
 				</Select>
+				<Button
+					onClick={handleClearChat}
+					disabled={messages.length === 0}
+					className="ml-auto"
+				>
+					New
+				</Button>
 			</div>
 
 			<div className="flex-1 max-h-[80vh] md:max-h-[72vh] overflow-y-auto space-y-4 p-4 border rounded-lg bg-card/50">
