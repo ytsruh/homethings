@@ -28,56 +28,12 @@ export interface Note {
 	comments?: Comment[];
 }
 
-export interface Attachment {
-	id: string;
-	fileKey: string;
-	fileName: string;
-	fileType: string;
-	fileSize: number;
-	noteId: string;
-	createdAt: string;
-	presignedUrl?: string;
-}
-
 export interface Comment {
 	id: string;
 	comment: string;
 	noteId: string;
 	createdAt: string;
 }
-
-const mockAttachments: Attachment[] = [
-	{
-		id: "a1",
-		fileKey: "notes/1/screenshot.png",
-		fileName: "screenshot.png",
-		fileType: "image/png",
-		fileSize: 245000,
-		noteId: "1",
-		createdAt: "2026-02-15T11:00:00Z",
-		presignedUrl: "#",
-	},
-	{
-		id: "a2",
-		fileKey: "notes/1/specs.pdf",
-		fileName: "project-specs.pdf",
-		fileType: "application/pdf",
-		fileSize: 1250000,
-		noteId: "1",
-		createdAt: "2026-02-15T11:30:00Z",
-		presignedUrl: "#",
-	},
-	{
-		id: "a3",
-		fileKey: "notes/3/error-log.txt",
-		fileName: "error-log.txt",
-		fileType: "text/plain",
-		fileSize: 15000,
-		noteId: "3",
-		createdAt: "2026-02-15T14:30:00Z",
-		presignedUrl: "#",
-	},
-];
 
 export async function getNotes(completed?: boolean): Promise<Note[]> {
 	let url = getApiUrl("/api/notes");
@@ -178,11 +134,6 @@ export async function deleteNote(id: string): Promise<{ message: string }> {
 	return handleResponse<{ message: string }>(response);
 }
 
-export async function getAttachments(noteId: string): Promise<Attachment[]> {
-	await new Promise((resolve) => setTimeout(resolve, 200));
-	return mockAttachments.filter((att) => att.noteId === noteId);
-}
-
 export async function addComment(
 	noteId: string,
 	commentText: string,
@@ -216,10 +167,4 @@ export async function deleteComment(
 	);
 
 	return handleResponse<{ message: string }>(response);
-}
-
-export function formatFileSize(bytes: number): string {
-	if (bytes < 1024) return `${bytes} B`;
-	if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }

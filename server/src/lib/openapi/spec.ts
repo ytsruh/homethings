@@ -52,29 +52,6 @@ export const openApiSpec = {
 					updatedAt: { type: "string", format: "date-time" },
 				},
 			},
-			Attachment: {
-				type: "object",
-				properties: {
-					id: { type: "string" },
-					fileKey: { type: "string" },
-					fileName: { type: "string" },
-					fileType: { type: "string" },
-					fileSize: { type: "number" },
-					createdAt: { type: "string", format: "date-time" },
-				},
-			},
-			AttachmentWithUrl: {
-				type: "object",
-				properties: {
-					id: { type: "string" },
-					fileKey: { type: "string" },
-					fileName: { type: "string" },
-					fileType: { type: "string" },
-					fileSize: { type: "number" },
-					createdAt: { type: "string", format: "date-time" },
-					presignedUrl: { type: "string" },
-				},
-			},
 			Comment: {
 				type: "object",
 				properties: {
@@ -463,7 +440,7 @@ export const openApiSpec = {
 			delete: {
 				tags: ["Notes"],
 				summary: "Delete note",
-				description: "Delete a specific note and its attachments",
+				description: "Delete a specific note",
 				parameters: [
 					{
 						name: "id",
@@ -483,169 +460,6 @@ export const openApiSpec = {
 					},
 					404: {
 						description: "Note not found",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Error" },
-							},
-						},
-					},
-				},
-			},
-		},
-		"/notes/{id}/attachments": {
-			post: {
-				tags: ["Attachments"],
-				summary: "Upload attachments",
-				description: "Upload one or more files to a note",
-				parameters: [
-					{
-						name: "id",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-				],
-				requestBody: {
-					content: {
-						"multipart/form-data": {
-							schema: {
-								type: "object",
-								properties: {
-									files: {
-										type: "array",
-										items: { type: "string", format: "binary" },
-									},
-								},
-							},
-						},
-					},
-				},
-				responses: {
-					200: {
-						description: "Attachments uploaded",
-						content: {
-							"application/json": {
-								schema: {
-									type: "array",
-									items: { $ref: "#/components/schemas/Attachment" },
-								},
-							},
-						},
-					},
-					404: {
-						description: "Note not found",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Error" },
-							},
-						},
-					},
-				},
-			},
-			get: {
-				tags: ["Attachments"],
-				summary: "List attachments",
-				description: "List all attachments for a note with presigned URLs",
-				parameters: [
-					{
-						name: "id",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-				],
-				responses: {
-					200: {
-						description: "List of attachments",
-						content: {
-							"application/json": {
-								schema: {
-									type: "array",
-									items: { $ref: "#/components/schemas/AttachmentWithUrl" },
-								},
-							},
-						},
-					},
-					404: {
-						description: "Note not found",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Error" },
-							},
-						},
-					},
-				},
-			},
-		},
-		"/notes/{id}/attachments/{attachmentId}": {
-			delete: {
-				tags: ["Attachments"],
-				summary: "Delete attachment",
-				description: "Delete a specific attachment",
-				parameters: [
-					{
-						name: "id",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-					{
-						name: "attachmentId",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-				],
-				responses: {
-					200: {
-						description: "Attachment deleted",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Error" },
-							},
-						},
-					},
-					404: {
-						description: "Attachment not found",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Error" },
-							},
-						},
-					},
-				},
-			},
-		},
-		"/notes/{id}/attachments/{attachmentId}/presigned": {
-			get: {
-				tags: ["Attachments"],
-				summary: "Get presigned URL",
-				description: "Get a presigned URL for a specific attachment",
-				parameters: [
-					{
-						name: "id",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-					{
-						name: "attachmentId",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-				],
-				responses: {
-					200: {
-						description: "Presigned URL generated",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/AttachmentWithUrl" },
-							},
-						},
-					},
-					404: {
-						description: "Attachment not found",
 						content: {
 							"application/json": {
 								schema: { $ref: "#/components/schemas/Error" },

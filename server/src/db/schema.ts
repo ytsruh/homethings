@@ -34,18 +34,6 @@ export const notes = sqliteTable("notes", {
 		.$onUpdate(() => new Date()),
 });
 
-export const noteAttachments = sqliteTable("note_attachments", {
-	id: text("id").primaryKey(),
-	noteId: text("note_id")
-		.notNull()
-		.references(() => notes.id, { onDelete: "cascade" }),
-	fileKey: text("file_key").notNull(),
-	fileName: text("file_name").notNull(),
-	fileType: text("file_type").notNull(),
-	fileSize: integer("file_size").notNull(),
-	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-});
-
 export const notesComments = sqliteTable("notes_comments", {
 	id: text("id").primaryKey(),
 	comment: text("comment").notNull(),
@@ -75,19 +63,8 @@ export const notesRelations = relations(notes, ({ one, many }) => ({
 		fields: [notes.createdBy],
 		references: [users.id],
 	}),
-	attachments: many(noteAttachments),
 	comments: many(notesComments),
 }));
-
-export const noteAttachmentsRelations = relations(
-	noteAttachments,
-	({ one }) => ({
-		note: one(notes, {
-			fields: [noteAttachments.noteId],
-			references: [notes.id],
-		}),
-	}),
-);
 
 export const notesCommentsRelations = relations(notesComments, ({ one }) => ({
 	note: one(notes, {

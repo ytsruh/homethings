@@ -10,7 +10,6 @@ import {
 	NotePathSchema,
 	UpdateNoteRequestSchema,
 } from "~/lib/schemas";
-import { deleteFiles } from "~/lib/storage/r2";
 import { throwNotFound, throwServerError } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
@@ -145,16 +144,12 @@ notesRoutes.delete(
 
 		const note = await database.query.notes.findFirst({
 			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
-			with: { attachments: true },
 		});
 
 		if (!note) {
 			throwNotFound("Note not found");
 			return;
 		}
-
-		const fileKeys = note.attachments.map((att) => att.fileKey);
-		await deleteFiles(fileKeys);
 
 		await database.delete(notes).where(eq(notes.id, params.id));
 
