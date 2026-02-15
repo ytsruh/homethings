@@ -2,17 +2,6 @@ node_modules
 .DS_Store
 .env
 *.db
-tmp
-
-# Pocketbase
-.pocketbase
-pb_data
-
-# Project build, scripts & test binary
-*.test
-main
-homethings
-scripts/data
 
 # React Router
 .react-router/
