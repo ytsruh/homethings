@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { Link, Outlet, useNavigation } from "react-router";
+import {
+	Link,
+	Outlet,
+	redirect,
+	useLoaderData,
+	useNavigation,
+} from "react-router";
 import { BreadcrumbNav } from "~/components/BreadcrumbNav";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import { menuItems, Navbar } from "~/components/Navbar";
@@ -15,8 +21,19 @@ import {
 	SidebarMenuItem,
 	SidebarProvider,
 } from "~/components/ui/sidebar";
+import { AuthProvider } from "~/hooks/use-auth";
+import { checkAuth } from "~/lib/auth";
+
+export async function clientLoader() {
+	const user = await checkAuth();
+	if (!user) {
+		throw redirect("/login");
+	}
+	return { user };
+}
 
 export default function AppLayout() {
+	const { user } = useLoaderData<typeof clientLoader>();
 	const navigation = useNavigation();
 	const isNavigating = Boolean(navigation.location);
 
@@ -149,56 +166,58 @@ export default function AppLayout() {
 
 	return (
 		<ThemeProvider defaultTheme="dark" storageKey="ui-theme">
-			<SidebarProvider defaultOpen={false}>
-				<main className="h-screen w-screen overflow-hidden flex flex-col">
-					<Navbar />
-					<div className="px-1 sm:px-5 flex flex-col h-full">
-						<BreadcrumbNav />
-						<div className="hidden md:block">
-							<Separator />
-						</div>
-						<div className="flex h-full">
-							<Sidebar
-								variant="sidebar"
-								collapsible="none"
-								className="hidden lg:block bg-transparent"
-							>
-								<SidebarContent>
-									<SidebarGroup>
-										<SidebarGroupContent>
-											<SidebarMenu>
-												<nav className="flex flex-col space-y-3">
-													{menuItems.map((item) => {
-														return (
-															<SidebarMenuItem key={item.title}>
-																<SidebarMenuButton asChild>
-																	<Link to={item.url}>
-																		<item.icon />
-																		<span>{item.title}</span>
-																	</Link>
-																</SidebarMenuButton>
-															</SidebarMenuItem>
-														);
-													})}
-												</nav>
-											</SidebarMenu>
-										</SidebarGroupContent>
-									</SidebarGroup>
-								</SidebarContent>
-							</Sidebar>
-							<div className="p-0 md:p-2 w-full h-full">
-								{isNavigating ? (
-									<div className="flex items-center justify-center h-full">
-										<LoadingSpinner />
-									</div>
-								) : (
-									<Outlet />
-								)}
+			<AuthProvider user={user}>
+				<SidebarProvider defaultOpen={false}>
+					<main className="h-screen w-screen overflow-hidden flex flex-col">
+						<Navbar />
+						<div className="px-1 sm:px-5 flex flex-col h-full">
+							<BreadcrumbNav />
+							<div className="hidden md:block">
+								<Separator />
+							</div>
+							<div className="flex h-full">
+								<Sidebar
+									variant="sidebar"
+									collapsible="none"
+									className="hidden lg:block bg-transparent"
+								>
+									<SidebarContent>
+										<SidebarGroup>
+											<SidebarGroupContent>
+												<SidebarMenu>
+													<nav className="flex flex-col space-y-3">
+														{menuItems.map((item) => {
+															return (
+																<SidebarMenuItem key={item.title}>
+																	<SidebarMenuButton asChild>
+																		<Link to={item.url}>
+																			<item.icon />
+																			<span>{item.title}</span>
+																		</Link>
+																	</SidebarMenuButton>
+																</SidebarMenuItem>
+															);
+														})}
+													</nav>
+												</SidebarMenu>
+											</SidebarGroupContent>
+										</SidebarGroup>
+									</SidebarContent>
+								</Sidebar>
+								<div className="p-0 md:p-2 w-full h-full">
+									{isNavigating ? (
+										<div className="flex items-center justify-center h-full">
+											<LoadingSpinner />
+										</div>
+									) : (
+										<Outlet />
+									)}
+								</div>
 							</div>
 						</div>
-					</div>
-				</main>
-			</SidebarProvider>
+					</main>
+				</SidebarProvider>
+			</AuthProvider>
 		</ThemeProvider>
 	);
 }

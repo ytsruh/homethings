@@ -6,14 +6,35 @@ import { ThemeProvider } from "~/components/theme-provider";
 import { ModeToggle } from "~/components/theme-toggle";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { login } from "~/lib/auth";
 import { loginForm } from "~/lib/schema";
-import type { Route } from "../+types/login";
 
 export function meta() {
 	return [
 		{ title: "Login to Homethings" },
 		{ name: "description", content: "Login to view awesome things" },
 	];
+}
+
+export async function clientAction({ request }: { request: Request }) {
+	const formData = await request.formData();
+	const email = formData.get("email") as string;
+	const password = formData.get("password") as string;
+
+	try {
+		loginForm.parse({ email, password });
+		await login(email, password);
+		return redirect("/app");
+	} catch (error) {
+		if (error instanceof ZodError) {
+			const message = error.errors[0]?.message || "Validation error";
+			toast({ title: "Error", description: message, type: "destructive" });
+			return { error: message };
+		}
+		const message = error instanceof Error ? error.message : "Login failed";
+		toast({ title: "Error", description: message, type: "destructive" });
+		return { error: message };
+	}
 }
 
 export default function Login() {

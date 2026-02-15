@@ -15,25 +15,25 @@ This document provides guidance for AI agents working on this codebase.
 
 ```bash
 # Development
-npm run dev              # Start dev server (react-router dev)
+bun run dev              # Start dev server (react-router dev)
 
 # Build
-npm run build            # Production build (react-router build)
-npm run start            # Build and serve production build
+bun run build            # Production build (react-router build)
+bun run start            # Build and serve production build
 
 # Type Checking
-npm run typecheck        # Run TypeScript typegen + tsc --noEmit
+bun run typecheck        # Run TypeScript typegen + tsc --noEmit
 
 # Linting & Formatting
-npx biome check .        # Run Biome linter
-npx biome check --write .  # Fix auto-fixable issues
-npx biome format .      # Format code
+bunx biome check .        # Run Biome linter
+bunx biome check --write .  # Fix auto-fixable issues
+bunx biome format .      # Format code
 ```
 
 ## Code Style
 
 ### Formatting
-- Run `npx biome format --write .` before committing
+- Run `bunx biome format --write .` before committing
 
 ### TypeScript
 - **Strict mode**: Always enabled
@@ -113,9 +113,9 @@ app/
 
 ## Before Submitting Changes
 
-1. Run `npm run typecheck` to verify TypeScript
-2. Run `npx biome check --write .` to fix lint issues
-3. Run `npm run build` to verify production build works
+1. Run `bun run typecheck` to verify TypeScript
+2. Run `bunx biome check --write .` to fix lint issues
+3. Run `bun run build` to verify production build works
 
 ## Important Notes
 

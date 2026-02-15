@@ -34,7 +34,12 @@ app.onError((error, c) => {
 app.use(
 	"*",
 	cors({
-		origin: process.env.CLIENT_URL || "http://localhost:3000",
+		origin: (origin) => {
+			if (!origin) return "https://www.ytsruh.com"; // Default for same-origin
+			return origin.startsWith("http://localhost")
+				? origin
+				: "https://www.ytsruh.com";
+		},
 		credentials: true,
 		allowMethods: ["GET", "POST", "PATCH", "DELETE"],
 		allowHeaders: ["Content-Type", "Authorization"],
