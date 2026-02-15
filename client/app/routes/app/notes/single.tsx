@@ -29,7 +29,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "~/components/ui/select";
-import { Switch } from "~/components/ui/switch";
 import { Textarea } from "~/components/ui/textarea";
 import {
 	addComment,
@@ -40,7 +39,6 @@ import {
 	getNote,
 	getNoteComments,
 	type NotePriority,
-	setNoteComplete,
 	updateNote,
 } from "~/lib/notes";
 
@@ -90,12 +88,6 @@ export async function clientAction({
 			body,
 			priority: priority || undefined,
 		});
-		return { success: true, note };
-	}
-
-	if (intent === "toggleComplete") {
-		const completed = formData.get("completed") === "true";
-		const note = await setNoteComplete(noteId, completed);
 		return { success: true, note };
 	}
 
@@ -180,24 +172,13 @@ export default function NoteDetailPage({
 	async function handleSave() {
 		setIsSaving(true);
 		try {
-			const formData = new FormData();
-			formData.set("intent", "update");
-			formData.set("title", title);
-			formData.set("body", body);
-			formData.set("priority", priority);
-
-			const response = await fetch("", {
-				method: "POST",
-				body: formData,
+			const updatedNote = await updateNote(note.id, {
+				title,
+				body: body || null,
+				priority,
 			});
-			const result = await response.json();
-
-			if (result.success) {
-				setNote(result.note);
-				toast.success("Note saved");
-			} else {
-				toast.error(result.error || "Failed to save note");
-			}
+			setNote(updatedNote);
+			toast.success("Note saved");
 		} catch (error) {
 			console.error("Failed to save note:", error);
 			toast.error("Failed to save note");
@@ -208,21 +189,10 @@ export default function NoteDetailPage({
 
 	async function handleToggleComplete() {
 		try {
-			const formData = new FormData();
-			formData.set("intent", "toggleComplete");
-			formData.set("completed", String(!note.completed));
-
-			const response = await fetch("", {
-				method: "POST",
-				body: formData,
+			const updatedNote = await updateNote(note.id, {
+				completed: !note.completed,
 			});
-			const result = await response.json();
-
-			if (result.success) {
-				setNote(result.note);
-			} else {
-				toast.error(result.error || "Failed to update note");
-			}
+			setNote(updatedNote);
 		} catch (error) {
 			console.error("Failed to update note:", error);
 			toast.error("Failed to update note");
@@ -342,16 +312,23 @@ export default function NoteDetailPage({
 										<Badge>
 											{priority.charAt(0).toUpperCase() + priority.slice(1)}
 										</Badge>
-										<div className="flex items-center gap-2">
-											<Switch
-												id="completed"
-												checked={note.completed}
-												onCheckedChange={handleToggleComplete}
-											/>
-											<label htmlFor="completed" className="text-sm">
-												{note.completed ? "Closed" : "Open"}
-											</label>
-										</div>
+										<Select
+											value={note.completed ? "closed" : "open"}
+											onValueChange={(value) => {
+												const newCompleted = value === "closed";
+												if (newCompleted !== note.completed) {
+													handleToggleComplete();
+												}
+											}}
+										>
+											<SelectTrigger className="w-[120px]">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="open">Open</SelectItem>
+												<SelectItem value="closed">Closed</SelectItem>
+											</SelectContent>
+										</Select>
 									</div>
 								</div>
 								<Button onClick={handleSave} disabled={isSaving}>

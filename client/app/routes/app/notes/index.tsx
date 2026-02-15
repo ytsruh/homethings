@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import {
+	Link,
+	useLoaderData,
+	useNavigate,
+	useSearchParams,
+} from "react-router";
 import { toast } from "sonner";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
@@ -36,27 +41,30 @@ export function meta() {
 	];
 }
 
-export async function clientLoader() {
+export async function clientLoader({ request }: { request: Request }) {
+	const url = new URL(request.url);
+	const filter = url.searchParams.get("filter") || "incomplete";
+	const completed = filter === "completed";
+
 	try {
-		const notes = await getNotes();
+		const notes = await getNotes(completed);
 		return { notes };
 	} catch {
 		return { notes: [] };
 	}
 }
 
-type FilterType = "all" | "incomplete" | "completed";
+type FilterType = "incomplete" | "completed";
 
-export default function NotesPage({
-	loaderData,
-}: {
-	loaderData: { notes: Note[] };
-}) {
-	const initialNotes = loaderData?.notes ?? [];
+export default function NotesPage() {
+	const initialData = useLoaderData<typeof clientLoader>();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();
-	const [notes, setNotes] = useState<Note[]>(initialNotes);
+	const [notes, setNotes] = useState<Note[]>(initialData.notes);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [filter, setFilter] = useState<FilterType>("all");
+	const [filter, setFilter] = useState<FilterType>(
+		(searchParams.get("filter") as FilterType) || "incomplete",
+	);
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 	const [newNoteTitle, setNewNoteTitle] = useState("");
 	const [newNoteBody, setNewNoteBody] = useState("");
@@ -65,22 +73,16 @@ export default function NotesPage({
 	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
-		setNotes(initialNotes);
-	}, [initialNotes]);
+		setNotes(initialData.notes);
+	}, [initialData.notes]);
 
-	const filteredNotes = notes
-		.filter((note) => {
-			if (filter === "incomplete") return !note.completed;
-			if (filter === "completed") return note.completed;
-			return true;
-		})
-		.filter((note) => {
-			if (!searchQuery) return true;
-			const query = searchQuery.toLowerCase();
-			const titleMatch = note.title.toLowerCase().includes(query);
-			const bodyMatch = note.body?.toLowerCase().includes(query);
-			return titleMatch || bodyMatch;
-		});
+	const filteredNotes = notes.filter((note) => {
+		if (!searchQuery) return true;
+		const query = searchQuery.toLowerCase();
+		const titleMatch = note.title.toLowerCase().includes(query);
+		const bodyMatch = note.body?.toLowerCase().includes(query);
+		return titleMatch || bodyMatch;
+	});
 
 	async function handleCreateNote() {
 		if (!newNoteTitle.trim()) {
@@ -216,23 +218,22 @@ export default function NotesPage({
 				/>
 				<div className="flex gap-2">
 					<Button
-						variant={filter === "all" ? "default" : "outline"}
-						size="sm"
-						onClick={() => setFilter("all")}
-					>
-						All
-					</Button>
-					<Button
 						variant={filter === "incomplete" ? "default" : "outline"}
 						size="sm"
-						onClick={() => setFilter("incomplete")}
+						onClick={() => {
+							setFilter("incomplete");
+							setSearchParams({ filter: "incomplete" });
+						}}
 					>
 						Incomplete
 					</Button>
 					<Button
 						variant={filter === "completed" ? "default" : "outline"}
 						size="sm"
-						onClick={() => setFilter("completed")}
+						onClick={() => {
+							setFilter("completed");
+							setSearchParams({ filter: "completed" });
+						}}
 					>
 						Completed
 					</Button>
@@ -242,7 +243,7 @@ export default function NotesPage({
 			{filteredNotes.length === 0 ? (
 				<div className="text-center py-12">
 					<p className="text-muted-foreground">
-						{searchQuery || filter !== "all"
+						{searchQuery
 							? "No notes match your search"
 							: "No notes yet. Create your first note!"}
 					</p>

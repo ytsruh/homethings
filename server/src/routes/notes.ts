@@ -114,6 +114,7 @@ notesRoutes.patch(
 				title: body.title ?? note.title,
 				body: body.body ?? note.body,
 				priority: body.priority ?? note.priority,
+				completed: body.completed ?? note.completed,
 			})
 			.where(eq(notes.id, note.id));
 
@@ -153,42 +154,6 @@ notesRoutes.delete(
 		await database.delete(notes).where(eq(notes.id, params.id));
 
 		return c.json({ message: "Note deleted" });
-	},
-);
-
-notesRoutes.patch(
-	"/notes/:id/complete",
-	zValidator("param", NotePathSchema),
-	createValidator(z.object({ completed: z.boolean() })),
-	async (c) => {
-		const user = c.get("user");
-		const params = c.req.valid("param");
-		const body = c.req.valid("json");
-
-		const note = await database.query.notes.findFirst({
-			where: and(eq(notes.id, params.id), eq(notes.createdBy, user.userId)),
-		});
-
-		if (!note) {
-			throwNotFound("Note not found");
-			return;
-		}
-
-		await database
-			.update(notes)
-			.set({ completed: body.completed })
-			.where(eq(notes.id, params.id));
-
-		const updated = await database.query.notes.findFirst({
-			where: eq(notes.id, params.id),
-		});
-
-		if (!updated) {
-			throwServerError();
-			return;
-		}
-
-		return c.json(updated);
 	},
 );
 

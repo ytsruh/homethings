@@ -21,6 +21,7 @@ export const UpdateNoteRequestSchema = z.object({
 	title: z.string().optional(),
 	body: z.string().optional(),
 	priority: z.enum(["low", "medium", "high", "urgent"]).optional(),
+	completed: z.boolean().optional(),
 });
 
 export const CompleteNoteRequestSchema = z.object({
@@ -28,7 +29,7 @@ export const CompleteNoteRequestSchema = z.object({
 });
 
 export const ListNotesQuerySchema = z.object({
-	completed: z.coerce.boolean(),
+	completed: z.preprocess((val) => val === "true", z.boolean()),
 });
 
 // ============ Response Schemas ============

@@ -492,46 +492,6 @@ export const openApiSpec = {
 				},
 			},
 		},
-		"/notes/{id}/complete": {
-			patch: {
-				tags: ["Notes"],
-				summary: "Complete note",
-				description: "Mark a note as completed or incomplete",
-				parameters: [
-					{
-						name: "id",
-						in: "path",
-						required: true,
-						schema: { type: "string", format: "uuid" },
-					},
-				],
-				requestBody: {
-					content: {
-						"application/json": {
-							schema: { $ref: "#/components/schemas/CompleteNoteRequest" },
-						},
-					},
-				},
-				responses: {
-					200: {
-						description: "Note completion status updated",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Note" },
-							},
-						},
-					},
-					404: {
-						description: "Note not found",
-						content: {
-							"application/json": {
-								schema: { $ref: "#/components/schemas/Error" },
-							},
-						},
-					},
-				},
-			},
-		},
 		"/notes/{id}/attachments": {
 			post: {
 				tags: ["Attachments"],

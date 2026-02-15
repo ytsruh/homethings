@@ -186,7 +186,7 @@ const mockComments: Comment[] = [
 	},
 ];
 
-const notes = [...mockNotes];
+const _notes = [...mockNotes];
 
 function generateId(): string {
 	return Math.random().toString(36).substring(2, 15);
@@ -257,36 +257,23 @@ export async function createNote(
 
 export async function updateNote(
 	id: string,
-	updates: Partial<Pick<Note, "title" | "body" | "priority">>,
+	updates: Partial<Pick<Note, "title" | "body" | "priority" | "completed">>,
 ): Promise<Note> {
-	await new Promise((resolve) => setTimeout(resolve, 300));
-	const index = notes.findIndex((note) => note.id === id);
-	if (index === -1) {
-		throw new Error("Note not found");
-	}
-	notes[index] = {
-		...notes[index],
-		...updates,
-		updatedAt: new Date().toISOString(),
-	};
-	return notes[index];
-}
+	const response = await fetch(getApiUrl(`/api/notes/${id}`), {
+		method: "PATCH",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(updates),
+	});
 
-export async function setNoteComplete(
-	id: string,
-	completed: boolean,
-): Promise<Note> {
-	await new Promise((resolve) => setTimeout(resolve, 200));
-	const index = notes.findIndex((note) => note.id === id);
-	if (index === -1) {
-		throw new Error("Note not found");
-	}
-	notes[index] = {
-		...notes[index],
-		completed,
-		updatedAt: new Date().toISOString(),
+	const note = await handleResponse<Note>(response);
+	return {
+		...note,
+		createdAt: note.createdAt.toString(),
+		updatedAt: note.updatedAt.toString(),
 	};
-	return notes[index];
 }
 
 export async function deleteNote(id: string): Promise<{ message: string }> {
