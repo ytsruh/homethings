@@ -1,7 +1,10 @@
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { timeout } from "hono/timeout";
 import { z } from "zod";
 import { ai, type ChatOptions } from "~/lib/ai";
 import { aiConfig, allModels, isModelAvailable } from "~/lib/ai/config";
+import { AIError } from "~/lib/ai/errors";
 import { throwBadRequest } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
@@ -17,9 +20,15 @@ const tokensSchema = z.object({
 
 export const chat = new Hono<{ Variables: { user: JWTPayload } }>();
 
+// Set longer timeout than server standard for chat routes
+chat.use("*", timeout(30000));
 chat.post("/chat", createValidator(chatSchema), async (c) => {
 	const _user = c.get("user");
 	const body = c.req.valid("json");
+
+	if (!process.env.OPENROUTER_API_KEY) {
+		throw new HTTPException(503, { message: "AI service not configured" });
+	}
 
 	if (body.model && !isModelAvailable(body.model)) {
 		throwBadRequest(`Model '${body.model}' is not available`, {
@@ -34,18 +43,35 @@ chat.post("/chat", createValidator(chatSchema), async (c) => {
 		maxTokens: aiConfig.maxTokens,
 	};
 
-	const response = await ai.chat(
-		[{ role: "user", content: body.message }],
-		options,
-	);
-
-	return c.json({ response });
+	try {
+		const response = await ai.chat(
+			[{ role: "user", content: body.message }],
+			options,
+		);
+		return c.json({ response });
+	} catch (error) {
+		console.error("Chat error:", error);
+		if (error instanceof AIError) {
+			throw new HTTPException(error.statusCode as any, {
+				message: error.message,
+				cause: { code: error.code },
+			});
+		}
+		if (error instanceof Error) {
+			throw new HTTPException(500, { message: error.message });
+		}
+		throw error;
+	}
 });
 
 chat.post("/chat/stream", createValidator(chatSchema), async (c) => {
 	const _user = c.get("user");
 	const body = c.req.valid("json");
 
+	if (!process.env.OPENROUTER_API_KEY) {
+		throw new HTTPException(503, { message: "AI service not configured" });
+	}
+
 	if (body.model && !isModelAvailable(body.model)) {
 		throwBadRequest(`Model '${body.model}' is not available`, {
 			code: "INVALID_MODEL",
@@ -59,29 +85,55 @@ chat.post("/chat/stream", createValidator(chatSchema), async (c) => {
 		maxTokens: aiConfig.maxTokens,
 	};
 
-	const stream = ai.chatStream(
-		[{ role: "user", content: body.message }],
-		options,
-	);
+	try {
+		const stream = ai.chatStream(
+			[{ role: "user", content: body.message }],
+			options,
+		);
 
-	const readable = new ReadableStream({
-		async start(controller) {
-			try {
-				for await (const chunk of stream) {
-					controller.enqueue(new TextEncoder().encode(chunk));
+		const readable = new ReadableStream({
+			async start(controller) {
+				try {
+					for await (const chunk of stream) {
+						controller.enqueue(new TextEncoder().encode(chunk));
+					}
+					if (controller.desiredSize !== null) {
+						controller.close();
+					}
+				} catch (error) {
+					console.error("Stream error:", error);
+					const message =
+						error instanceof AIError
+							? error.message
+							: error instanceof Error
+								? error.message
+								: "An error occurred";
+					if (controller.desiredSize !== null) {
+						controller.enqueue(new TextEncoder().encode(`Error: ${message}`));
+						controller.close();
+					}
 				}
-				controller.close();
-			} catch (error) {
-				controller.error(error);
-			}
-		},
-	});
+			},
+		});
 
-	c.header("Content-Type", "text/plain; charset=utf-8");
-	c.header("Cache-Control", "no-cache");
-	c.header("Connection", "keep-alive");
+		c.header("Content-Type", "text/plain; charset=utf-8");
+		c.header("Cache-Control", "no-cache");
+		c.header("Connection", "keep-alive");
 
-	return c.body(readable);
+		return c.body(readable);
+	} catch (error) {
+		console.error("Stream handler error:", error);
+		if (error instanceof AIError) {
+			throw new HTTPException(error.statusCode as any, {
+				message: error.message,
+				cause: { code: error.code },
+			});
+		}
+		if (error instanceof Error) {
+			throw new HTTPException(500, { message: error.message });
+		}
+		throw error;
+	}
 });
 
 chat.get("/chat/models", (c) => {

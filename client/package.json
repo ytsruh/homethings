@@ -9,6 +9,7 @@
 		"typecheck": "react-router typegen && tsc"
 	},
 	"dependencies": {
+		"@ai-sdk/react": "^3.0.88",
 		"@react-router/node": "^7.3.0",
 		"@react-router/serve": "^7.7.1",
 		"@tanstack/react-table": "^8.21.3",
