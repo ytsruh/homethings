@@ -169,7 +169,7 @@ export default function AppLayout() {
 			<AuthProvider user={user}>
 				<SidebarProvider defaultOpen={false}>
 					<main className="h-screen w-screen overflow-hidden flex flex-col">
-						<Navbar />
+						<Navbar user={user} />
 						<div className="px-1 sm:px-5 flex flex-col h-full">
 							<BreadcrumbNav />
 							<div className="hidden md:block">

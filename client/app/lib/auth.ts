@@ -70,3 +70,24 @@ export async function checkAuth(): Promise<User | null> {
 		return null;
 	}
 }
+
+export interface UpdateUserRequest {
+	name?: string;
+	email?: string;
+	password?: string;
+}
+
+export async function updateUser(
+	updates: UpdateUserRequest,
+): Promise<{ message: string }> {
+	const response = await fetch(getAuthUrl("/auth/me"), {
+		method: "PATCH",
+		credentials: "include",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(updates),
+	});
+
+	return handleResponse<{ message: string }>(response);
+}

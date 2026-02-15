@@ -1,6 +1,6 @@
 import type { MiddlewareHandler } from "hono";
 import { getCookie } from "hono/cookie";
-import { type JWTPayload, verifyJWT } from "~/middleware/jwt";
+import { verifyJWT } from "~/middleware/jwt";
 
 export const authMiddleware: MiddlewareHandler = async (c, next) => {
 	const token = getCookie(c, "auth_token");
@@ -8,7 +8,7 @@ export const authMiddleware: MiddlewareHandler = async (c, next) => {
 		return c.json({ error: "Unauthorized" }, 401);
 	}
 
-	const payload = verifyJWT(token);
+	const payload = await verifyJWT(token);
 	if (!payload) {
 		return c.json({ error: "Invalid token" }, 401);
 	}

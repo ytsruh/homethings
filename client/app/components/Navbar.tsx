@@ -31,13 +31,28 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "~/components/ui/sidebar";
+import type { User } from "~/lib/auth";
 
-function getFirstPathSegment(path: string): string {
-	// Remove leading slash, split by '/', and return the first segment
-	return path.replace(/^\/+/, "").split("/")[0];
+interface NavbarProps {
+	user: User;
 }
 
-export function Navbar() {
+function getPageTitle(pathname: string): string {
+	const path = pathname.replace(/^\/+/, "").split("/");
+	const segment = path[1] || path[0];
+
+	const titleMap: Record<string, string> = {
+		app: "Dashboard",
+		chat: "Chat",
+		notes: "Notes",
+		profile: "Profile",
+		feedback: "Feedback",
+	};
+
+	return titleMap[segment] || "Dashboard";
+}
+
+export function Navbar({ user }: NavbarProps) {
 	const { toggleSidebar } = useSidebar();
 	const location = useLocation();
 	return (
@@ -56,23 +71,32 @@ export function Navbar() {
 					<p>Homethings</p>
 				</Link>
 				<div className="text-theme capitalize justify-center items-center gap-2 flex lg:hidden mx-1">
-					{getFirstPathSegment(location.pathname) || "Home"}
+					{getPageTitle(location.pathname)}
 				</div>
 				<div className="ml-auto flex items-center space-x-4">
 					<ModeToggle />
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild className="hover:cursor-pointer">
 							<Avatar>
-								<AvatarImage alt="test" />
-								<AvatarFallback>Test</AvatarFallback>
+								<AvatarImage alt={user.name} />
+								<AvatarFallback>
+									{user.name
+										.split(" ")
+										.map((n) => n[0])
+										.join("")
+										.toUpperCase()
+										.slice(0, 2)}
+								</AvatarFallback>
 							</Avatar>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="min-w-[12rem]">
 							<DropdownMenuLabel>
 								<div className="flex flex-col space-y-1">
-									<p className="text-sm font-medium leading-none">Username</p>
+									<p className="text-sm font-medium leading-none">
+										{user.name}
+									</p>
 									<p className="text-xs leading-none text-muted-foreground">
-										User Email
+										{user.email}
 									</p>
 								</div>
 							</DropdownMenuLabel>
