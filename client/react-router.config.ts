@@ -18,4 +18,7 @@ export default {
 			...blogSlugs,
 		];
 	},
+	future: {
+	    v8_viteEnvironmentApi: true,
+	  },
 } satisfies Config;
