@@ -40,10 +40,10 @@ app.use(
 	"*",
 	cors({
 		origin: (origin) => {
-			if (!origin) return "https://www.ytsruh.com"; // Default for same-origin
-			return origin.startsWith("http://localhost")
-				? origin
-				: "https://www.ytsruh.com";
+			if (!origin) return "https://www.ytsruh.com";
+			if (origin.startsWith("http://localhost")) return origin;
+			if (origin.includes("ytsruh.workers.dev")) return origin;
+			return "https://www.ytsruh.com";
 		},
 		credentials: true,
 		allowMethods: ["GET", "POST", "PATCH", "DELETE"],
