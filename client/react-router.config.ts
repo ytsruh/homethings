@@ -19,6 +19,6 @@ export default {
 		];
 	},
 	future: {
-	    v8_viteEnvironmentApi: true,
+	    v8_viteEnvironmentApi: false,
 	  },
 } satisfies Config;
