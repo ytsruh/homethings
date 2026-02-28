@@ -53,7 +53,8 @@ auth.post("/auth/login", createValidator(loginSchema), async (c) => {
 
 	const token = await signJWT({ userId: user.id, email: user.email });
 
-	const isSecure = c.req.url.startsWith("https://");
+	const protocol = c.req.header("X-Forwarded-Proto") || "http";
+	const isSecure = protocol === "https";
 
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
@@ -94,7 +95,8 @@ auth.post("/auth/register", createValidator(registerSchema), async (c) => {
 
 	const token = await signJWT({ userId: id, email: body.email });
 
-	const isSecure = c.req.url.startsWith("https://");
+	const protocol = c.req.header("X-Forwarded-Proto") || "http";
+	const isSecure = protocol === "https";
 
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
