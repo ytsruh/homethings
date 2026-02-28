@@ -4,9 +4,13 @@ import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
 import { timeout } from "hono/timeout";
 import { openApiSpec } from "./lib/openapi/spec";
+import { envVarCheck } from "./lib/validator";
 import { authMiddleware } from "./middleware/auth";
 import { routes } from "./routes";
 import { auth } from "./routes/auth";
+
+// Check environment variables before starting the server
+envVarCheck();
 
 const app = new Hono();
 
@@ -54,8 +58,6 @@ app.route("/", auth);
 
 app.get("/openapi.json", (c) => c.json(openApiSpec));
 app.get("/docs", Scalar({ url: "/openapi.json" }));
-
-console.log(`Hono is running on port ${process.env.PORT || 3000}`);
 
 export default {
 	idleTimeout: 30,
