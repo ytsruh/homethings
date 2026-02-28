@@ -1,6 +1,13 @@
 import { z } from "zod";
 
 export { LoginSchema, RegisterSchema } from "./auth";
+export {
+	FilePathSchema,
+	FileResponseSchema,
+	FilesListResponseSchema,
+	FileUploadRequestSchema,
+	FileUploadResponseSchema,
+} from "./files";
 export { UpdateUserSchema } from "./user";
 
 // ============ Path Parameter Schemas ============

@@ -24,6 +24,7 @@ export default [
 			index("routes/app/dashboard.tsx"),
 			route("logout", "routes/app/logout.tsx"),
 			route("chat", "routes/app/chat.tsx"),
+			route("files", "routes/app/files.tsx"),
 			route("notes", "routes/app/notes/index.tsx"),
 			route("notes/:noteId", "routes/app/notes/single.tsx"),
 			route("profile", "routes/app/profile.tsx"),

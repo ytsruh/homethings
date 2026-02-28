@@ -53,9 +53,24 @@ export const feedback = sqliteTable("feedback", {
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
 
+export const files = sqliteTable("files", {
+	id: text("id").primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	fileKey: text("file_key").notNull(),
+	fileName: text("file_name").notNull(),
+	fileType: text("file_type").notNull(),
+	fileSize: integer("file_size").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(
+		() => new Date(),
+	),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
 	notes: many(notes),
 	feedback: many(feedback),
+	files: many(files),
 }));
 
 export const notesRelations = relations(notes, ({ one, many }) => ({
@@ -76,6 +91,13 @@ export const notesCommentsRelations = relations(notesComments, ({ one }) => ({
 export const feedbackRelations = relations(feedback, ({ one }) => ({
 	user: one(users, {
 		fields: [feedback.createdBy],
+		references: [users.id],
+	}),
+}));
+
+export const filesRelations = relations(files, ({ one }) => ({
+	user: one(users, {
+		fields: [files.userId],
 		references: [users.id],
 	}),
 }));

@@ -1,5 +1,6 @@
 import {
 	Bot,
+	Folder,
 	Home,
 	House,
 	Menu,
@@ -135,6 +136,11 @@ export const menuItems = [
 		title: "Chat",
 		url: "/app/chat",
 		icon: Bot,
+	},
+	{
+		title: "Files",
+		url: "/app/files",
+		icon: Folder,
 	},
 	{
 		title: "Notes",

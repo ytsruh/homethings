@@ -24,6 +24,14 @@ export const createPresignedUrl = (key: string) => {
 	});
 };
 
+export const getPresignedDownloadUrl = (key: string) => {
+	const client = getS3Client();
+	return client.presign(key, {
+		expiresIn: 3600, // 1 hour
+		method: "GET",
+	});
+};
+
 interface S3Object {
 	key: string;
 	lastModified?: string;
@@ -96,3 +104,5 @@ export async function deleteImg(key: string) {
 		throw error;
 	}
 }
+
+export const deleteFile = deleteImg;

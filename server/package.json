@@ -10,7 +10,8 @@
 		"lint:fix": "biome check --write .",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio"
+		"db:studio": "drizzle-kit studio",
+		"create-user": "bun scripts/createUser.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.12",
