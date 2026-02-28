@@ -1,7 +1,12 @@
 import { redirect } from "react-router";
-import { pb } from "~/lib/utils";
+import { logout } from "~/lib/auth";
 
 export async function clientLoader() {
-  pb.authStore.clear();
-  return redirect("/login");
+	await logout();
+	return redirect("/login");
+}
+
+export async function clientAction() {
+	await logout();
+	return redirect("/login");
 }
