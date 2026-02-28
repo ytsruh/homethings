@@ -53,10 +53,12 @@ auth.post("/auth/login", createValidator(loginSchema), async (c) => {
 
 	const token = await signJWT({ userId: user.id, email: user.email });
 
+	const isSecure = c.req.url.startsWith("https://");
+
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "lax",
+		secure: isSecure,
+		sameSite: isSecure ? "none" : "lax",
 		maxAge: 60 * 60 * 24 * 7,
 		path: "/",
 	});
@@ -92,10 +94,12 @@ auth.post("/auth/register", createValidator(registerSchema), async (c) => {
 
 	const token = await signJWT({ userId: id, email: body.email });
 
+	const isSecure = c.req.url.startsWith("https://");
+
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "lax",
+		secure: isSecure,
+		sameSite: isSecure ? "none" : "lax",
 		maxAge: 60 * 60 * 24 * 7,
 		path: "/",
 	});
