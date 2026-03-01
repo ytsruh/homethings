@@ -3,6 +3,7 @@ import {
 	Folder,
 	Home,
 	House,
+	Image,
 	Menu,
 	NotebookPen,
 	User as UserIcon,
@@ -45,6 +46,7 @@ function getPageTitle(pathname: string): string {
 	const titleMap: Record<string, string> = {
 		app: "Dashboard",
 		chat: "Chat",
+		images: "Images",
 		notes: "Notes",
 		profile: "Profile",
 		feedback: "Feedback",
@@ -136,6 +138,11 @@ export const menuItems = [
 		title: "Chat",
 		url: "/app/chat",
 		icon: Bot,
+	},
+	{
+		title: "Images",
+		url: "/app/images",
+		icon: Image,
 	},
 	{
 		title: "Files",

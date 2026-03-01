@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { timeout } from "hono/timeout";
 import { database } from "~/db";
 import { files } from "~/db/schema";
 import {
@@ -20,6 +21,8 @@ import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
 const filesRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
+
+filesRoutes.use("*", timeout(10000));
 
 filesRoutes.get("/files", async (c) => {
 	const user = c.get("user");

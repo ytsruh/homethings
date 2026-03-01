@@ -20,8 +20,8 @@ const tokensSchema = z.object({
 
 export const chat = new Hono<{ Variables: { user: JWTPayload } }>();
 
-// Set longer timeout than server standard for chat routes
-chat.use("*", timeout(30000));
+// Set longer timeout for chat routes
+chat.use("*", timeout(60000));
 chat.post("/chat", createValidator(chatSchema), async (c) => {
 	const _user = c.get("user");
 	const body = c.req.valid("json");
