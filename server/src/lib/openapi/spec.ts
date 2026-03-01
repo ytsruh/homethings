@@ -160,6 +160,47 @@ export const openApiSpec = {
 					text: { type: "string" },
 				},
 			},
+			FilePath: {
+				type: "object",
+				required: ["id"],
+				properties: {
+					id: { type: "string", format: "uuid" },
+				},
+			},
+			FileUploadRequest: {
+				type: "object",
+				required: ["fileName", "fileType", "fileSize"],
+				properties: {
+					fileName: { type: "string" },
+					fileType: { type: "string" },
+					fileSize: { type: "number" },
+				},
+			},
+			File: {
+				type: "object",
+				properties: {
+					id: { type: "string" },
+					fileKey: { type: "string" },
+					fileName: { type: "string" },
+					fileType: { type: "string" },
+					fileSize: { type: "number" },
+					createdAt: { type: "string", format: "date-time" },
+					presignedUrl: { type: "string" },
+				},
+			},
+			FileUploadResponse: {
+				type: "object",
+				required: ["presignedUrl"],
+				properties: {
+					id: { type: "string" },
+					fileKey: { type: "string" },
+					fileName: { type: "string" },
+					fileType: { type: "string" },
+					fileSize: { type: "number" },
+					createdAt: { type: "string", format: "date-time" },
+					presignedUrl: { type: "string" },
+				},
+			},
 		},
 	},
 	security: [{ cookieAuth: [] }],
@@ -655,6 +696,114 @@ export const openApiSpec = {
 						content: {
 							"application/json": {
 								schema: { $ref: "#/components/schemas/TokenCount" },
+							},
+						},
+					},
+				},
+			},
+		},
+		"/files": {
+			get: {
+				tags: ["Files"],
+				summary: "List files",
+				description: "List all files for the authenticated user",
+				responses: {
+					200: {
+						description: "List of files",
+						content: {
+							"application/json": {
+								schema: {
+									type: "array",
+									items: { $ref: "#/components/schemas/File" },
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		"/files/upload": {
+			post: {
+				tags: ["Files"],
+				summary: "Upload file",
+				description: "Create a presigned URL for file upload",
+				requestBody: {
+					content: {
+						"application/json": {
+							schema: { $ref: "#/components/schemas/FileUploadRequest" },
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: "File upload URL created",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/FileUploadResponse" },
+							},
+						},
+					},
+				},
+			},
+		},
+		"/files/{id}": {
+			get: {
+				tags: ["Files"],
+				summary: "Get file",
+				description: "Get a specific file by ID",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { $ref: "#/components/schemas/FilePath" },
+					},
+				],
+				responses: {
+					200: {
+						description: "File found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/File" },
+							},
+						},
+					},
+					404: {
+						description: "File not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+				},
+			},
+			delete: {
+				tags: ["Files"],
+				summary: "Delete file",
+				description: "Delete a specific file",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { $ref: "#/components/schemas/FilePath" },
+					},
+				],
+				responses: {
+					200: {
+						description: "File deleted",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+					404: {
+						description: "File not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
 							},
 						},
 					},
