@@ -42,6 +42,18 @@ export const openrouterProvider: AIProvider = {
 				);
 			}
 
+			const requestBody: Record<string, unknown> = {
+				model,
+				messages: [{ role: "user", content: prompt }],
+				modalities: ["image"],
+			};
+
+			if (options?.aspectRatio) {
+				requestBody.image_config = {
+					aspect_ratio: options.aspectRatio,
+				};
+			}
+
 			const response = await fetch(
 				"https://openrouter.ai/api/v1/chat/completions",
 				{
@@ -50,11 +62,7 @@ export const openrouterProvider: AIProvider = {
 						Authorization: `Bearer ${apiKey}`,
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({
-						model,
-						messages: [{ role: "user", content: prompt }],
-						modalities: ["image"],
-					}),
+					body: JSON.stringify(requestBody),
 				},
 			);
 

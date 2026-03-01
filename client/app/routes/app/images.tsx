@@ -26,12 +26,21 @@ export default function Images() {
 	const [prompt, setPrompt] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [selectedModel, setSelectedModel] = useState<string>("");
+	const [selectedAspectRatio, setSelectedAspectRatio] = useState<string>("1:1");
 	const [images, setImages] = useState<string[]>([]);
 	const [generationText, setGenerationText] = useState<string>("");
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const models = loaderData?.models ?? [];
 	const defaultModel = loaderData?.defaultModel ?? "";
+
+	const aspectRatios = [
+		{ value: "1:1", label: "Square (1:1)" },
+		{ value: "3:2", label: "Landscape (3:2)" },
+		{ value: "3:4", label: "Portrait (3:4)" },
+		{ value: "16:9", label: "Wide (16:9)" },
+		{ value: "9:16", label: "Tall (9:16)" },
+	];
 
 	useEffect(() => {
 		if (defaultModel && !selectedModel) {
@@ -47,7 +56,11 @@ export default function Images() {
 		setGenerationText("");
 
 		try {
-			const result = await generateImage(prompt, selectedModel || undefined);
+			const result = await generateImage(
+				prompt,
+				selectedModel || undefined,
+				selectedAspectRatio,
+			);
 			setImages(result.images);
 			if (result.text) {
 				setGenerationText(result.text);
@@ -83,6 +96,8 @@ export default function Images() {
 		setPrompt("");
 		setImages([]);
 		setGenerationText("");
+		setSelectedModel(defaultModel);
+		setSelectedAspectRatio("1:1");
 	}
 
 	return (
@@ -100,6 +115,22 @@ export default function Images() {
 							{models.map((model) => (
 								<SelectItem key={model} value={model}>
 									{model}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<span className="text-sm text-muted-foreground">Aspect:</span>
+					<Select
+						value={selectedAspectRatio}
+						onValueChange={setSelectedAspectRatio}
+					>
+						<SelectTrigger className="w-[150px]">
+							<SelectValue placeholder="Aspect ratio" />
+						</SelectTrigger>
+						<SelectContent>
+							{aspectRatios.map((ratio) => (
+								<SelectItem key={ratio.value} value={ratio.value}>
+									{ratio.label}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -151,29 +182,28 @@ export default function Images() {
 								{generationText}
 							</div>
 						)}
-						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-							{images.map((imageUrl, index) => (
-								<div
-									key={imageUrl.substring(0, 50)}
-									className="border rounded-lg overflow-hidden bg-card"
-								>
-									<img
-										src={imageUrl}
-										alt={`AI generated result ${index + 1}`}
-										className="w-full h-auto"
-									/>
-									<div className="p-2 flex justify-end">
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() => handleDownload(imageUrl, index)}
-										>
-											Download
-										</Button>
+						{images[0] && (
+							<div className="flex flex-col max-h-[70vh]">
+								<div className="flex-1 overflow-auto flex justify-center">
+									<div className="max-w-full border rounded-lg overflow-hidden bg-card">
+										<img
+											src={images[0]}
+											alt="AI generated result"
+											className="w-full h-auto max-w-full"
+										/>
 									</div>
 								</div>
-							))}
-						</div>
+								<div className="pt-2 flex justify-center">
+									<Button
+										variant="outline"
+										size="sm"
+										onClick={() => handleDownload(images[0], 0)}
+									>
+										Download
+									</Button>
+								</div>
+							</div>
+						)}
 					</div>
 				)}
 

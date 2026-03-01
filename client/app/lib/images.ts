@@ -41,11 +41,13 @@ export async function getImageModels(): Promise<ImageModelsResponse> {
 export interface GenerateImageRequest {
 	prompt: string;
 	model?: string;
+	aspectRatio?: string;
 }
 
 export async function generateImage(
 	prompt: string,
 	model?: string,
+	aspectRatio?: string,
 ): Promise<ImageGenerationResponse> {
 	const response = await fetch(getApiUrl("/api/images/generate"), {
 		method: "POST",
@@ -53,7 +55,7 @@ export async function generateImage(
 		headers: {
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({ prompt, model }),
+		body: JSON.stringify({ prompt, model, aspectRatio }),
 	});
 
 	return handleResponse<ImageGenerationResponse>(response);

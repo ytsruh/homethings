@@ -13,9 +13,12 @@ import { throwBadRequest } from "~/middleware/http-exception";
 import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
+const ASPECT_RATIOS = ["1:1", "3:2", "3:4", "16:9", "9:16"] as const;
+
 const generateImageSchema = z.object({
 	prompt: z.string().min(1).max(10000),
 	model: z.string().optional(),
+	aspectRatio: z.enum(ASPECT_RATIOS).optional(),
 });
 
 export const images = new Hono<{ Variables: { user: JWTPayload } }>();
@@ -40,6 +43,7 @@ images.post("/images/generate", createValidator(generateImageSchema), async (c) 
 	try {
 		const result = await ai.generateImage(body.prompt, {
 			model: body.model || defaultImageModel,
+			aspectRatio: body.aspectRatio,
 		});
 		return c.json(result);
 	} catch (error) {
