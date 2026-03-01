@@ -1,6 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { timeout } from "hono/timeout";
 import { z } from "zod";
 import { database } from "~/db";
 import { notes, notesComments } from "~/db/schema";
@@ -15,6 +16,8 @@ import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
 const notesRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
+
+notesRoutes.use("*", timeout(10000));
 
 notesRoutes.post(
 	"/notes",

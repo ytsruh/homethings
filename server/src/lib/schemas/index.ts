@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export { LoginSchema, RegisterSchema } from "./auth";
 export {
@@ -13,7 +13,7 @@ export { UpdateUserSchema } from "./user";
 // ============ Path Parameter Schemas ============
 
 export const NotePathSchema = z.object({
-	id: z.string().uuid("Invalid note ID format"),
+	id: z.uuid("Invalid note ID format"),
 });
 
 // ============ Request/Body Schemas ============
@@ -84,8 +84,8 @@ export const DeleteResponseSchema = z.object({
 });
 
 export const CommentPathSchema = z.object({
-	id: z.string().uuid("Invalid note ID format"),
-	commentId: z.string().uuid("Invalid comment ID format"),
+	id: z.uuid("Invalid note ID format"),
+	commentId: z.uuid("Invalid comment ID format"),
 });
 
 export const CreateCommentRequestSchema = z.object({

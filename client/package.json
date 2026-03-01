@@ -6,7 +6,9 @@
 		"build": "react-router build",
 		"dev": "react-router dev",
 		"start": "bun run build && wrangler pages dev ./build/client/",
-		"typecheck": "react-router typegen && tsc"
+		"typecheck": "react-router typegen && tsc",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write ."
 	},
 	"dependencies": {
 		"@ai-sdk/react": "^3.0.88",
@@ -27,7 +29,7 @@
 		"remark-html": "^16.0.1",
 		"sonner": "^2.0.6",
 		"tailwind-merge": "^3.3.1",
-		"zod": "^3.25.76"
+		"zod": "^4.3.6"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.2.2",

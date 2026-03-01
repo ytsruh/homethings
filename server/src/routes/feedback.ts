@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { timeout } from "hono/timeout";
 import { database } from "~/db";
 import { feedback } from "~/db/schema";
 import { CreateFeedbackRequestSchema } from "~/lib/schemas";
@@ -6,6 +7,8 @@ import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
 const feedbackRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
+
+feedbackRoutes.use("*", timeout(10000));
 
 feedbackRoutes.post(
 	"/feedback",

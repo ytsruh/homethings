@@ -6,8 +6,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["src/**"],
-		"experimentalScannerIgnores": ["drizzle/**"]
+		"includes": ["src/**", "!!**/drizzle"]
 	},
 	"formatter": {
 		"enabled": true,
