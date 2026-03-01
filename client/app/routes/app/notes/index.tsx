@@ -19,6 +19,7 @@ import {
 	DialogTrigger,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
+import { ScrollArea } from "~/components/ui/scroll-area";
 import {
 	Select,
 	SelectContent,
@@ -249,42 +250,44 @@ export default function NotesPage() {
 					</p>
 				</div>
 			) : (
-				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-					{filteredNotes.map((note) => (
-						<Link
-							key={note.id}
-							to={`/app/notes/${note.id}`}
-							className={`block ${note.completed ? "opacity-60" : ""}`}
-						>
-							<Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-								<CardHeader className="pb-2">
-									<div className="flex items-start justify-between gap-2">
-										<CardTitle className="text-lg line-clamp-1">
-											{note.title}
-										</CardTitle>
-										<Badge variant={note.completed ? "secondary" : "default"}>
-											{note.completed ? "Closed" : "Open"}
-										</Badge>
-									</div>
-									<div className="flex items-center gap-2 mt-2">
-										<Badge>
-											{note.priority.charAt(0).toUpperCase() +
-												note.priority.slice(1)}
-										</Badge>
-									</div>
-								</CardHeader>
-								<CardContent>
-									<p className="text-sm text-muted-foreground line-clamp-2">
-										{truncateBody(note.body)}
-									</p>
-									<p className="text-xs text-muted-foreground mt-2">
-										{new Date(note.createdAt).toLocaleDateString()}
-									</p>
-								</CardContent>
-							</Card>
-						</Link>
-					))}
-				</div>
+				<ScrollArea className="h-[65vh] sm:h-[75vh] md:h-[68vh]">
+					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						{filteredNotes.map((note) => (
+							<Link
+								key={note.id}
+								to={`/app/notes/${note.id}`}
+								className={`block ${note.completed ? "opacity-60" : ""}`}
+							>
+								<Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+									<CardHeader className="pb-2">
+										<div className="flex items-start justify-between gap-2">
+											<CardTitle className="text-lg line-clamp-1">
+												{note.title}
+											</CardTitle>
+											<Badge variant={note.completed ? "secondary" : "default"}>
+												{note.completed ? "Closed" : "Open"}
+											</Badge>
+										</div>
+										<div className="flex items-center gap-2 mt-2">
+											<Badge>
+												{note.priority.charAt(0).toUpperCase() +
+													note.priority.slice(1)}
+											</Badge>
+										</div>
+									</CardHeader>
+									<CardContent>
+										<p className="text-sm text-muted-foreground line-clamp-2">
+											{truncateBody(note.body)}
+										</p>
+										<p className="text-xs text-muted-foreground mt-2">
+											{new Date(note.createdAt).toLocaleDateString()}
+										</p>
+									</CardContent>
+								</Card>
+							</Link>
+						))}
+					</div>
+				</ScrollArea>
 			)}
 		</div>
 	);
