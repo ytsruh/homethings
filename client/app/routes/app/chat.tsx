@@ -16,13 +16,6 @@ import {
 	streamChatMessage,
 } from "~/lib/chat";
 
-export function meta() {
-	return [
-		{ title: "Chat | Homethings" },
-		{ name: "description", content: "Chat with AI" },
-	];
-}
-
 export async function clientLoader() {
 	try {
 		const { models, default: defaultModel } = await getAvailableModels();
@@ -171,85 +164,89 @@ export default function Chat() {
 	}
 
 	return (
-		<div className="flex flex-col h-full px-2 mx-auto">
-			<div className="flex items-center gap-4 pb-4">
-				<span className="text-sm text-muted-foreground">Model:</span>
-				<Select value={selectedModel} onValueChange={setSelectedModel}>
-					<SelectTrigger className="w-[200px]">
-						<SelectValue placeholder="Select model" />
-					</SelectTrigger>
-					<SelectContent>
-						{models.map((model) => (
-							<SelectItem key={model} value={model}>
-								{model}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-				<Button
-					onClick={handleClearChat}
-					disabled={messages.length === 0}
-					className="ml-auto"
-				>
-					New
-				</Button>
-			</div>
-
-			<div className="flex-1 max-h-[80vh] md:max-h-[72vh] overflow-y-auto space-y-4 p-4 border rounded-lg bg-card/50">
-				{messages.length === 0 && (
-					<div className="flex items-center justify-center h-full">
-						<p className="text-muted-foreground">
-							Start a conversation with the AI
-						</p>
-					</div>
-				)}
-				{messages.map((msg) => (
-					<div
-						key={msg.id}
-						className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+		<>
+			<title>Chat | Homethings</title>
+			<meta name="description" content="Chat with AI" />
+			<div className="flex flex-col h-full px-2 mx-auto">
+				<div className="flex items-center gap-4 pb-4">
+					<span className="text-sm text-muted-foreground">Model:</span>
+					<Select value={selectedModel} onValueChange={setSelectedModel}>
+						<SelectTrigger className="w-[200px]">
+							<SelectValue placeholder="Select model" />
+						</SelectTrigger>
+						<SelectContent>
+							{models.map((model) => (
+								<SelectItem key={model} value={model}>
+									{model}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Button
+						onClick={handleClearChat}
+						disabled={messages.length === 0}
+						className="ml-auto"
 					>
-						<div
-							className={`max-w-[80%] rounded-lg px-4 py-2 ${
-								msg.role === "user" ? "bg-theme text-white" : "bg-muted"
-							}`}
-						>
-							<div className="text-sm font-medium mb-1">
-								{msg.role === "user" ? "You" : "Assistant"}
-							</div>
-							<div className="whitespace-pre-wrap">{msg.content}</div>
-						</div>
-					</div>
-				))}
-				{isLoading && (
-					<div className="flex justify-start">
-						<div className="bg-muted rounded-lg px-4 py-2">
-							<div className="text-sm font-medium mb-1">Assistant</div>
-							<div className="flex items-center gap-2">
-								<span className="animate-pulse">Thinking...</span>
-							</div>
-						</div>
-					</div>
-				)}
-				<div ref={messagesEndRef} />
-			</div>
+						New
+					</Button>
+				</div>
 
-			<div className="pt-4 flex gap-2">
-				<Input
-					ref={inputRef}
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					onKeyDown={handleKeyDown}
-					placeholder="Type a message..."
-					disabled={isLoading}
-					className="flex-1"
-				/>
-				<Button
-					onClick={handleSendMessage}
-					disabled={isLoading || !input.trim()}
-				>
-					{isLoading ? "Sending..." : "Send"}
-				</Button>
+				<div className="flex-1 max-h-[80vh] md:max-h-[72vh] overflow-y-auto space-y-4 p-4 border rounded-lg bg-card/50">
+					{messages.length === 0 && (
+						<div className="flex items-center justify-center h-full">
+							<p className="text-muted-foreground">
+								Start a conversation with the AI
+							</p>
+						</div>
+					)}
+					{messages.map((msg) => (
+						<div
+							key={msg.id}
+							className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+						>
+							<div
+								className={`max-w-[80%] rounded-lg px-4 py-2 ${
+									msg.role === "user" ? "bg-theme text-white" : "bg-muted"
+								}`}
+							>
+								<div className="text-sm font-medium mb-1">
+									{msg.role === "user" ? "You" : "Assistant"}
+								</div>
+								<div className="whitespace-pre-wrap">{msg.content}</div>
+							</div>
+						</div>
+					))}
+					{isLoading && (
+						<div className="flex justify-start">
+							<div className="bg-muted rounded-lg px-4 py-2">
+								<div className="text-sm font-medium mb-1">Assistant</div>
+								<div className="flex items-center gap-2">
+									<span className="animate-pulse">Thinking...</span>
+								</div>
+							</div>
+						</div>
+					)}
+					<div ref={messagesEndRef} />
+				</div>
+
+				<div className="pt-4 flex gap-2">
+					<Input
+						ref={inputRef}
+						value={input}
+						onChange={(e) => setInput(e.target.value)}
+						onKeyDown={handleKeyDown}
+						placeholder="Type a message..."
+						disabled={isLoading}
+						className="flex-1"
+					/>
+					<Button
+						onClick={handleSendMessage}
+						disabled={isLoading || !input.trim()}
+					>
+						{isLoading ? "Sending..." : "Send"}
+					</Button>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }

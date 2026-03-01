@@ -11,13 +11,6 @@ import type { Route } from "./+types/feedback";
 const API_BASE_URL =
 	import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
-export function meta() {
-	return [
-		{ title: "Feedback | HomeThings" },
-		{ name: "description", content: "Please give your feedback" },
-	];
-}
-
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
 	const title = formData.get("title") as string;
@@ -71,6 +64,8 @@ export default function Feedback() {
 
 	return (
 		<>
+			<title>Feedback | HomeThings</title>
+			<meta name="description" content="Please give your feedback" />
 			<PageHeader title="Feedback" subtitle="Please give your feedback" />
 			<fetcher.Form
 				ref={formRef}
