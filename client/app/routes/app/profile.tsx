@@ -7,13 +7,6 @@ import { Label } from "~/components/ui/label";
 import { getCurrentUser, type User, updateUser } from "~/lib/auth";
 import type { Route } from "./+types/profile";
 
-export function meta() {
-	return [
-		{ title: "Profile | Homethings" },
-		{ name: "description", content: "Welcome to Homethings" },
-	];
-}
-
 export async function clientLoader(_args: Route.ClientLoaderArgs) {
 	const { user } = await getCurrentUser();
 	if (!user) {
@@ -48,6 +41,8 @@ export default function Profile({ loaderData }: Route.ComponentProps) {
 
 	return (
 		<>
+			<title>Profile | Homethings</title>
+			<meta name="description" content="Welcome to Homethings" />
 			<PageHeader title="Profile" subtitle="Manage your profile" />
 			<fetcher.Form
 				method="post"

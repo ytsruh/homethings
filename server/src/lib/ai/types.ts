@@ -9,7 +9,19 @@ export interface ChatOptions {
 	maxTokens?: number;
 }
 
+export interface ImageOptions {
+	model?: string;
+	aspectRatio?: string;
+	imageSize?: string;
+}
+
+export interface ImageResponse {
+	images: string[];
+	text?: string;
+}
+
 export interface AIProvider {
+	generateImage(prompt: string, options?: ImageOptions): Promise<ImageResponse>;
 	chat(messages: ChatMessage[], options?: ChatOptions): Promise<string>;
 	chatStream(
 		messages: ChatMessage[],

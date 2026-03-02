@@ -32,13 +32,6 @@ import {
 	updateNote,
 } from "~/lib/notes";
 
-export function meta() {
-	return [
-		{ title: "Notes | Homethings" },
-		{ name: "description", content: "View and edit note" },
-	];
-}
-
 export async function clientLoader({
 	params,
 }: {
@@ -200,172 +193,179 @@ export default function NoteDetailPage({
 	}
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<Button variant="ghost" size="sm" asChild>
-					<Link to="/app/notes">← Back</Link>
-				</Button>
-				<Button
-					variant="destructive"
-					size="sm"
-					onClick={() => setIsDeleteOpen(true)}
-				>
-					<Trash2 className="h-4 w-4 mr-2" />
-					Delete
-				</Button>
-			</div>
-
+		<>
+			<title>Notes | Homethings</title>
+			<meta name="description" content="View and edit note" />
 			<div className="space-y-6">
-				<Card>
-					<CardHeader>
-						<div className="flex items-start justify-between gap-4">
-							<div className="flex-1 space-y-4">
-								<Input
-									value={title}
-									onChange={(e) => setTitle(e.target.value)}
-									placeholder="Note title"
-									className="text-xl font-bold"
-								/>
-								<div className="flex items-center justify-between gap-4">
-									<Select
-										value={priority}
-										onValueChange={(v) => setPriority(v as NotePriority)}
-									>
-										<SelectTrigger className="w-[140px]">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="low">Low</SelectItem>
-											<SelectItem value="medium">Medium</SelectItem>
-											<SelectItem value="high">High</SelectItem>
-											<SelectItem value="urgent">Urgent</SelectItem>
-										</SelectContent>
-									</Select>
-									<Select
-										value={note.completed ? "closed" : "open"}
-										onValueChange={(value) => {
-											const newCompleted = value === "closed";
-											if (newCompleted !== note.completed) {
-												handleToggleComplete();
-											}
-										}}
-									>
-										<SelectTrigger className="w-[120px]">
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="open">Open</SelectItem>
-											<SelectItem value="closed">Closed</SelectItem>
-										</SelectContent>
-									</Select>
+				<div className="flex items-center justify-between">
+					<Button variant="ghost" size="sm" asChild>
+						<Link to="/app/notes">← Back</Link>
+					</Button>
+					<Button
+						variant="destructive"
+						size="sm"
+						onClick={() => setIsDeleteOpen(true)}
+					>
+						<Trash2 className="h-4 w-4 mr-2" />
+						Delete
+					</Button>
+				</div>
+
+				<div className="space-y-6">
+					<Card>
+						<CardHeader>
+							<div className="flex items-start justify-between gap-4">
+								<div className="flex-1 space-y-4">
+									<Input
+										value={title}
+										onChange={(e) => setTitle(e.target.value)}
+										placeholder="Note title"
+										className="text-xl font-bold"
+									/>
+									<div className="flex items-center justify-between gap-4">
+										<Select
+											value={priority}
+											onValueChange={(v) => setPriority(v as NotePriority)}
+										>
+											<SelectTrigger className="w-[140px]">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="low">Low</SelectItem>
+												<SelectItem value="medium">Medium</SelectItem>
+												<SelectItem value="high">High</SelectItem>
+												<SelectItem value="urgent">Urgent</SelectItem>
+											</SelectContent>
+										</Select>
+										<Select
+											value={note.completed ? "closed" : "open"}
+											onValueChange={(value) => {
+												const newCompleted = value === "closed";
+												if (newCompleted !== note.completed) {
+													handleToggleComplete();
+												}
+											}}
+										>
+											<SelectTrigger className="w-[120px]">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value="open">Open</SelectItem>
+												<SelectItem value="closed">Closed</SelectItem>
+											</SelectContent>
+										</Select>
+									</div>
 								</div>
+								<Button onClick={handleSave} disabled={isSaving}>
+									{isSaving ? "Saving..." : "Save"}
+								</Button>
 							</div>
-							<Button onClick={handleSave} disabled={isSaving}>
-								{isSaving ? "Saving..." : "Save"}
-							</Button>
-						</div>
-					</CardHeader>
-					<CardContent>
-						<Textarea
-							value={body}
-							onChange={(e) => setBody(e.target.value)}
-							placeholder="Write your note..."
-							className="min-h-[100px]"
-						/>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardContent className="space-y-4">
-						<div className="space-y-2">
+						</CardHeader>
+						<CardContent>
 							<Textarea
-								value={newComment}
-								onChange={(e) => setNewComment(e.target.value)}
-								placeholder="Add a comment..."
+								value={body}
+								onChange={(e) => setBody(e.target.value)}
+								placeholder="Write your note..."
+								className="min-h-[100px]"
 							/>
-							<Button
-								onClick={handleAddComment}
-								disabled={isAddingComment || !newComment.trim()}
-								size="sm"
-								className="w-full"
-							>
-								{isAddingComment ? "Adding..." : "Add Comment"}
-							</Button>
-						</div>
+						</CardContent>
+					</Card>
 
-						{comments.length === 0 ? (
-							<p className="text-sm text-muted-foreground">No comments yet</p>
-						) : (
-							<ScrollArea className="max-h-48 overflow-auto">
-								{comments.map((comment) => (
-									<React.Fragment key={comment.id}>
-										<div className="border-b py-1 last:border-0 flex items-center justify-between">
-											<div>
-												<p className="text-sm">{comment.comment}</p>
-												<span className="text-xs text-muted-foreground">
-													{new Date(comment.createdAt).toLocaleString()}
-												</span>
+					<Card>
+						<CardContent className="space-y-4">
+							<div className="space-y-2">
+								<Textarea
+									value={newComment}
+									onChange={(e) => setNewComment(e.target.value)}
+									placeholder="Add a comment..."
+								/>
+								<Button
+									onClick={handleAddComment}
+									disabled={isAddingComment || !newComment.trim()}
+									size="sm"
+									className="w-full"
+								>
+									{isAddingComment ? "Adding..." : "Add Comment"}
+								</Button>
+							</div>
+
+							{comments.length === 0 ? (
+								<p className="text-sm text-muted-foreground">No comments yet</p>
+							) : (
+								<ScrollArea className="max-h-48 overflow-auto">
+									{comments.map((comment) => (
+										<React.Fragment key={comment.id}>
+											<div className="border-b py-1 last:border-0 flex items-center justify-between">
+												<div>
+													<p className="text-sm">{comment.comment}</p>
+													<span className="text-xs text-muted-foreground">
+														{new Date(comment.createdAt).toLocaleString()}
+													</span>
+												</div>
+
+												<Button
+													variant="ghost"
+													size="sm"
+													className="h-6 text-xs text-destructive hover:text-destructive"
+													onClick={() => openDeleteCommentDialog(comment.id)}
+												>
+													Delete
+												</Button>
 											</div>
+										</React.Fragment>
+									))}
+								</ScrollArea>
+							)}
+						</CardContent>
+					</Card>
+				</div>
 
-											<Button
-												variant="ghost"
-												size="sm"
-												className="h-6 text-xs text-destructive hover:text-destructive"
-												onClick={() => openDeleteCommentDialog(comment.id)}
-											>
-												Delete
-											</Button>
-										</div>
-									</React.Fragment>
-								))}
-							</ScrollArea>
-						)}
-					</CardContent>
-				</Card>
+				<Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Delete Note</DialogTitle>
+							<DialogDescription>
+								Are you sure you want to delete this note? This action cannot be
+								undone.
+							</DialogDescription>
+						</DialogHeader>
+						<DialogFooter>
+							<Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
+								Cancel
+							</Button>
+							<Button variant="destructive" onClick={handleDelete}>
+								Delete
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+
+				<Dialog
+					open={isDeleteCommentOpen}
+					onOpenChange={setIsDeleteCommentOpen}
+				>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Delete Comment</DialogTitle>
+							<DialogDescription>
+								Are you sure you want to delete this comment? This action cannot
+								be undone.
+							</DialogDescription>
+						</DialogHeader>
+						<DialogFooter>
+							<Button
+								variant="outline"
+								onClick={() => setIsDeleteCommentOpen(false)}
+							>
+								Cancel
+							</Button>
+							<Button variant="destructive" onClick={handleDeleteComment}>
+								Delete
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
 			</div>
-
-			<Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Delete Note</DialogTitle>
-						<DialogDescription>
-							Are you sure you want to delete this note? This action cannot be
-							undone.
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button variant="outline" onClick={() => setIsDeleteOpen(false)}>
-							Cancel
-						</Button>
-						<Button variant="destructive" onClick={handleDelete}>
-							Delete
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-
-			<Dialog open={isDeleteCommentOpen} onOpenChange={setIsDeleteCommentOpen}>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Delete Comment</DialogTitle>
-						<DialogDescription>
-							Are you sure you want to delete this comment? This action cannot
-							be undone.
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button
-							variant="outline"
-							onClick={() => setIsDeleteCommentOpen(false)}
-						>
-							Cancel
-						</Button>
-						<Button variant="destructive" onClick={handleDeleteComment}>
-							Delete
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-		</div>
+		</>
 	);
 }

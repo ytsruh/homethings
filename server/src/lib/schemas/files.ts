@@ -1,7 +1,7 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const FilePathSchema = z.object({
-	id: z.string().uuid("Invalid file ID format"),
+	id: z.uuid("Invalid file ID format"),
 });
 
 export const FileUploadRequestSchema = z.object({

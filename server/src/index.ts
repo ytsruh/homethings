@@ -2,7 +2,6 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { HTTPException } from "hono/http-exception";
-import { timeout } from "hono/timeout";
 import { openApiSpec } from "./lib/openapi/spec";
 import { envVarCheck } from "./lib/validator";
 import { authMiddleware } from "./middleware/auth";
@@ -50,7 +49,6 @@ app.use(
 		allowHeaders: ["Content-Type", "Authorization"],
 	}),
 );
-app.use("*", timeout(10000));
 app.use("/api/*", authMiddleware);
 
 app.route("/api", routes);

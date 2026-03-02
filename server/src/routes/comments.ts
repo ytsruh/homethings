@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { timeout } from "hono/timeout";
 import { database } from "~/db";
 import { notes, notesComments } from "~/db/schema";
 import { CreateCommentRequestSchema } from "~/lib/schemas";
@@ -12,6 +13,8 @@ import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
 const commentsRoutes = new Hono<{ Variables: { user: JWTPayload } }>();
+
+commentsRoutes.use("*", timeout(10000));
 
 commentsRoutes.post(
 	"/notes/:id/comments",

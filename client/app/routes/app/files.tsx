@@ -20,13 +20,6 @@ import {
 	uploadFile,
 } from "~/lib/files";
 
-export function meta() {
-	return [
-		{ title: "Files | Homethings" },
-		{ name: "description", content: "Your files" },
-	];
-}
-
 export async function clientLoader() {
 	try {
 		const files = await getFiles();
@@ -143,6 +136,8 @@ export default function FilesPage() {
 
 	return (
 		<>
+			<title>Files | Homethings</title>
+			<meta name="description" content="Your files" />
 			<PageHeader
 				title="Files"
 				subtitle="Manage your files"

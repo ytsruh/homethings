@@ -1,11 +1,11 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const UpdateUserSchema = z
 	.object({
 		name: z.string().min(1).optional(),
-		email: z.string().email().optional(),
+		email: z.email().optional(),
 		password: z.string().min(6).optional(),
 	})
 	.refine((data) => data.name || data.email || data.password, {
-		message: "At least one field is required",
+		error: "At least one field is required",
 	});

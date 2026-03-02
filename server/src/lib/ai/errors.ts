@@ -19,7 +19,8 @@ export type AIErrorCode =
 	| "CONTENT_FILTERED"
 	| "TOKEN_LIMIT_EXCEEDED"
 	| "API_ERROR"
-	| "STREAMING_ERROR";
+	| "STREAMING_ERROR"
+	| "IMAGE_GENERATION_FAILED";
 
 export function normalizeError(error: unknown): AIError {
 	if (error instanceof AIError) {
