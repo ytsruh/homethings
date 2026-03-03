@@ -29,12 +29,12 @@ export default function WorkHistory() {
 									{job.name}
 								</h3>
 								<div className="mb-8 mt-6 flex w-full flex-wrap justify-center gap-3 lg:w-auto lg:justify-start">
-									<Badge variant="default">{job.date}</Badge>
 									<Badge variant="secondary" className="text-base">
 										{job.jobTitle}
 									</Badge>
+									<Badge variant="default">{job.date}</Badge>
 								</div>
-								<p>{job.description}</p>
+								<p className="text-zinc-300">{job.description}</p>
 							</div>
 						</div>
 					))}

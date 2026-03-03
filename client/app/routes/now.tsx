@@ -19,7 +19,7 @@ export default function Now() {
 						<div className="icon mr-5">
 							<Tag size="36" />
 						</div>
-						<p>
+						<p className="text-zinc-300">
 							Working at{" "}
 							<a
 								href="http://www.lseg.com"
@@ -49,29 +49,26 @@ export default function Now() {
 					<div>
 						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
 						<h2 className="text-3xl font-bold">Project</h2>
-						<p className="py-2">
+						<p className="py-2 text-zinc-300">
 							My main goal in 2025 is to build out Webiliti into a viable &
-							usable project. I'm also using it as an opportunity to build my TS
-							skills and to solve some interesting problems in the Digital
-							world.
-						</p>
-					</div>
-					<div>
-						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
-						<h2 className="text-3xl font-bold">Go</h2>
-						<p className="py-2">
-							Building my skills in Go by building a number of small systems
-							type projects such as a SSH server, a database & a number of CLI's
-							/ TUI's.
+							usable project, whilst improving my TypeScript and AI skills.
 						</p>
 					</div>
 					<div>
 						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
 						<h2 className="text-3xl font-bold">Fitness</h2>
-						<p className="py-2">
+						<p className="py-2 text-zinc-300">
 							My fitness goal this year is to run a 10k in under 60 minutes.
-							Despite doing numerous 5k's and beating 30 mins in 2024, I was not
-							able to beat 60 mins.
+							I've entered Warrington Running Festival 10k.
+						</p>
+					</div>
+					<div>
+						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
+						<h2 className="text-3xl font-bold">Go</h2>
+						<p className="py-2 text-zinc-300">
+							Building my skills in Go by building a number of small systems
+							type projects such as a SSH server, a database & a number of CLI's
+							/ TUI's.
 						</p>
 					</div>
 				</div>

@@ -93,7 +93,7 @@ export const work: Job[] = [
 		name: "London Stock Exchange Group",
 		logo: "/img/lseg.webp",
 		jobTitle: "Digital Strategy & Enablement Manager",
-		date: "Dec '16 - Oct '18",
+		date: "Sep '21 - Current",
 		description:
 			"Acting as product owner for all marketing websites in the group. Working with multiple development teams to support, maintain & enhance the Adobe & Drupal platforms.",
 	},
