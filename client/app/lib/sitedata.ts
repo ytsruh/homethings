@@ -4,6 +4,7 @@ interface Project {
 	img: string;
 	description: string;
 	technologies: string[];
+	featured: boolean;
 	link: {
 		url: string;
 		text: string;
@@ -29,6 +30,7 @@ export const projects: Project[] = [
 			"Pocketbase",
 			"Charm",
 		],
+		featured: true,
 		link: {
 			url: "https://homethings.ytsruh.com/",
 			text: "Visit",
@@ -52,6 +54,7 @@ export const projects: Project[] = [
 			"Cloudflare",
 			"SQlite",
 		],
+		featured: true,
 		link: {
 			url: "https://www.webiliti.com/",
 			text: "Visit",
@@ -72,6 +75,7 @@ export const projects: Project[] = [
 			"Railway",
 			"SQLite",
 		],
+		featured: true,
 		link: {
 			url: "https://www.finly.cc",
 			text: "Visit",
