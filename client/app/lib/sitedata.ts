@@ -19,20 +19,20 @@ export const projects: Project[] = [
 	{
 		name: "Homethings",
 		id: 1,
-		img: "/img/homethings.webp",
+		img: "/img/homethings.png",
 		description:
-			"The home & personal playground built using Pocketbase, Go & React. The app features a number of hobby projects including a personal note taking app, document storage, a personalised AI Chatbot as well as others. A CLI application is also included that extends some of the server functionality into the command line.",
+			"The home & personal playground built using Typescript. The app features a number of hobby projects including a personal note taking app, document storage, a personalised AI Chatbot as well as others. The app also doubles as this site.",
 		technologies: [
-			"Go",
-			"SQLite",
+			"Typescript",
 			"React",
 			"Tailwind CSS",
-			"Pocketbase",
-			"Charm",
+			"HonoJS",
+			"SQLite",
+			"Cloudflare",
 		],
 		featured: true,
 		link: {
-			url: "https://homethings.ytsruh.com/",
+			url: "https://www.ytsruh.com/login",
 			text: "Visit",
 		},
 		github: {
@@ -62,22 +62,15 @@ export const projects: Project[] = [
 		github: null,
 	},
 	{
-		name: "Finly",
+		name: "Envoy",
 		id: 3,
-		img: "/img/finly.png",
+		img: "/img/envoy.png",
 		description:
-			"Finly is a market data app built using Go, Echo & SQLite. The app is an API that holds relevant market data from over 25+ sources and aggregates it into a single scalable format. HTMX is used to create a small logged in section to allow users to manage API keys.",
-		technologies: [
-			"Go / Golang",
-			"Echo",
-			"HTMX",
-			"Tailwind CSS",
-			"Railway",
-			"SQLite",
-		],
+			"Envoy is an envinroment storage app built using Go, Echo & SQLite. The server acts as an API with CRUD functionality for environment variables. A CLI application is also included that extends some of the server functionality into the command line and acts as the client for interacting with the API.",
+		technologies: ["Go / Golang", "Echo", "Tailwind CSS", "Railway", "SQLite"],
 		featured: true,
 		link: {
-			url: "https://www.finly.cc",
+			url: "https://envoy.webiliti.com",
 			text: "Visit",
 		},
 		github: null,
@@ -95,7 +88,7 @@ interface Job {
 export const work: Job[] = [
 	{
 		name: "London Stock Exchange Group",
-		logo: "/img/lseg.webp",
+		logo: "/img/lseg.jpg",
 		jobTitle: "Digital Strategy & Enablement Manager",
 		date: "Sep '21 - Current",
 		description:
