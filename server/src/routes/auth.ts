@@ -1,16 +1,10 @@
-import { zValidator } from "@hono/zod-validator";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { database } from "~/db";
 import { users } from "~/db/schema";
 import { LoginSchema, RegisterSchema, UpdateUserSchema } from "~/lib/schemas";
-import {
-	throwBadRequest,
-	throwConflict,
-	throwServerError,
-	throwUnauthorized,
-} from "~/middleware/http-exception";
+import { throwConflict, throwUnauthorized } from "~/middleware/http-exception";
 import { type JWTPayload, signJWT, verifyJWT } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
@@ -53,13 +47,15 @@ auth.post("/auth/login", createValidator(loginSchema), async (c) => {
 
 	const token = await signJWT({ userId: user.id, email: user.email });
 
-	const protocol = c.req.header("X-Forwarded-Proto") || "http";
-	const isSecure = protocol === "https";
+	const host = c.req.header("Host") || "";
+	const isLocalhost = host.includes("localhost") || host.includes("127.1");
+	const cookieDomain = isLocalhost ? undefined : ".ytsruh.com";
 
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
-		secure: isSecure,
-		sameSite: isSecure ? "none" : "lax",
+		secure: !isLocalhost,
+		sameSite: "lax",
+		domain: cookieDomain,
 		maxAge: 60 * 60 * 24 * 7,
 		path: "/",
 	});
@@ -95,13 +91,15 @@ auth.post("/auth/register", createValidator(registerSchema), async (c) => {
 
 	const token = await signJWT({ userId: id, email: body.email });
 
-	const protocol = c.req.header("X-Forwarded-Proto") || "http";
-	const isSecure = protocol === "https";
+	const host = c.req.header("Host") || "";
+	const isLocalhost = host.includes("localhost") || host.includes("127.1");
+	const cookieDomain = isLocalhost ? undefined : ".ytsruh.com";
 
 	setCookie(c, "auth_token", token, {
 		httpOnly: true,
-		secure: isSecure,
-		sameSite: isSecure ? "none" : "lax",
+		secure: !isLocalhost,
+		sameSite: "lax",
+		domain: cookieDomain,
 		maxAge: 60 * 60 * 24 * 7,
 		path: "/",
 	});

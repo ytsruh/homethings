@@ -13,7 +13,8 @@ interface LoginResponse {
 }
 
 interface AuthError {
-	error: string;
+	error?: string;
+	message?: string;
 }
 
 function getAuthUrl(endpoint: string): string {
@@ -24,8 +25,9 @@ async function handleResponse<T>(response: Response): Promise<T> {
 	if (!response.ok) {
 		const error = (await response.json().catch(() => ({
 			error: "An unexpected error occurred",
+			message: "An unexpected error occurred",
 		}))) as AuthError;
-		throw new Error(error.error || "Request failed");
+		throw new Error(error.error || error.message || "Request failed");
 	}
 	return response.json() as Promise<T>;
 }
