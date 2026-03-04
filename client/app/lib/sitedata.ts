@@ -75,6 +75,20 @@ export const projects: Project[] = [
 		},
 		github: null,
 	},
+	{
+		name: "AI Generated Gophers",
+		id: 4,
+		img: "/img/gophers/gophy.png",
+		description:
+			"Whilst learning to use some of the more recently released AI tools, I created some images of the Golang mascot, the Gopher. This helped me understand how these tools work and how they can be used to generate creative content. All the images were generated using AI tools and are available for download.",
+		technologies: ["Go / Golang", "OpenAI", "Google Gemini Nano Banana"],
+		featured: false,
+		link: {
+			url: "/projects/gophers",
+			text: "View",
+		},
+		github: null,
+	},
 ];
 
 interface Job {

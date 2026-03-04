@@ -59,18 +59,20 @@ export default function Home() {
 							have been used or where a project is deployed.
 						</p>
 						<div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-							{projects.map((project) => (
-								<div key={project.id}>
-									<h3 className="py-5 text-center text-2xl text-white">
-										{project.name}
-									</h3>
-									<img
-										src={project.img}
-										className="h-36 w-full bg-nav object-cover xl:h-56"
-										alt={project.description}
-									/>
-								</div>
-							))}
+							{projects
+								.filter((project) => project.featured)
+								.map((project) => (
+									<div key={project.id}>
+										<h3 className="py-5 text-center text-2xl text-white">
+											{project.name}
+										</h3>
+										<img
+											src={project.img}
+											className="h-36 w-full bg-nav object-cover xl:h-56"
+											alt={project.description}
+										/>
+									</div>
+								))}
 						</div>
 					</section>
 				</div>
