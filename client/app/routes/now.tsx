@@ -1,5 +1,6 @@
-import { Tag } from "lucide-react";
+import { Brain, Briefcase, Dumbbell, Earth, Guitar } from "lucide-react";
 import PageTitle from "~/components/PageTitle";
+import { Card, CardContent, CardHeader } from "~/components/ui/card";
 
 export default function Now() {
 	return (
@@ -16,10 +17,10 @@ export default function Now() {
 				/>
 				<ul className="space-y-4 py-5">
 					<li className="flex items-center">
-						<div className="icon mr-5">
-							<Tag size="36" />
+						<div className="icon mr-5 text-theme">
+							<Briefcase size="36" />
 						</div>
-						<p>
+						<p className="text-zinc-300">
 							Working at{" "}
 							<a
 								href="http://www.lseg.com"
@@ -33,47 +34,68 @@ export default function Now() {
 						</p>
 					</li>
 					<li className="flex items-center">
-						<div className="icon mr-5">
-							<Tag size="36" />
+						<div className="icon mr-5 text-theme">
+							<Dumbbell size="36" />
 						</div>
 						<p>Improving my fitness</p>
 					</li>
 					<li className="flex items-center">
-						<div className="icon mr-5">
-							<Tag size="36" />
+						<div className="icon mr-5 text-theme">
+							<Brain size="36" />
 						</div>
 						<p>Improving my Go skills</p>
 					</li>
+					<li className="flex items-center">
+						<div className="icon mr-5 text-theme">
+							<Guitar size="36" />
+						</div>
+						<p>Learning to play Guitar</p>
+					</li>
+					<li className="flex items-center">
+						<div className="icon mr-5 text-theme">
+							<Earth size="36" />
+						</div>
+						<p>Learning Spanish</p>
+					</li>
 				</ul>
-				<div className="grid grid-cols-1 gap-5 py-5 md:grid-cols-2 md:py-10 lg:grid-cols-3">
-					<div>
-						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
-						<h2 className="text-3xl font-bold">Project</h2>
-						<p className="py-2">
-							My main goal in 2025 is to build out Webiliti into a viable &
-							usable project. I'm also using it as an opportunity to build my TS
-							skills and to solve some interesting problems in the Digital
-							world.
-						</p>
-					</div>
-					<div>
-						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
-						<h2 className="text-3xl font-bold">Go</h2>
-						<p className="py-2">
-							Building my skills in Go by building a number of small systems
-							type projects such as a SSH server, a database & a number of CLI's
-							/ TUI's.
-						</p>
-					</div>
-					<div>
-						<span className="mb-1 block h-2 w-12 bg-theme rounded-xl"></span>
-						<h2 className="text-3xl font-bold">Fitness</h2>
-						<p className="py-2">
-							My fitness goal this year is to run a 10k in under 60 minutes.
-							Despite doing numerous 5k's and beating 30 mins in 2024, I was not
-							able to beat 60 mins.
-						</p>
-					</div>
+				<div className="grid grid-cols-1 gap-5 py-10 md:grid-cols-2 lg:grid-cols-3">
+					<Card className="border-secondary/50 bg-secondary/10 transition-all duration-300 hover:border-theme hover:shadow-lg hover:shadow-theme/10">
+						<CardHeader className="pb-2">
+							<span className="mb-1 block h-1 w-12 bg-theme rounded-xl"></span>
+							<h2 className="text-2xl font-bold text-zinc-300">Project</h2>
+						</CardHeader>
+						<CardContent>
+							<p className="text-zinc-300">
+								My main goal in 2025 is to build out Webiliti into a viable &
+								usable project, whilst improving my TypeScript and AI skills.
+							</p>
+						</CardContent>
+					</Card>
+					<Card className="border-secondary/50 bg-secondary/10 transition-all duration-300 hover:border-theme hover:shadow-lg hover:shadow-theme/10">
+						<CardHeader className="pb-2">
+							<span className="mb-1 block h-1 w-12 bg-theme rounded-xl"></span>
+							<h2 className="text-2xl font-bold text-zinc-300">Fitness</h2>
+						</CardHeader>
+						<CardContent>
+							<p className="text-zinc-300">
+								My fitness goal this year is to run a 10k in under 60 minutes.
+								I've entered Warrington Running Festival 10k.
+							</p>
+						</CardContent>
+					</Card>
+					<Card className="border-secondary/50 bg-secondary/10 transition-all duration-300 hover:border-theme hover:shadow-lg hover:shadow-theme/10">
+						<CardHeader className="pb-2">
+							<span className="mb-1 block h-1 w-12 bg-theme rounded-xl"></span>
+							<h2 className="text-2xl font-bold text-zinc-300">Go</h2>
+						</CardHeader>
+						<CardContent>
+							<p className="text-zinc-300">
+								Building my skills in Go by building a number of small systems
+								type projects such as a SSH server, a database & a number of
+								CLI's / TUI's.
+							</p>
+						</CardContent>
+					</Card>
 				</div>
 				<p className="py-10 text-lg">
 					What is a now page? Click{" "}

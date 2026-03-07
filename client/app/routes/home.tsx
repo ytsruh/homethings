@@ -59,18 +59,20 @@ export default function Home() {
 							have been used or where a project is deployed.
 						</p>
 						<div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-							{projects.map((project) => (
-								<div key={project.id}>
-									<h3 className="py-5 text-center text-2xl text-white">
-										{project.name}
-									</h3>
-									<img
-										src={project.img}
-										className="h-36 w-full bg-nav object-cover xl:h-56"
-										alt={project.description}
-									/>
-								</div>
-							))}
+							{projects
+								.filter((project) => project.featured)
+								.map((project) => (
+									<div key={project.id}>
+										<h3 className="py-5 text-center text-2xl text-white">
+											{project.name}
+										</h3>
+										<img
+											src={project.img}
+											className="h-36 w-full bg-nav object-cover xl:h-56"
+											alt={project.description}
+										/>
+									</div>
+								))}
 						</div>
 					</section>
 				</div>
@@ -94,7 +96,7 @@ export default function Home() {
 								{/* logo */}
 								<div className="m-6 grid grid-cols-1 place-content-center md:basis-1/3 lg:mb-0">
 									<img
-										src="/img/lseg.webp"
+										src="/img/lseg.jpg"
 										alt="London Stock Exchange Logo"
 										width="100%"
 									/>
@@ -105,10 +107,10 @@ export default function Home() {
 										London Stock Exchange Group
 									</h3>
 									<div className="mb-8 mt-6 flex w-full flex-wrap justify-center gap-3 lg:w-auto lg:justify-start">
-										<Badge variant="default">Oct '21 - Current</Badge>
 										<Badge variant="secondary" className="text-base">
 											Digital Strategy & Enablement Manager
 										</Badge>
+										<Badge variant="default">Oct '21 - Current</Badge>
 									</div>
 								</div>
 							</div>
@@ -129,10 +131,10 @@ export default function Home() {
 										Refinitiv
 									</h3>
 									<div className="mb-8 mt-6 flex w-full flex-wrap justify-center gap-3 lg:w-auto lg:justify-start">
-										<Badge variant="default">Jan '19 - Oct '21</Badge>
 										<Badge variant="secondary" className="text-base">
 											Digital Localisation Manager
 										</Badge>
+										<Badge variant="default">Jan '19 - Oct '21</Badge>
 									</div>
 								</div>
 							</div>
@@ -153,10 +155,10 @@ export default function Home() {
 										Thomson Reuters
 									</h3>
 									<div className="mb-8 mt-6 flex w-full flex-wrap justify-center gap-3 lg:w-auto lg:justify-start">
-										<Badge variant="default">Dec '16 - Jan '19</Badge>
 										<Badge variant="secondary" className="text-base">
 											Head of Digital - Middle East
 										</Badge>
+										<Badge variant="default">Dec '16 - Jan '19</Badge>
 									</div>
 								</div>
 							</div>
