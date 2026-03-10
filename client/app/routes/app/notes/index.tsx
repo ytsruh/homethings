@@ -213,7 +213,7 @@ export default function NotesPage() {
 						onChange={(e) => setSearchQuery(e.target.value)}
 						className="sm:max-w-xs"
 					/>
-					<div className="flex gap-2">
+					<div className="flex items-center justify-between gap-2">
 						<Button
 							variant={filter === "incomplete" ? "default" : "outline"}
 							size="sm"
@@ -246,15 +246,15 @@ export default function NotesPage() {
 						</p>
 					</div>
 				) : (
-					<ScrollArea className="h-[65vh] sm:h-[75vh] md:h-[68vh]">
-						<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+					<ScrollArea className="w-full h-[65vh] sm:h-[75vh] md:h-[68vh]">
+						<div className="w-full grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 							{filteredNotes.map((note) => (
 								<Link
 									key={note.id}
 									to={`/app/notes/${note.id}`}
 									className={`block ${note.completed ? "opacity-60" : ""}`}
 								>
-									<Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
+									<Card className="hover:shadow-md transition-shadow cursor-pointer h-full max-w-full">
 										<CardHeader className="pb-2">
 											<div className="flex items-start justify-between gap-2">
 												<CardTitle className="text-lg line-clamp-1">

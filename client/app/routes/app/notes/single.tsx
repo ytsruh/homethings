@@ -2,7 +2,6 @@ import { Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, redirect, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import {
@@ -206,8 +205,8 @@ export default function NoteDetailPage({
 						size="sm"
 						onClick={() => setIsDeleteOpen(true)}
 					>
-						<Trash2 className="h-4 w-4 mr-2" />
-						Delete
+						<Trash2 className="h-4 w-4 sm:mr-2" />
+						<span className="hidden sm:inline">Delete</span>
 					</Button>
 				</div>
 

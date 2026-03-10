@@ -229,7 +229,7 @@ export default function Chat() {
 					<div ref={messagesEndRef} />
 				</div>
 
-				<div className="py-4 flex gap-2">
+				<div className="py-5 flex gap-2">
 					<Input
 						ref={inputRef}
 						value={input}
