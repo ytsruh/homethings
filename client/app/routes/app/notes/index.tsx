@@ -6,6 +6,7 @@ import {
 	useSearchParams,
 } from "react-router";
 import { toast } from "sonner";
+import PageHeader from "~/components/PageHeader";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -117,14 +118,13 @@ export default function NotesPage() {
 			<meta name="description" content="Your notes" />
 			<div className="space-y-6">
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-					<div>
-						<h1 className="text-3xl font-bold">Notes</h1>
-						<p className="text-muted-foreground">Manage your notes and tasks</p>
-					</div>
-
+					<PageHeader title="Notes" subtitle="Manage your notes and tasks" />
 					<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 						<DialogTrigger asChild>
-							<Button>New Note</Button>
+							<div className="py-2 flex items-center justify-end gap-2">
+								{" "}
+								<Button>New Note</Button>
+							</div>
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader>

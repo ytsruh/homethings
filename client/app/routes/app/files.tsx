@@ -138,27 +138,22 @@ export default function FilesPage() {
 		<>
 			<title>Files | Homethings</title>
 			<meta name="description" content="Your files" />
-			<PageHeader
-				title="Files"
-				subtitle="Manage your files"
-				actions={
-					<div className="flex items-center gap-2">
-						<input
-							ref={fileInputRef}
-							type="file"
-							id={fileInputId}
-							className="hidden"
-							onChange={handleUpload}
-							disabled={isUploading}
-						/>
-						<Button asChild>
-							<label htmlFor={fileInputId} className="cursor-pointer">
-								{isUploading ? "Uploading..." : "Upload File"}
-							</label>
-						</Button>
-					</div>
-				}
-			/>
+			<PageHeader title="Files" subtitle="Manage your files" />
+			<div className="py-2 flex items-center justify-end gap-2">
+				<input
+					ref={fileInputRef}
+					type="file"
+					id={fileInputId}
+					className="hidden"
+					onChange={handleUpload}
+					disabled={isUploading}
+				/>
+				<Button asChild>
+					<label htmlFor={fileInputId} className="cursor-pointer">
+						{isUploading ? "Uploading..." : "Upload File"}
+					</label>
+				</Button>
+			</div>
 			{files.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
 					<p className="text-lg">No files yet</p>

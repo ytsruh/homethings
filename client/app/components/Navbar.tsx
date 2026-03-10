@@ -47,6 +47,7 @@ function getPageTitle(pathname: string): string {
 		app: "Dashboard",
 		chat: "Chat",
 		images: "Images",
+		files: "Files",
 		notes: "Notes",
 		profile: "Profile",
 		feedback: "Feedback",

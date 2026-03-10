@@ -105,43 +105,47 @@ export default function Images() {
 			<title>Generate Images | Homethings</title>
 			<meta name="description" content="Generate images with AI" />
 			<div className="flex flex-col h-full px-2 mx-auto">
-				<div className="flex items-center gap-4 pb-4">
-					<span className="text-sm text-muted-foreground">Model:</span>
-					<Select value={selectedModel} onValueChange={setSelectedModel}>
-						<SelectTrigger className="w-[300px]">
-							<SelectValue placeholder="Select model" />
-						</SelectTrigger>
-						<SelectContent>
-							{models.map((model) => (
-								<SelectItem key={model} value={model}>
-									{model}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<span className="text-sm text-muted-foreground">Aspect:</span>
-					<Select
-						value={selectedAspectRatio}
-						onValueChange={setSelectedAspectRatio}
-					>
-						<SelectTrigger className="w-[150px]">
-							<SelectValue placeholder="Aspect ratio" />
-						</SelectTrigger>
-						<SelectContent>
-							{aspectRatios.map((ratio) => (
-								<SelectItem key={ratio.value} value={ratio.value}>
-									{ratio.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<Button
-						onClick={handleClear}
-						disabled={images.length === 0 && !prompt.trim()}
-						className="ml-auto"
-					>
-						Clear
-					</Button>
+				<div className="flex flex-col md:flex-row items-center gap-4 pb-4">
+					<div className="w-full flex items-center">
+						<span className="text-sm text-muted-foreground pr-2">Model:</span>
+						<Select value={selectedModel} onValueChange={setSelectedModel}>
+							<SelectTrigger className="w-75">
+								<SelectValue placeholder="Select model" />
+							</SelectTrigger>
+							<SelectContent>
+								{models.map((model) => (
+									<SelectItem key={model} value={model}>
+										{model}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="w-full flex items-center">
+						<span className="text-sm text-muted-foreground pr-2">Aspect:</span>
+						<Select
+							value={selectedAspectRatio}
+							onValueChange={setSelectedAspectRatio}
+						>
+							<SelectTrigger className="w-37.5">
+								<SelectValue placeholder="Aspect ratio" />
+							</SelectTrigger>
+							<SelectContent>
+								{aspectRatios.map((ratio) => (
+									<SelectItem key={ratio.value} value={ratio.value}>
+										{ratio.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<Button
+							onClick={handleClear}
+							disabled={images.length === 0 && !prompt.trim()}
+							className="ml-auto"
+						>
+							Clear
+						</Button>
+					</div>
 				</div>
 
 				<div className="flex gap-2 pb-4">
