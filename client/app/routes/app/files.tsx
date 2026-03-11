@@ -1,4 +1,14 @@
-import { useEffect, useId, useRef, useState } from "react";
+import {
+	Download,
+	File,
+	Folder,
+	Image,
+	Music,
+	Paperclip,
+	Trash,
+	Video,
+} from "lucide-react";
+import { type ReactElement, useEffect, useId, useRef, useState } from "react";
 import { useLoaderData, useRevalidator } from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { toast } from "~/components/Toaster";
@@ -43,13 +53,14 @@ function formatDate(dateString: string): string {
 	});
 }
 
-function getFileIcon(fileType: string): string {
-	if (fileType.startsWith("image/")) return "🖼️";
-	if (fileType.startsWith("video/")) return "🎬";
-	if (fileType.startsWith("audio/")) return "🎵";
-	if (fileType.includes("pdf")) return "📄";
-	if (fileType.includes("zip") || fileType.includes("archive")) return "📦";
-	return "📎";
+function getFileIcon(fileType: string): ReactElement {
+	if (fileType.startsWith("image/")) return <Image />;
+	if (fileType.startsWith("video/")) return <Video />;
+	if (fileType.startsWith("audio/")) return <Music />;
+	if (fileType.includes("pdf")) return <File />;
+	if (fileType.includes("zip") || fileType.includes("archive"))
+		return <Folder />;
+	return <Paperclip />;
 }
 
 export default function FilesPage() {
@@ -164,24 +175,30 @@ export default function FilesPage() {
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="w-[50px]"></TableHead>
+								<TableHead className="w-12.5 hidden sm:table-cell"></TableHead>
 								<TableHead>Name</TableHead>
-								<TableHead>Size</TableHead>
-								<TableHead>Type</TableHead>
-								<TableHead>Date</TableHead>
+								<TableHead className="hidden sm:table-cell">Size</TableHead>
+								<TableHead className="hidden md:table-cell">Type</TableHead>
+								<TableHead className="hidden sm:table-cell">Date</TableHead>
 								<TableHead className="text-right">Actions</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
 							{files.map((file) => (
 								<TableRow key={file.id}>
-									<TableCell className="font-medium text-xl">
+									<TableCell className="font-medium text-xl hidden md:table-cell">
 										{getFileIcon(file.fileType)}
 									</TableCell>
 									<TableCell>{file.fileName}</TableCell>
-									<TableCell>{formatFileSize(file.fileSize)}</TableCell>
-									<TableCell>{file.fileType}</TableCell>
-									<TableCell>{formatDate(file.createdAt)}</TableCell>
+									<TableCell className="hidden sm:table-cell">
+										{formatFileSize(file.fileSize)}
+									</TableCell>
+									<TableCell className="hidden sm:table-cell">
+										{file.fileType}
+									</TableCell>
+									<TableCell className="hidden sm:table-cell">
+										{formatDate(file.createdAt)}
+									</TableCell>
 									<TableCell className="text-right">
 										<div className="flex justify-end gap-2">
 											<Button
@@ -189,14 +206,16 @@ export default function FilesPage() {
 												size="sm"
 												onClick={() => handleDownload(file)}
 											>
-												Download
+												<Download className="sm:hidden" />
+												<span className="hidden sm:inline">Download</span>
 											</Button>
 											<Button
 												variant="destructive"
 												size="sm"
 												onClick={() => handleDelete(file)}
 											>
-												Delete
+												<Trash className="sm:hidden" />
+												<span className="hidden sm:inline">Delete</span>
 											</Button>
 										</div>
 									</TableCell>

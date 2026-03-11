@@ -109,7 +109,7 @@ export default function NotesPage() {
 	function truncateBody(body: string | null, maxLength: number = 100): string {
 		if (!body) return "";
 		if (body.length <= maxLength) return body;
-		return body.slice(0, maxLength) + "...";
+		return `${body.slice(0, maxLength)}...`;
 	}
 
 	return (
@@ -247,7 +247,7 @@ export default function NotesPage() {
 					</div>
 				) : (
 					<ScrollArea className="w-full h-[65vh] sm:h-[75vh] md:h-[68vh]">
-						<div className="w-full grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+						<div className="w-full grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 							{filteredNotes.map((note) => (
 								<Link
 									key={note.id}
