@@ -34,6 +34,7 @@ export default function Chat() {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const messageIdRef = useRef(0);
+	const messagesRef = useRef<ChatMessage[]>([]);
 
 	const models = loaderData?.models ?? [];
 	const defaultModel = loaderData?.defaultModel ?? "";
@@ -59,15 +60,18 @@ export default function Chat() {
 			role: "user",
 			content: input,
 		};
-		setMessages((prev) => [...prev, userMessage]);
 		setInput("");
 		setIsLoading(true);
+
+		const currentMessages = [...messagesRef.current, userMessage];
+		messagesRef.current = currentMessages;
+		setMessages(currentMessages);
 
 		let streamError: Error | null = null;
 
 		try {
 			const response = await streamChatMessage(
-				[...messages, userMessage],
+				currentMessages,
 				selectedModel || undefined,
 			);
 
@@ -85,7 +89,9 @@ export default function Chat() {
 				role: "assistant",
 				content: "",
 			};
-			setMessages((prev) => [...prev, assistantMsg]);
+			const messagesWithAssistant = [...currentMessages, assistantMsg];
+			messagesRef.current = messagesWithAssistant;
+			setMessages(messagesWithAssistant);
 
 			while (true) {
 				let result: ReadableStreamReadResult<Uint8Array>;
@@ -117,6 +123,11 @@ export default function Chat() {
 				}
 
 				assistantMessage += chunk;
+				messagesRef.current = messagesRef.current.map((msg, idx) =>
+					idx === messagesRef.current.length - 1 && msg.role === "assistant"
+						? { ...msg, content: assistantMessage }
+						: msg,
+				);
 				setMessages((prev) => {
 					const updated = [...prev];
 					const lastMsg = updated[updated.length - 1];
@@ -134,6 +145,9 @@ export default function Chat() {
 			setIsLoading(false);
 
 			if (streamError) {
+				messagesRef.current = messagesRef.current.filter(
+					(msg) => !(msg.role === "assistant" && msg.content === ""),
+				);
 				setMessages((prev) => {
 					const updated = [...prev];
 					if (
@@ -160,6 +174,7 @@ export default function Chat() {
 
 	function handleClearChat() {
 		setMessages([]);
+		messagesRef.current = [];
 		messageIdRef.current = 0;
 	}
 
@@ -191,7 +206,7 @@ export default function Chat() {
 					</Button>
 				</div>
 
-				<div className="flex-1 max-h-[80vh] md:max-h-[72vh] overflow-y-auto space-y-4 p-4 border rounded-lg bg-card/50">
+				<div className="flex-1 max-h-[80vh] md:max-h-[70vh] overflow-y-auto space-y-4 p-4 border rounded-lg bg-card/50">
 					{messages.length === 0 && (
 						<div className="flex items-center justify-center h-full">
 							<p className="text-muted-foreground">

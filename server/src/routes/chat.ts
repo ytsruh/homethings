@@ -10,7 +10,12 @@ import type { JWTPayload } from "~/middleware/jwt";
 import { createValidator } from "~/middleware/validator";
 
 const chatSchema = z.object({
-	message: z.string().min(1).max(10000),
+	messages: z.array(
+		z.object({
+			role: z.enum(["user", "assistant", "system"]),
+			content: z.string(),
+		}),
+	),
 	model: z.string().optional(),
 });
 
@@ -44,10 +49,7 @@ chat.post("/chat", createValidator(chatSchema), async (c) => {
 	};
 
 	try {
-		const response = await ai.chat(
-			[{ role: "user", content: body.message }],
-			options,
-		);
+		const response = await ai.chat(body.messages, options);
 		return c.json({ response });
 	} catch (error) {
 		console.error("Chat error:", error);
@@ -86,10 +88,7 @@ chat.post("/chat/stream", createValidator(chatSchema), async (c) => {
 	};
 
 	try {
-		const stream = ai.chatStream(
-			[{ role: "user", content: body.message }],
-			options,
-		);
+		const stream = ai.chatStream(body.messages, options);
 
 		const readable = new ReadableStream({
 			async start(controller) {

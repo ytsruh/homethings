@@ -147,9 +147,18 @@ export const openApiSpec = {
 			},
 			ChatRequest: {
 				type: "object",
-				required: ["message"],
+				required: ["messages"],
 				properties: {
-					message: { type: "string", maxLength: 10000 },
+					messages: {
+						type: "array",
+						items: {
+							type: "object",
+							properties: {
+								role: { type: "string", enum: ["user", "assistant", "system"] },
+								content: { type: "string" },
+							},
+						},
+					},
 					model: { type: "string" },
 				},
 			},

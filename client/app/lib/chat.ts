@@ -45,7 +45,7 @@ export async function getAvailableModels(): Promise<ModelsResponse> {
 }
 
 export interface ChatRequest {
-	message: string;
+	messages: { role: "user" | "assistant"; content: string }[];
 	model?: string;
 }
 
@@ -73,7 +73,6 @@ export async function streamChatMessage(
 	messages: ChatMessage[],
 	model?: string,
 ): Promise<Response> {
-	const lastMessage = messages[messages.length - 1];
 	const response = await fetch(getApiUrl("/api/chat/stream"), {
 		method: "POST",
 		credentials: "include",
@@ -81,7 +80,7 @@ export async function streamChatMessage(
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
-			message: lastMessage.content,
+			messages: messages.map(({ role, content }) => ({ role, content })),
 			model,
 		}),
 	});
