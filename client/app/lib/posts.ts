@@ -1,8 +1,6 @@
 import fs from "fs";
 import matter from "gray-matter";
 import path from "path";
-import { remark } from "remark";
-import html from "remark-html";
 
 const postsDirectory = path.join(process.cwd(), "app/posts");
 
@@ -11,31 +9,26 @@ export interface PostData {
 	title: string;
 	date: string;
 	description: string;
-	categories: string[];
-	published: boolean;
+	tags: string[];
+	featuredImage?: string;
 	content: string;
 }
 
-export async function getPostData(slug: string): Promise<PostData> {
+export function getPostData(slug: string): PostData {
 	const fullPath = path.join(postsDirectory, `${slug}.md`);
 	const fileContents = fs.readFileSync(fullPath, "utf8");
 
 	const matterResult = matter(fileContents);
 
-	const processedContent = await remark()
-		.use(html)
-		.process(matterResult.content);
-	const contentHtml = processedContent.toString();
-
 	return {
 		slug,
-		content: contentHtml,
+		content: matterResult.content,
 		...(matterResult.data as {
 			title: string;
 			date: string;
 			description: string;
-			categories: string[];
-			published: boolean;
+			tags: string[];
+			featuredImage?: string;
 		}),
 	};
 }
@@ -53,36 +46,29 @@ export function getAllPostSlugs() {
 	});
 }
 
-export async function getSortedPostsData(): Promise<PostData[]> {
+export function getSortedPostsData(): PostData[] {
 	const fileNames = fs
 		.readdirSync(postsDirectory)
 		.filter((fileName) => fileName.endsWith(".md"));
-	const allPostsData = await Promise.all(
-		fileNames.map(async (fileName) => {
-			const slug = fileName.replace(/\.md$/, "");
-			const fullPath = path.join(postsDirectory, fileName);
-			const fileContents = fs.readFileSync(fullPath, "utf8");
+	const allPostsData = fileNames.map((fileName) => {
+		const slug = fileName.replace(/\.md$/, "");
+		const fullPath = path.join(postsDirectory, fileName);
+		const fileContents = fs.readFileSync(fullPath, "utf8");
 
-			const matterResult = matter(fileContents);
+		const matterResult = matter(fileContents);
 
-			const processedContent = await remark()
-				.use(html)
-				.process(matterResult.content);
-			const contentHtml = processedContent.toString();
-
-			return {
-				slug,
-				content: contentHtml,
-				...(matterResult.data as {
-					title: string;
-					date: string;
-					description: string;
-					categories: string[];
-					published: boolean;
-				}),
-			};
-		}),
-	);
+		return {
+			slug,
+			content: matterResult.content,
+			...(matterResult.data as {
+				title: string;
+				date: string;
+				description: string;
+				tags: string[];
+				featuredImage?: string;
+			}),
+		};
+	});
 
 	return allPostsData.sort((a, b) => {
 		if (a.date < b.date) {

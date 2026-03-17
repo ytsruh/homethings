@@ -35,20 +35,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				/>
 				<Meta />
 				<Links />
-				<link rel="icon" type="image/png" href="/favicon/favicon.ico" />
 				<link rel="manifest" href="/manifest.json" />
 				<link
 					rel="apple-touch-icon"
 					sizes="180x180"
-					href="/favicon/apple-touch-icon.png"
+					href="/apple-touch-icon.png"
 				/>
 				<link
 					rel="icon"
 					type="image/png"
 					sizes="96x96"
-					href="/favicon/favicon-96x96.png"
+					href="/favicon-96x96.png"
 				/>
-				<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
 				<meta name="theme-color" content="#ffffff" />
 			</head>
 			<body>
