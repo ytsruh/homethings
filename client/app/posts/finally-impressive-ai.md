@@ -1,6 +1,6 @@
 ---
 title: AI is finally, starting, to impress me
-description: Whilst the world has been going crazy about AI, I've been sat quietly using it and learning as I go. Up until very recently, I've not been impressed. 2026 is finally the year where I think proper use cases will emerge, not fantasies based on hopes & dreams.
+description: Whilst the world has been going crazy about AI, I've been sat quietly using it and learning as I go. Up until very recently, I've not been impressed.
 date: "2026-03-17"
 tags:
   - AI
