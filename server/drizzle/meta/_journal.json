@@ -15,6 +15,13 @@
       "when": 1772305429654,
       "tag": "0001_nifty_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774521987910,
+      "tag": "0002_milky_patch",
+      "breakpoints": true
     }
   ]
 }

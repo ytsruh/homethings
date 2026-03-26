@@ -5,6 +5,7 @@ import feedbackRoutes from "./feedback";
 import { filesRoutes } from "./files";
 import { images as imagesRoutes } from "./images";
 import notesRoutes from "./notes";
+import { recipesRoutes } from "./recipes";
 
 export const routes = new Hono()
 	.route("/", chatRoutes)
@@ -12,4 +13,5 @@ export const routes = new Hono()
 	.route("/", notesRoutes)
 	.route("/", commentsRoutes)
 	.route("/", feedbackRoutes)
-	.route("/", filesRoutes);
+	.route("/", filesRoutes)
+	.route("/", recipesRoutes);

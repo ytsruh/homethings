@@ -210,6 +210,56 @@ export const openApiSpec = {
 					presignedUrl: { type: "string" },
 				},
 			},
+			Ingredient: {
+				type: "object",
+				properties: {
+					name: { type: "string", nullable: true },
+					amount: { type: "string", nullable: true },
+				},
+			},
+			Recipe: {
+				type: "object",
+				properties: {
+					id: { type: "string" },
+					title: { type: "string" },
+					description: { type: "string", nullable: true },
+					tags: { type: "array", items: { type: "string" } },
+					ingredients: {
+						type: "array",
+						items: { $ref: "#/components/schemas/Ingredient" },
+					},
+					steps: { type: "array", items: { type: "string" } },
+					createdAt: { type: "string", format: "date-time" },
+					updatedAt: { type: "string", format: "date-time" },
+				},
+			},
+			CreateRecipeRequest: {
+				type: "object",
+				required: ["title"],
+				properties: {
+					title: { type: "string" },
+					description: { type: "string" },
+					tags: { type: "array", items: { type: "string" } },
+					ingredients: {
+						type: "array",
+						items: { $ref: "#/components/schemas/Ingredient" },
+					},
+					steps: { type: "array", items: { type: "string" } },
+				},
+			},
+			UpdateRecipeRequest: {
+				type: "object",
+				properties: {
+					title: { type: "string" },
+					description: { type: "string" },
+					tags: { type: "array", items: { type: "string" } },
+					ingredients: {
+						type: "array",
+						items: { $ref: "#/components/schemas/Ingredient" },
+					},
+					steps: { type: "array", items: { type: "string" } },
+				},
+			},
 		},
 	},
 	security: [{ cookieAuth: [] }],
@@ -810,6 +860,158 @@ export const openApiSpec = {
 					},
 					404: {
 						description: "File not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+				},
+			},
+		},
+		"/recipes": {
+			get: {
+				tags: ["Recipes"],
+				summary: "List recipes",
+				description: "List all recipes, optionally filtered by tag",
+				parameters: [
+					{
+						name: "tag",
+						in: "query",
+						schema: { type: "string" },
+						description: "Filter by tag",
+					},
+				],
+				responses: {
+					200: {
+						description: "List of recipes",
+						content: {
+							"application/json": {
+								schema: {
+									type: "array",
+									items: { $ref: "#/components/schemas/Recipe" },
+								},
+							},
+						},
+					},
+				},
+			},
+			post: {
+				tags: ["Recipes"],
+				summary: "Create recipe",
+				description: "Create a new recipe",
+				requestBody: {
+					content: {
+						"application/json": {
+							schema: { $ref: "#/components/schemas/CreateRecipeRequest" },
+						},
+					},
+				},
+				responses: {
+					201: {
+						description: "Recipe created",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Recipe" },
+							},
+						},
+					},
+				},
+			},
+		},
+		"/recipes/{id}": {
+			get: {
+				tags: ["Recipes"],
+				summary: "Get recipe",
+				description: "Get a specific recipe by ID",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				responses: {
+					200: {
+						description: "Recipe found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Recipe" },
+							},
+						},
+					},
+					404: {
+						description: "Recipe not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+				},
+			},
+			patch: {
+				tags: ["Recipes"],
+				summary: "Update recipe",
+				description: "Update a specific recipe",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				requestBody: {
+					content: {
+						"application/json": {
+							schema: { $ref: "#/components/schemas/UpdateRecipeRequest" },
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: "Recipe updated",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Recipe" },
+							},
+						},
+					},
+					404: {
+						description: "Recipe not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+				},
+			},
+			delete: {
+				tags: ["Recipes"],
+				summary: "Delete recipe",
+				description: "Delete a specific recipe",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				responses: {
+					200: {
+						description: "Recipe deleted",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+					404: {
+						description: "Recipe not found",
 						content: {
 							"application/json": {
 								schema: { $ref: "#/components/schemas/Error" },
