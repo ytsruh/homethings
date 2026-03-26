@@ -5,6 +5,7 @@ CREATE TABLE `recipes` (
 	`tags` text DEFAULT '[]',
 	`ingredients` text DEFAULT '[]',
 	`steps` text DEFAULT '[]',
+	`image_key` text,
 	`created_at` integer NOT NULL,
 	`updated_at` integer NOT NULL
 );

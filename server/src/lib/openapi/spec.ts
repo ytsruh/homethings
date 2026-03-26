@@ -229,6 +229,7 @@ export const openApiSpec = {
 						items: { $ref: "#/components/schemas/Ingredient" },
 					},
 					steps: { type: "array", items: { type: "string" } },
+					imageKey: { type: "string", nullable: true },
 					createdAt: { type: "string", format: "date-time" },
 					updatedAt: { type: "string", format: "date-time" },
 				},
@@ -245,6 +246,7 @@ export const openApiSpec = {
 						items: { $ref: "#/components/schemas/Ingredient" },
 					},
 					steps: { type: "array", items: { type: "string" } },
+					imageKey: { type: "string" },
 				},
 			},
 			UpdateRecipeRequest: {
@@ -258,6 +260,30 @@ export const openApiSpec = {
 						items: { $ref: "#/components/schemas/Ingredient" },
 					},
 					steps: { type: "array", items: { type: "string" } },
+					imageKey: { type: "string" },
+				},
+			},
+			RecipeImageUploadRequest: {
+				type: "object",
+				required: ["fileType"],
+				properties: {
+					fileType: {
+						type: "string",
+						enum: ["image/jpeg", "image/png", "image/webp", "image/gif"],
+					},
+				},
+			},
+			RecipeImageUploadResponse: {
+				type: "object",
+				properties: {
+					imageKey: { type: "string" },
+					presignedUrl: { type: "string" },
+				},
+			},
+			RecipeImageUrlResponse: {
+				type: "object",
+				properties: {
+					presignedUrl: { type: "string" },
 				},
 			},
 		},
@@ -1012,6 +1038,81 @@ export const openApiSpec = {
 					},
 					404: {
 						description: "Recipe not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+				},
+			},
+		},
+		"/recipes/{id}/upload-url": {
+			post: {
+				tags: ["Recipes"],
+				summary: "Get image upload URL",
+				description: "Get a presigned URL to upload a recipe image",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				requestBody: {
+					content: {
+						"application/json": {
+							schema: { $ref: "#/components/schemas/RecipeImageUploadRequest" },
+						},
+					},
+				},
+				responses: {
+					200: {
+						description: "Upload URL generated",
+						content: {
+							"application/json": {
+								schema: {
+									$ref: "#/components/schemas/RecipeImageUploadResponse",
+								},
+							},
+						},
+					},
+					404: {
+						description: "Recipe not found",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/Error" },
+							},
+						},
+					},
+				},
+			},
+		},
+		"/recipes/{id}/image-url": {
+			get: {
+				tags: ["Recipes"],
+				summary: "Get image download URL",
+				description: "Get a presigned URL to download a recipe image",
+				parameters: [
+					{
+						name: "id",
+						in: "path",
+						required: true,
+						schema: { type: "string" },
+					},
+				],
+				responses: {
+					200: {
+						description: "Download URL generated",
+						content: {
+							"application/json": {
+								schema: { $ref: "#/components/schemas/RecipeImageUrlResponse" },
+							},
+						},
+					},
+					404: {
+						description: "Recipe image not found",
 						content: {
 							"application/json": {
 								schema: { $ref: "#/components/schemas/Error" },

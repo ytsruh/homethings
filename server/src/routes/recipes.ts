@@ -5,9 +5,15 @@ import { recipes } from "~/db/schema";
 import {
 	CreateRecipeRequestSchema,
 	ListRecipesQuerySchema,
+	RecipeImageUploadRequestSchema,
 	RecipePathSchema,
 	UpdateRecipeRequestSchema,
 } from "~/lib/schemas";
+import {
+	createPresignedUrl,
+	deleteImg,
+	getPresignedDownloadUrl,
+} from "~/lib/storage";
 import { throwNotFound, throwServerError } from "~/middleware/http-exception";
 import { createParamValidator, createValidator } from "~/middleware/validator";
 
@@ -61,9 +67,9 @@ recipesRoutes.post(
 			id: recipeId,
 			title: body.title,
 			description: body.description || null,
-			tags: body.tags,
-			ingredients: body.ingredients,
-			steps: body.steps,
+			tags: JSON.stringify(body.tags ?? []),
+			ingredients: JSON.stringify(body.ingredients ?? []),
+			steps: JSON.stringify(body.steps ?? []),
 			createdAt: now,
 			updatedAt: now,
 		});
@@ -98,10 +104,21 @@ recipesRoutes.patch(
 			return;
 		}
 
+		if (body.imageKey === null && existing.imageKey) {
+			await deleteImg(existing.imageKey);
+		}
+
 		await database
 			.update(recipes)
 			.set({
-				...body,
+				title: body.title,
+				description: body.description,
+				tags: body.tags ? JSON.stringify(body.tags) : undefined,
+				ingredients: body.ingredients
+					? JSON.stringify(body.ingredients)
+					: undefined,
+				steps: body.steps ? JSON.stringify(body.steps) : undefined,
+				imageKey: body.imageKey,
 				updatedAt: new Date(),
 			})
 			.where(eq(recipes.id, params.id));
@@ -134,8 +151,61 @@ recipesRoutes.delete(
 			return;
 		}
 
+		if (existing.imageKey) {
+			await deleteImg(existing.imageKey);
+		}
+
 		await database.delete(recipes).where(eq(recipes.id, params.id));
 
 		return c.json({ message: "Recipe deleted" });
+	},
+);
+
+recipesRoutes.post(
+	"/recipes/:id/upload-url",
+	createParamValidator(RecipePathSchema),
+	createValidator(RecipeImageUploadRequestSchema),
+	async (c) => {
+		const params = c.req.valid("param");
+		const body = c.req.valid("json");
+
+		const existing = await database.query.recipes.findFirst({
+			where: eq(recipes.id, params.id),
+		});
+
+		if (!existing) {
+			throwNotFound("Recipe not found");
+			return;
+		}
+
+		if (existing.imageKey) {
+			await deleteImg(existing.imageKey);
+		}
+
+		const fileExt = body.fileType.split("/")[1];
+		const imageKey = `recipes/${params.id}/${crypto.randomUUID()}.${fileExt}`;
+		const presignedUrl = createPresignedUrl(imageKey);
+
+		return c.json({ imageKey, presignedUrl });
+	},
+);
+
+recipesRoutes.get(
+	"/recipes/:id/image-url",
+	createParamValidator(RecipePathSchema),
+	async (c) => {
+		const params = c.req.valid("param");
+
+		const recipe = await database.query.recipes.findFirst({
+			where: eq(recipes.id, params.id),
+		});
+
+		if (!recipe || !recipe.imageKey) {
+			throwNotFound("Recipe image not found");
+			return;
+		}
+
+		const presignedUrl = getPresignedDownloadUrl(recipe.imageKey);
+		return c.json({ presignedUrl });
 	},
 );

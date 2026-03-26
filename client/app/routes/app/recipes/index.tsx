@@ -1,15 +1,15 @@
-import { Plus } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Link, useLoaderData, useSearchParams } from "react-router";
-import { toast } from "sonner";
+import { ImageIcon, Plus } from "lucide-react";
+import { useEffect, useId, useRef, useState } from "react";
+import { Link, redirect, useFetcher, useLoaderData, useSearchParams } from "react-router";
 import PageHeader from "~/components/PageHeader";
+import { toast } from "~/components/Toaster";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
-	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -17,86 +17,136 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { Textarea } from "~/components/ui/textarea";
-import {
-	createRecipe,
-	getRecipes,
-	type Recipe,
-} from "~/lib/recipes";
+import { type Recipe, RecipeResponseSchema } from "~/lib/schemas/recipes";
+import type { Route } from "./+types/index";
 
-export async function clientLoader({ request }: { request: Request }) {
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 	const url = new URL(request.url);
 	const tag = url.searchParams.get("tag") || undefined;
 
+	let apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/recipes`;
+	if (tag) {
+		apiUrl += `?tag=${encodeURIComponent(tag)}`;
+	}
+
+	let recipes: Recipe[] = [];
 	try {
-		const recipes = await getRecipes(tag);
-		return { recipes };
-	} catch {
-		return { recipes: [] };
+		const response = await fetch(apiUrl, { credentials: "include" });
+		const text = await response.text();
+		if (text) {
+			const data = JSON.parse(text) as unknown;
+			recipes = RecipeResponseSchema.array().parse(data);
+		}
+	} catch (e) {
+		console.error("Failed to fetch recipes:", e);
+	}
+
+	const imageUrls: Record<string, string | null> = {};
+	await Promise.all(
+		recipes.map(async (recipe) => {
+			if (!recipe.imageKey) {
+				imageUrls[recipe.id] = null;
+				return;
+			}
+			try {
+				const res = await fetch(
+					`${import.meta.env.VITE_API_BASE_URL}/api/recipes/${recipe.id}/image-url`,
+					{ credentials: "include" },
+				);
+				if (res.ok) {
+					const imageData = (await res.json()) as unknown as {
+						presignedUrl: string;
+					};
+					imageUrls[recipe.id] = imageData.presignedUrl;
+				} else {
+					imageUrls[recipe.id] = null;
+				}
+			} catch {
+				imageUrls[recipe.id] = null;
+			}
+		}),
+	);
+
+	return { recipes, imageUrls };
+}
+
+export async function clientAction({ request }: Route.ClientActionArgs) {
+	const formData = await request.formData();
+	const title = (formData.get("title") as string | null) ?? "";
+	const description = (formData.get("description") as string | null) ?? "";
+	const tagsRaw = (formData.get("tags") as string | null) ?? "";
+	const tags = tagsRaw
+		? tagsRaw
+				.split(",")
+				.map((t) => t.trim())
+				.filter(Boolean)
+		: [];
+
+	try {
+		const response = await fetch(
+			`${import.meta.env.VITE_API_BASE_URL}/api/recipes`,
+			{
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					title,
+					description: description || undefined,
+					tags,
+				}),
+			},
+		);
+
+		if (!response.ok) {
+			const error = await response.json().catch(() => ({}));
+			throw new Error(error.error || "Failed to create recipe");
+		}
+
+		toast({
+			title: "Success",
+			description: "Recipe created successfully",
+		});
+		return redirect("/app/recipes");
+	} catch (error) {
+		console.error("Failed to create recipe:", error);
+		toast({
+			title: "Error",
+			description:
+				error instanceof Error ? error.message : "Failed to create recipe",
+			type: "destructive",
+		});
+		return false;
 	}
 }
 
 export default function RecipesPage() {
-	const initialData = useLoaderData<typeof clientLoader>();
-	const [searchParams, setSearchParams] = useSearchParams();
-	const [recipes, setRecipes] = useState<Recipe[]>(initialData.recipes);
+	const id = useId();
+	const { recipes, imageUrls } = useLoaderData<typeof clientLoader>();
 	const [searchQuery, setSearchQuery] = useState("");
-	const [isCreateOpen, setIsCreateOpen] = useState(false);
-	const [newTitle, setNewTitle] = useState("");
-	const [newDescription, setNewDescription] = useState("");
-	const [newTags, setNewTags] = useState("");
-	const [isLoading, setIsLoading] = useState(false);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const activeTag = searchParams.get("tag") || null;
+	const fetcher = useFetcher();
+	const formRef = useRef<HTMLFormElement>(null);
 
-	useEffect(() => {
-		setRecipes(initialData.recipes);
-	}, [initialData.recipes]);
+	const allTags = [...new Set(recipes.flatMap((r) => r.tags))].sort();
 
-	const allTags = [
-		...new Set(recipes.flatMap((r) => r.tags ?? [])),
-	].filter(Boolean);
-
-	const filteredRecipes = recipes.filter((recipe) => {
+	const filteredRecipes = recipes.filter((recipe: Recipe) => {
+		if (activeTag && !recipe.tags.includes(activeTag)) return false;
 		if (!searchQuery) return true;
 		const query = searchQuery.toLowerCase();
 		return (
 			recipe.title.toLowerCase().includes(query) ||
-			recipe.description?.toLowerCase().includes(query) ||
-			recipe.tags.some((t) => t.toLowerCase().includes(query))
+			recipe.description?.toLowerCase().includes(query)
 		);
 	});
 
-	async function handleCreate() {
-		if (!newTitle.trim()) {
-			toast.error("Title is required");
-			return;
+	useEffect(() => {
+		if (fetcher.state === "idle" && fetcher.data) {
+			formRef.current?.reset();
 		}
-
-		setIsLoading(true);
-		try {
-			const tags = newTags
-				.split(",")
-				.map((t) => t.trim())
-				.filter(Boolean);
-			const recipe = await createRecipe({
-				title: newTitle,
-				description: newDescription || undefined,
-				tags,
-				ingredients: [],
-				steps: [],
-			});
-			setRecipes((prev) => [recipe, ...prev]);
-			setNewTitle("");
-			setNewDescription("");
-			setNewTags("");
-			setIsCreateOpen(false);
-			toast.success("Recipe created");
-		} catch (error) {
-			console.error("Failed to create recipe:", error);
-			toast.error("Failed to create recipe");
-		} finally {
-			setIsLoading(false);
-		}
-	}
+	}, [fetcher.state, fetcher.data]);
 
 	return (
 		<>
@@ -105,7 +155,7 @@ export default function RecipesPage() {
 			<div className="space-y-6">
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 					<PageHeader title="Recipes" subtitle="Your recipe collection" />
-					<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+					<Dialog>
 						<DialogTrigger asChild>
 							<div className="py-2 flex items-center justify-end gap-2">
 								<Button>
@@ -116,189 +166,149 @@ export default function RecipesPage() {
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader>
-								<DialogTitle>Create New Recipe</DialogTitle>
-								<DialogDescription>
-									Add a new recipe to your collection.
-								</DialogDescription>
+								<DialogTitle>New Recipe</DialogTitle>
 							</DialogHeader>
-							<div className="space-y-4 py-4">
+							<fetcher.Form
+								ref={formRef}
+								method="post"
+								className="space-y-4 py-4"
+								onSubmit={(e) => {
+									e.preventDefault();
+									const formData = new FormData(e.currentTarget);
+									fetcher.submit(formData, { method: "post" });
+								}}
+							>
 								<div className="space-y-2">
 									<label
-										htmlFor="title"
+										htmlFor={`${id}-title`}
 										className="text-sm font-medium"
 									>
 										Title
 									</label>
 									<Input
-										id="title"
+										id={`${id}-title`}
+										name="title"
 										placeholder="Recipe title"
-										value={newTitle}
-										onChange={(e) =>
-											setNewTitle(e.target.value)
-										}
-										onKeyDown={(e) => {
-											if (
-												e.key === "Enter" &&
-												!e.shiftKey
-											) {
-												e.preventDefault();
-												handleCreate();
-											}
-										}}
+										required
 									/>
 								</div>
 								<div className="space-y-2">
 									<label
-										htmlFor="description"
+										htmlFor={`${id}-description`}
 										className="text-sm font-medium"
 									>
 										Description (optional)
 									</label>
-									<Textarea
-										id="description"
+									<Input
+										id={`${id}-description`}
+										name="description"
 										placeholder="Brief description..."
-										value={newDescription}
-										onChange={(e) =>
-											setNewDescription(e.target.value)
-										}
-										rows={3}
 									/>
 								</div>
 								<div className="space-y-2">
-									<label
-										htmlFor="tags"
-										className="text-sm font-medium"
-									>
+									<label htmlFor={`${id}-tags`} className="text-sm font-medium">
 										Tags (comma-separated)
 									</label>
 									<Input
-										id="tags"
+										id={`${id}-tags`}
+										name="tags"
 										placeholder="breakfast, quick, healthy"
-										value={newTags}
-										onChange={(e) =>
-											setNewTags(e.target.value)
-										}
 									/>
 								</div>
-							</div>
-							<DialogFooter>
-								<Button
-									variant="outline"
-									onClick={() => {
-										setNewTitle("");
-										setNewDescription("");
-										setNewTags("");
-										setIsCreateOpen(false);
-									}}
-								>
-									Cancel
-								</Button>
-								<Button
-									onClick={handleCreate}
-									disabled={isLoading || !newTitle.trim()}
-								>
-									{isLoading ? "Creating..." : "Create"}
-								</Button>
-							</DialogFooter>
+								<DialogFooter>
+									<DialogClose asChild>
+										<Button variant="outline">Cancel</Button>
+									</DialogClose>
+									<Button type="submit" disabled={fetcher.state !== "idle"}>
+										{fetcher.state !== "idle" ? "Creating..." : "Create"}
+									</Button>
+								</DialogFooter>
+							</fetcher.Form>
 						</DialogContent>
 					</Dialog>
 				</div>
 
-				<div className="flex flex-col sm:flex-row gap-4">
-					<Input
-						placeholder="Search recipes..."
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						className="sm:max-w-xs"
-					/>
-					{allTags.length > 0 && (
-						<div className="flex flex-wrap gap-2">
-							{allTags.map((tag) => (
-								<Badge
-									key={tag}
-									variant={
-										searchParams.get("tag") === tag
-											? "default"
-											: "outline"
-									}
-									className="cursor-pointer"
-									onClick={() => {
-										if (searchParams.get("tag") === tag) {
-											setSearchParams({});
-										} else {
-											setSearchParams({ tag });
-										}
-									}}
-								>
-									{tag}
-								</Badge>
-							))}
-						</div>
-					)}
-				</div>
+				<Input
+					placeholder="Search recipes..."
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					className="sm:max-w-xs"
+				/>
+
+				{allTags.length > 0 && (
+					<div className="flex gap-2 flex-wrap">
+						<Button
+							variant={!activeTag ? "default" : "outline"}
+							size="sm"
+							onClick={() => setSearchParams({})}
+						>
+							All
+						</Button>
+						{allTags.map((tag) => (
+							<Button
+								key={tag}
+								variant={activeTag === tag ? "default" : "outline"}
+								size="sm"
+								onClick={() => setSearchParams({ tag })}
+							>
+								{tag}
+							</Button>
+						))}
+					</div>
+				)}
 
 				{filteredRecipes.length === 0 ? (
 					<div className="text-center py-12">
 						<p className="text-muted-foreground">
-							{searchQuery
-								? "No recipes match your search"
-								: "No recipes yet. Create your first recipe!"}
+							{searchQuery || activeTag
+								? "No recipes match your filters"
+								: "No recipes yet"}
 						</p>
 					</div>
 				) : (
-					<ScrollArea className="w-full h-[65vh] sm:h-[75vh] md:h-[68vh]">
+					<ScrollArea className="w-full h-[65vh] sm:h-[75vh] md:h-[68vh] pb-5">
 						<div className="w-full grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-							{filteredRecipes.map((recipe) => (
-								<Link
-									key={recipe.id}
-									to={`/app/recipes/${recipe.id}`}
-									className="block"
-								>
-									<Card className="hover:shadow-md transition-shadow cursor-pointer h-full max-w-full">
-										<CardHeader className="pb-2">
-											<CardTitle className="text-lg line-clamp-1">
-												{recipe.title}
-											</CardTitle>
-											{recipe.tags.length > 0 && (
-												<div className="flex flex-wrap gap-1 mt-2">
-													{recipe.tags
-														.slice(0, 3)
-														.map((tag) => (
-															<Badge
-																key={tag}
-																variant="secondary"
-															>
-																{tag}
-															</Badge>
-														))}
-													{recipe.tags.length > 3 && (
-														<Badge variant="outline">
-															+{recipe.tags.length - 3}
-														</Badge>
-													)}
+							{filteredRecipes.map((recipe: Recipe) => {
+								const imageUrl = imageUrls[recipe.id];
+								return (
+									<Link
+										key={recipe.id}
+										to={`/app/recipes/${recipe.id}`}
+										className="block"
+									>
+										<Card className="hover:shadow-md transition-shadow cursor-pointer h-full max-w-full overflow-hidden">
+											{imageUrl ? (
+												<img
+													src={imageUrl}
+													alt={recipe.title}
+													className="aspect-video w-full object-cover"
+												/>
+											) : (
+												<div className="aspect-video w-full bg-muted flex items-center justify-center">
+													<ImageIcon className="h-10 w-10 text-muted-foreground/50" />
 												</div>
 											)}
-										</CardHeader>
-										<CardContent>
-											<p className="text-sm text-muted-foreground line-clamp-2">
-												{recipe.description ||
-													"No description"}
-											</p>
-											<div className="text-xs text-muted-foreground mt-2">
-												<span>
-													{recipe.ingredients
-														.length}
-													{" ingredients"}
-												</span>
-												<span className="mx-1">|</span>
-												<span>
-													{recipe.steps.length} steps
-												</span>
-											</div>
-										</CardContent>
-									</Card>
-								</Link>
-							))}
+											<CardHeader className="pb-2">
+												<CardTitle className="text-lg line-clamp-1">
+													{recipe.title}
+												</CardTitle>
+											</CardHeader>
+											<CardContent>
+												<p className="text-sm text-muted-foreground line-clamp-2">
+													{recipe.description || "No description"}
+												</p>
+												<div className="flex gap-1 mt-2 flex-wrap">
+													{recipe.tags.map((tag: string) => (
+														<Badge key={tag} variant="secondary">
+															{tag}
+														</Badge>
+													))}
+												</div>
+											</CardContent>
+										</Card>
+									</Link>
+								);
+							})}
 						</div>
 					</ScrollArea>
 				)}

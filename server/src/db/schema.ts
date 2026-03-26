@@ -109,6 +109,7 @@ export const recipes = sqliteTable("recipes", {
 	tags: text("tags").$type<string[]>().default([]),
 	ingredients: text("ingredients").$type<Ingredient[]>().default([]),
 	steps: text("steps").$type<string[]>().default([]),
+	imageKey: text("image_key"),
 	createdAt: integer("created_at", { mode: "timestamp" })
 		.notNull()
 		.$defaultFn(() => new Date()),

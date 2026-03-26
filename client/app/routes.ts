@@ -31,6 +31,7 @@ export default [
 			route("notes/:noteId", "routes/app/notes/single.tsx"),
 			route("recipes", "routes/app/recipes/index.tsx"),
 			route("recipes/:recipeId", "routes/app/recipes/single.tsx"),
+			route("recipes/:recipeId/delete", "routes/app/recipes/delete.tsx"),
 			route("profile", "routes/app/profile.tsx"),
 			route("feedback", "routes/app/feedback.tsx"),
 		]),

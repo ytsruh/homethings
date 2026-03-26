@@ -122,7 +122,6 @@ export default function NotesPage() {
 					<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 						<DialogTrigger asChild>
 							<div className="py-2 flex items-center justify-end gap-2">
-								{" "}
 								<Button>New Note</Button>
 							</div>
 						</DialogTrigger>
