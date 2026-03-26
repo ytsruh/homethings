@@ -45,3 +45,55 @@ export const CreateRecipeFormSchema = z.object({
 	description: z.string().optional(),
 	tags: z.string().optional(),
 });
+
+export async function uploadRecipeImage(
+	recipeId: string,
+	file: File,
+): Promise<{ imageKey: string }> {
+	const response = await fetch(
+		`${import.meta.env.VITE_API_BASE_URL}/api/recipes/${recipeId}/upload-url`,
+		{
+			method: "POST",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ fileType: file.type }),
+		},
+	);
+
+	if (!response.ok) {
+		throw new Error("Failed to get upload URL");
+	}
+
+	const { imageKey, presignedUrl } = (await response.json()) as {
+		imageKey: string;
+		presignedUrl: string;
+	};
+
+	const uploadRes = await fetch(presignedUrl, {
+		method: "PUT",
+		headers: { "Content-Type": file.type || "application/octet-stream" },
+		body: file,
+	});
+
+	if (!uploadRes.ok) {
+		throw new Error("Failed to upload image");
+	}
+
+	return { imageKey };
+}
+
+export async function removeRecipeImage(recipeId: string): Promise<void> {
+	const response = await fetch(
+		`${import.meta.env.VITE_API_BASE_URL}/api/recipes/${recipeId}`,
+		{
+			method: "PATCH",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ imageKey: null }),
+		},
+	);
+
+	if (!response.ok) {
+		throw new Error("Failed to remove image");
+	}
+}

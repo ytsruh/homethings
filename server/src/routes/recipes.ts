@@ -104,7 +104,7 @@ recipesRoutes.patch(
 			return;
 		}
 
-		if (body.imageKey === null && existing.imageKey) {
+		if (!body.imageKey && existing.imageKey) {
 			await deleteImg(existing.imageKey);
 		}
 
@@ -183,7 +183,7 @@ recipesRoutes.post(
 		}
 
 		const fileExt = body.fileType.split("/")[1];
-		const imageKey = `recipes/${params.id}/${crypto.randomUUID()}.${fileExt}`;
+		const imageKey = `recipes/${params.id}.${fileExt}`;
 		const presignedUrl = createPresignedUrl(imageKey);
 
 		return c.json({ imageKey, presignedUrl });

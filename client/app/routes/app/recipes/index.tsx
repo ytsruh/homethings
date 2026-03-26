@@ -1,6 +1,12 @@
 import { ImageIcon, Plus } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { Link, redirect, useFetcher, useLoaderData, useSearchParams } from "react-router";
+import {
+	Link,
+	redirect,
+	useFetcher,
+	useLoaderData,
+	useSearchParams,
+} from "react-router";
 import PageHeader from "~/components/PageHeader";
 import { toast } from "~/components/Toaster";
 import { Badge } from "~/components/ui/badge";
@@ -42,30 +48,11 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 	}
 
 	const imageUrls: Record<string, string | null> = {};
-	await Promise.all(
-		recipes.map(async (recipe) => {
-			if (!recipe.imageKey) {
-				imageUrls[recipe.id] = null;
-				return;
-			}
-			try {
-				const res = await fetch(
-					`${import.meta.env.VITE_API_BASE_URL}/api/recipes/${recipe.id}/image-url`,
-					{ credentials: "include" },
-				);
-				if (res.ok) {
-					const imageData = (await res.json()) as unknown as {
-						presignedUrl: string;
-					};
-					imageUrls[recipe.id] = imageData.presignedUrl;
-				} else {
-					imageUrls[recipe.id] = null;
-				}
-			} catch {
-				imageUrls[recipe.id] = null;
-			}
-		}),
-	);
+	for (const recipe of recipes) {
+		imageUrls[recipe.id] = recipe.imageKey
+			? `${import.meta.env.VITE_PUBLIC_IMAGE_BASE_URL}/${recipe.imageKey}?v=${recipe.updatedAt}`
+			: null;
+	}
 
 	return { recipes, imageUrls };
 }
@@ -266,7 +253,9 @@ export default function RecipesPage() {
 						</p>
 					</div>
 				) : (
-					<ScrollArea className="w-full h-[65vh] sm:h-[75vh] md:h-[68vh] pb-5">
+					<ScrollArea
+						className={`w-full ${allTags.length > 0 ? "h-[72vh] md:h-[60vh]" : "h-[80vh] md:h-[68vh]"} pb-5`}
+					>
 						<div className="w-full grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
 							{filteredRecipes.map((recipe: Recipe) => {
 								const imageUrl = imageUrls[recipe.id];

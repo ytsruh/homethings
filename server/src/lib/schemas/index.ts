@@ -120,7 +120,7 @@ export const CreateRecipeRequestSchema = z.object({
 		)
 		.default([]),
 	steps: z.array(z.string()).default([]),
-	imageKey: z.string().optional(),
+	imageKey: z.string().optional().nullable(),
 });
 
 export const UpdateRecipeRequestSchema = CreateRecipeRequestSchema.partial();
