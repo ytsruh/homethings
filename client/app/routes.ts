@@ -29,6 +29,8 @@ export default [
 			route("files", "routes/app/files.tsx"),
 			route("notes", "routes/app/notes/index.tsx"),
 			route("notes/:noteId", "routes/app/notes/single.tsx"),
+			route("recipes", "routes/app/recipes/index.tsx"),
+			route("recipes/:recipeId", "routes/app/recipes/single.tsx"),
 			route("profile", "routes/app/profile.tsx"),
 			route("feedback", "routes/app/feedback.tsx"),
 		]),
