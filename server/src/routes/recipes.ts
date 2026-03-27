@@ -3,7 +3,12 @@ import { Hono } from "hono";
 import { database } from "~/db";
 import { recipes } from "~/db/schema";
 import {
+	type ExtractedRecipe,
+	extractRecipeFromImage,
+} from "~/lib/ai/recipe-extractor";
+import {
 	CreateRecipeRequestSchema,
+	ExtractRecipeRequestSchema,
 	ListRecipesQuerySchema,
 	RecipeImageUploadRequestSchema,
 	RecipePathSchema,
@@ -14,10 +19,70 @@ import {
 	deleteImg,
 	getPresignedDownloadUrl,
 } from "~/lib/storage";
-import { throwNotFound, throwServerError } from "~/middleware/http-exception";
+import {
+	throwBadRequest,
+	throwNotFound,
+	throwServerError,
+} from "~/middleware/http-exception";
 import { createParamValidator, createValidator } from "~/middleware/validator";
 
 export const recipesRoutes = new Hono();
+
+recipesRoutes.post(
+	"/recipes/extract",
+	createValidator(ExtractRecipeRequestSchema),
+	async (c) => {
+		const body = c.req.valid("json");
+
+		if (!body.imageData || !body.imageData.startsWith("data:image/")) {
+			throwBadRequest("Invalid image data. Expected base64 data URI.");
+			return;
+		}
+
+		let extracted: ExtractedRecipe;
+		try {
+			extracted = await extractRecipeFromImage(body.imageData);
+		} catch (error) {
+			console.error("AI extraction failed:", error);
+			throwBadRequest(
+				error instanceof Error
+					? error.message
+					: "Failed to extract recipe from image",
+			);
+			return;
+		}
+
+		if (!extracted.title) {
+			throwBadRequest("Could not extract recipe title from image");
+			return;
+		}
+
+		const now = new Date();
+		const recipeId = crypto.randomUUID();
+
+		await database.insert(recipes).values({
+			id: recipeId,
+			title: extracted.title,
+			description: extracted.description || null,
+			tags: JSON.stringify(extracted.tags ?? []),
+			ingredients: JSON.stringify(extracted.ingredients ?? []),
+			steps: JSON.stringify(extracted.steps ?? []),
+			createdAt: now,
+			updatedAt: now,
+		});
+
+		const created = await database.query.recipes.findFirst({
+			where: eq(recipes.id, recipeId),
+		});
+
+		if (!created) {
+			throwServerError();
+			return;
+		}
+
+		return c.json(created, 201);
+	},
+);
 
 recipesRoutes.get(
 	"/recipes",
@@ -104,23 +169,26 @@ recipesRoutes.patch(
 			return;
 		}
 
-		if (!body.imageKey && existing.imageKey) {
+		if (body.imageKey === null && existing.imageKey) {
 			await deleteImg(existing.imageKey);
 		}
 
+		const updateData: Record<string, unknown> = {
+			updatedAt: new Date(),
+		};
+
+		if (body.title !== undefined) updateData.title = body.title;
+		if (body.description !== undefined) updateData.description = body.description;
+		if (body.tags !== undefined) updateData.tags = JSON.stringify(body.tags);
+		if (body.ingredients !== undefined)
+			updateData.ingredients = JSON.stringify(body.ingredients);
+		if (body.steps !== undefined) updateData.steps = JSON.stringify(body.steps);
+		if (body.imageKey !== undefined)
+			updateData.imageKey = body.imageKey;
+
 		await database
 			.update(recipes)
-			.set({
-				title: body.title,
-				description: body.description,
-				tags: body.tags ? JSON.stringify(body.tags) : undefined,
-				ingredients: body.ingredients
-					? JSON.stringify(body.ingredients)
-					: undefined,
-				steps: body.steps ? JSON.stringify(body.steps) : undefined,
-				imageKey: body.imageKey,
-				updatedAt: new Date(),
-			})
+			.set(updateData)
 			.where(eq(recipes.id, params.id));
 
 		const updated = await database.query.recipes.findFirst({

@@ -1,10 +1,11 @@
-import { ImageIcon, Plus } from "lucide-react";
+import { ImageIcon, Plus, Upload } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import {
 	Link,
 	redirect,
 	useFetcher,
 	useLoaderData,
+	useNavigate,
 	useSearchParams,
 } from "react-router";
 import PageHeader from "~/components/PageHeader";
@@ -23,7 +24,11 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { type Recipe, RecipeResponseSchema } from "~/lib/schemas/recipes";
+import {
+	extractRecipeFromImage,
+	type Recipe,
+	RecipeResponseSchema,
+} from "~/lib/schemas/recipes";
 import type { Route } from "./+types/index";
 
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
@@ -116,6 +121,11 @@ export default function RecipesPage() {
 	const activeTag = searchParams.get("tag") || null;
 	const fetcher = useFetcher();
 	const formRef = useRef<HTMLFormElement>(null);
+	const [extractOpen, setExtractOpen] = useState(false);
+	const [extracting, setExtracting] = useState(false);
+	const fileInputRef = useRef<HTMLInputElement>(null);
+	const newRecipeDialogRef = useRef<HTMLButtonElement>(null);
+	const navigate = useNavigate();
 
 	const allTags = [...new Set(recipes.flatMap((r) => r.tags))].sort();
 
@@ -135,6 +145,68 @@ export default function RecipesPage() {
 		}
 	}, [fetcher.state, fetcher.data]);
 
+	const handleExtractFromImage = async (
+		e: React.ChangeEvent<HTMLInputElement>,
+	) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		if (!file.type.startsWith("image/")) {
+			toast({
+				title: "Error",
+				description: "Please select an image file",
+				type: "destructive",
+			});
+			return;
+		}
+
+		const maxSize = 5 * 1024 * 1024;
+		if (file.size > maxSize) {
+			toast({
+				title: "Error",
+				description: "Image must be smaller than 5MB",
+				type: "destructive",
+			});
+			return;
+		}
+
+		setExtracting(true);
+
+		try {
+			const reader = new FileReader();
+			reader.onload = async (event) => {
+				const base64 = event.target?.result as string;
+				const recipe = await extractRecipeFromImage(base64);
+				toast({
+					title: "Success",
+					description: `Recipe "${recipe.title}" created from image`,
+				});
+				setExtractOpen(false);
+				navigate(`/app/recipes/${recipe.id}`);
+			};
+			reader.onerror = () => {
+				toast({
+					title: "Error",
+					description: "Failed to read image file",
+					type: "destructive",
+				});
+				setExtracting(false);
+			};
+			reader.readAsDataURL(file);
+		} catch (error) {
+			console.error("Failed to extract recipe:", error);
+			toast({
+				title: "Error",
+				description:
+					error instanceof Error
+						? error.message
+						: "Failed to extract recipe from image",
+				type: "destructive",
+			});
+			setExtracting(false);
+		}
+	};
+
 	return (
 		<>
 			<title>Recipes | Homethings</title>
@@ -142,77 +214,104 @@ export default function RecipesPage() {
 			<div className="space-y-6">
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 					<PageHeader title="Recipes" subtitle="Your recipe collection" />
-					<Dialog>
-						<DialogTrigger asChild>
-							<div className="py-2 flex items-center justify-end gap-2">
+					<div className="py-2 flex items-center justify-end gap-2">
+						<Button
+							variant="outline"
+							onClick={() => fileInputRef.current?.click()}
+							disabled={extracting}
+						>
+							{extracting ? (
+								<>
+									<span className="h-4 w-4 mr-2 animate-spin">⟳</span>
+									Generating...
+								</>
+							) : (
+								<>
+									<Upload className="h-4 w-4 mr-2" />
+									Create from Image
+								</>
+							)}
+						</Button>
+						<input
+							ref={fileInputRef}
+							type="file"
+							accept="image/*"
+							className="hidden"
+							onChange={handleExtractFromImage}
+						/>
+						<Dialog>
+							<DialogTrigger asChild>
 								<Button>
 									<Plus className="h-4 w-4 mr-2" />
 									New Recipe
 								</Button>
-							</div>
-						</DialogTrigger>
-						<DialogContent>
-							<DialogHeader>
-								<DialogTitle>New Recipe</DialogTitle>
-							</DialogHeader>
-							<fetcher.Form
-								ref={formRef}
-								method="post"
-								className="space-y-4 py-4"
-								onSubmit={(e) => {
-									e.preventDefault();
-									const formData = new FormData(e.currentTarget);
-									fetcher.submit(formData, { method: "post" });
-								}}
-							>
-								<div className="space-y-2">
-									<label
-										htmlFor={`${id}-title`}
-										className="text-sm font-medium"
-									>
-										Title
-									</label>
-									<Input
-										id={`${id}-title`}
-										name="title"
-										placeholder="Recipe title"
-										required
-									/>
-								</div>
-								<div className="space-y-2">
-									<label
-										htmlFor={`${id}-description`}
-										className="text-sm font-medium"
-									>
-										Description (optional)
-									</label>
-									<Input
-										id={`${id}-description`}
-										name="description"
-										placeholder="Brief description..."
-									/>
-								</div>
-								<div className="space-y-2">
-									<label htmlFor={`${id}-tags`} className="text-sm font-medium">
-										Tags (comma-separated)
-									</label>
-									<Input
-										id={`${id}-tags`}
-										name="tags"
-										placeholder="breakfast, quick, healthy"
-									/>
-								</div>
-								<DialogFooter>
-									<DialogClose asChild>
-										<Button variant="outline">Cancel</Button>
-									</DialogClose>
-									<Button type="submit" disabled={fetcher.state !== "idle"}>
-										{fetcher.state !== "idle" ? "Creating..." : "Create"}
-									</Button>
-								</DialogFooter>
-							</fetcher.Form>
-						</DialogContent>
-					</Dialog>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>New Recipe</DialogTitle>
+								</DialogHeader>
+								<fetcher.Form
+									ref={formRef}
+									method="post"
+									className="space-y-4 py-4"
+									onSubmit={(e) => {
+										e.preventDefault();
+										const formData = new FormData(e.currentTarget);
+										fetcher.submit(formData, { method: "post" });
+									}}
+								>
+									<div className="space-y-2">
+										<label
+											htmlFor={`${id}-title`}
+											className="text-sm font-medium"
+										>
+											Title
+										</label>
+										<Input
+											id={`${id}-title`}
+											name="title"
+											placeholder="Recipe title"
+											required
+										/>
+									</div>
+									<div className="space-y-2">
+										<label
+											htmlFor={`${id}-description`}
+											className="text-sm font-medium"
+										>
+											Description (optional)
+										</label>
+										<Input
+											id={`${id}-description`}
+											name="description"
+											placeholder="Brief description..."
+										/>
+									</div>
+									<div className="space-y-2">
+										<label
+											htmlFor={`${id}-tags`}
+											className="text-sm font-medium"
+										>
+											Tags (comma-separated)
+										</label>
+										<Input
+											id={`${id}-tags`}
+											name="tags"
+											placeholder="breakfast, quick, healthy"
+										/>
+									</div>
+									<DialogFooter>
+										<DialogClose asChild>
+											<Button variant="outline">Cancel</Button>
+										</DialogClose>
+										<Button type="submit" disabled={fetcher.state !== "idle"}>
+											{fetcher.state !== "idle" ? "Creating..." : "Create"}
+										</Button>
+									</DialogFooter>
+								</fetcher.Form>
+							</DialogContent>
+						</Dialog>
+					</div>
 				</div>
 
 				<Input
@@ -277,7 +376,7 @@ export default function RecipesPage() {
 													<ImageIcon className="h-10 w-10 text-muted-foreground/50" />
 												</div>
 											)}
-											<CardHeader className="pb-2">
+											<CardHeader>
 												<CardTitle className="text-lg line-clamp-1">
 													{recipe.title}
 												</CardTitle>

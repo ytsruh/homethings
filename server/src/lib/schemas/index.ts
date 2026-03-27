@@ -123,7 +123,18 @@ export const CreateRecipeRequestSchema = z.object({
 	imageKey: z.string().optional().nullable(),
 });
 
-export const UpdateRecipeRequestSchema = CreateRecipeRequestSchema.partial();
+export const UpdateRecipeRequestSchema = z.object({
+	title: z.string().min(1).optional(),
+	description: z.string().optional(),
+	tags: z.array(z.string()).optional(),
+	ingredients: z
+		.array(
+			z.object({ name: z.string().optional(), amount: z.string().optional() }),
+		)
+		.optional(),
+	steps: z.array(z.string()).optional(),
+	imageKey: z.string().optional().nullable(),
+});
 
 export const RecipeImageUploadRequestSchema = z.object({
 	fileType: z.enum(["image/jpeg", "image/png", "image/webp", "image/gif"]),
@@ -148,3 +159,9 @@ export const RecipeResponseSchema = z.object({
 });
 
 export const RecipesListResponseSchema = z.array(RecipeResponseSchema);
+
+export const ExtractRecipeRequestSchema = z.object({
+	imageData: z
+		.string()
+		.describe("Base64 encoded image data URI (data:image/jpeg;base64,...)"),
+});

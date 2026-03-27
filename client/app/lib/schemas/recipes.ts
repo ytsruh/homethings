@@ -97,3 +97,24 @@ export async function removeRecipeImage(recipeId: string): Promise<void> {
 		throw new Error("Failed to remove image");
 	}
 }
+
+export async function extractRecipeFromImage(imageData: string): Promise<Recipe> {
+	const response = await fetch(
+		`${import.meta.env.VITE_API_BASE_URL}/api/recipes/extract`,
+		{
+			method: "POST",
+			credentials: "include",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ imageData }),
+		},
+	);
+
+	if (!response.ok) {
+		const error = await response.json().catch(() => ({}));
+		throw new Error(error.error || "Failed to extract recipe from image");
+	}
+
+	const text = await response.text();
+	const data = JSON.parse(text) as unknown;
+	return RecipeResponseSchema.parse(data);
+}
