@@ -51,27 +51,20 @@ DATABASE_URL=file:./local.db
 
 ## Code Style
 
-### Tooling
-
-- **Linter/Formatter**: Biome (v2.2.2 client, v2.3.12 server)
-- **TypeScript**: Strict mode enabled
-- **Indentation**: Tabs
-- **Quotes**: Double quotes for JavaScript/TypeScript
-
 ### Running the Linter
 
 ```bash
 # Client
-cd client && npm run lint  # Not configured - use biome directly
-cd client && npx biome check .
+cd client && bunx biome check .
 
 # Server
-cd server && npm run lint
-cd server && npm run lint:fix
+cd server && bun run lint
+cd server && bun run lint:fix
 ```
 
 ### TypeScript Conventions
 
+- No not leave any Type errors in the code
 - Always use explicit types for function parameters and return types
 - Use `type` for simple type aliases, `interface` for objects
 - Use Zod for runtime validation (especially API inputs)

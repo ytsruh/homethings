@@ -7,6 +7,7 @@ import {
 	Menu,
 	NotebookPen,
 	User as UserIcon,
+	UtensilsCrossed,
 	X,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -49,6 +50,7 @@ function getPageTitle(pathname: string): string {
 		images: "Images",
 		files: "Files",
 		notes: "Notes",
+		recipes: "Recipes",
 		profile: "Profile",
 		feedback: "Feedback",
 	};
@@ -154,6 +156,11 @@ export const menuItems = [
 		title: "Notes",
 		url: "/app/notes",
 		icon: NotebookPen,
+	},
+	{
+		title: "Recipes",
+		url: "/app/recipes",
+		icon: UtensilsCrossed,
 	},
 	{
 		title: "Profile",

@@ -101,3 +101,22 @@ export const filesRelations = relations(files, ({ one }) => ({
 		references: [users.id],
 	}),
 }));
+
+export const recipes = sqliteTable("recipes", {
+	id: text("id").primaryKey(),
+	title: text("title").notNull(),
+	description: text("description"),
+	tags: text("tags").$type<string[]>().default([]),
+	ingredients: text("ingredients").$type<Ingredient[]>().default([]),
+	steps: text("steps").$type<string[]>().default([]),
+	imageKey: text("image_key"),
+	createdAt: integer("created_at", { mode: "timestamp" })
+		.notNull()
+		.$defaultFn(() => new Date()),
+	updatedAt: integer("updated_at", { mode: "timestamp" })
+		.notNull()
+		.$defaultFn(() => new Date())
+		.$onUpdate(() => new Date()),
+});
+
+export type Ingredient = { name?: string; amount?: string };

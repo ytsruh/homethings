@@ -11,6 +11,7 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
+		"db:dump": "bun run scripts/dump-db.ts",
 		"create-user": "bun scripts/createUser.ts"
 	},
 	"devDependencies": {

@@ -8,23 +8,23 @@ import { Label } from "~/components/ui/label";
 import { Textarea } from "~/components/ui/textarea";
 import type { Route } from "./+types/feedback";
 
-const API_BASE_URL =
-	import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
-
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
 	const title = formData.get("title") as string;
 	const body = formData.get("body") as string;
 
 	try {
-		const response = await fetch(`${API_BASE_URL}/api/feedback`, {
-			method: "POST",
-			credentials: "include",
-			headers: {
-				"Content-Type": "application/json",
+		const response = await fetch(
+			`${import.meta.env.VITE_API_BASE_URL}/api/feedback`,
+			{
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ title, body }),
 			},
-			body: JSON.stringify({ title, body }),
-		});
+		);
 
 		if (!response.ok) {
 			const error = await response.json().catch(() => ({}));

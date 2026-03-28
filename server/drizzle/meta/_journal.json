@@ -15,6 +15,13 @@
       "when": 1772305429654,
       "tag": "0001_nifty_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1774523780331,
+      "tag": "0002_cultured_red_ghost",
+      "breakpoints": true
     }
   ]
 }

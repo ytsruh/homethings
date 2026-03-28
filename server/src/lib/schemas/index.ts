@@ -103,3 +103,65 @@ export const CreateFeedbackRequestSchema = z.object({
 	title: z.string().min(5, "Title must be at least 5 characters"),
 	body: z.string().min(5, "Body must be at least 5 characters"),
 });
+
+// ============ Recipe Schemas ============
+
+export const RecipePathSchema = z.object({
+	id: z.string().min(1, "Recipe ID required"),
+});
+
+export const CreateRecipeRequestSchema = z.object({
+	title: z.string().min(1, "Title is required"),
+	description: z.string().optional(),
+	tags: z.array(z.string()).default([]),
+	ingredients: z
+		.array(
+			z.object({ name: z.string().optional(), amount: z.string().optional() }),
+		)
+		.default([]),
+	steps: z.array(z.string()).default([]),
+	imageKey: z.string().optional().nullable(),
+});
+
+export const UpdateRecipeRequestSchema = z.object({
+	title: z.string().min(1).optional(),
+	description: z.string().optional(),
+	tags: z.array(z.string()).optional(),
+	ingredients: z
+		.array(
+			z.object({ name: z.string().optional(), amount: z.string().optional() }),
+		)
+		.optional(),
+	steps: z.array(z.string()).optional(),
+	imageKey: z.string().optional().nullable(),
+});
+
+export const RecipeImageUploadRequestSchema = z.object({
+	fileType: z.enum(["image/jpeg", "image/png", "image/webp", "image/gif"]),
+});
+
+export const ListRecipesQuerySchema = z.object({
+	tag: z.string().optional(),
+});
+
+export const RecipeResponseSchema = z.object({
+	id: z.string(),
+	title: z.string(),
+	description: z.string().nullable(),
+	tags: z.array(z.string()),
+	ingredients: z.array(
+		z.object({ name: z.string().nullable(), amount: z.string().nullable() }),
+	),
+	steps: z.array(z.string()),
+	imageKey: z.string().nullable(),
+	createdAt: z.date(),
+	updatedAt: z.date(),
+});
+
+export const RecipesListResponseSchema = z.array(RecipeResponseSchema);
+
+export const ExtractRecipeRequestSchema = z.object({
+	imageData: z
+		.string()
+		.describe("Base64 encoded image data URI (data:image/jpeg;base64,...)"),
+});
