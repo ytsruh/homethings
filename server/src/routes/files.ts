@@ -47,7 +47,7 @@ filesRoutes.post(
 		const body = c.req.valid("json");
 
 		const fileId = crypto.randomUUID();
-		const fileKey = `${user.userId}/${fileId}-${body.fileName}`;
+		const fileKey = `files/${fileId}-${body.fileName}`;
 
 		const presignedUrl = createPresignedUrl(fileKey);
 
