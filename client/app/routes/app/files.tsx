@@ -1,6 +1,7 @@
 import {
 	Download,
 	File,
+	FileText,
 	Folder,
 	Image,
 	Music,
@@ -21,6 +22,16 @@ import {
 	TableHeader,
 	TableRow,
 } from "~/components/ui/table";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "~/components/ui/dialog";
 import {
 	deleteFile,
 	type FileItem,
@@ -58,9 +69,61 @@ function getFileIcon(fileType: string): ReactElement {
 	if (fileType.startsWith("video/")) return <Video />;
 	if (fileType.startsWith("audio/")) return <Music />;
 	if (fileType.includes("pdf")) return <File />;
+	if (fileType.includes("markdown")) return <FileText />;
 	if (fileType.includes("zip") || fileType.includes("archive"))
 		return <Folder />;
 	return <Paperclip />;
+}
+
+type DeleteFileModalProps = {
+	file: FileItem;
+	onDeleted: () => void;
+};
+
+function DeleteFileModal({ file, onDeleted }: DeleteFileModalProps) {
+	const handleDelete = async () => {
+		try {
+			await deleteFile(file.id);
+			toast({ title: "Success", description: "File deleted successfully" });
+			onDeleted();
+		} catch (error) {
+			console.error("Failed to delete file:", error);
+			toast({
+				title: "Error",
+				description:
+					error instanceof Error ? error.message : "Failed to delete file",
+				type: "destructive",
+			});
+		}
+	};
+
+	return (
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button variant="destructive" size="sm">
+					<Trash className="sm:hidden" />
+					<span className="hidden sm:inline">Delete</span>
+				</Button>
+			</DialogTrigger>
+			<DialogContent>
+				<DialogHeader>
+					<DialogTitle>Delete File</DialogTitle>
+					<DialogDescription>
+						Are you sure you want to delete "{file.fileName}"? This action cannot
+						be undone.
+					</DialogDescription>
+				</DialogHeader>
+				<DialogFooter>
+					<DialogClose asChild>
+						<Button variant="outline">Cancel</Button>
+					</DialogClose>
+					<Button variant="destructive" onClick={handleDelete}>
+						Delete
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
 }
 
 export default function FilesPage() {
@@ -129,22 +192,6 @@ export default function FilesPage() {
 		}
 	};
 
-	const handleDelete = async (file: FileItem) => {
-		try {
-			await deleteFile(file.id);
-			toast({ title: "Success", description: "File deleted successfully" });
-			revalidator.revalidate();
-		} catch (error) {
-			console.error("Failed to delete file:", error);
-			toast({
-				title: "Error",
-				description:
-					error instanceof Error ? error.message : "Failed to delete file",
-				type: "destructive",
-			});
-		}
-	};
-
 	return (
 		<>
 			<title>Files | Homethings</title>
@@ -175,10 +222,10 @@ export default function FilesPage() {
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead className="w-12.5 hidden sm:table-cell"></TableHead>
+								<TableHead className="w-12 hidden md:table-cell"></TableHead>
 								<TableHead>Name</TableHead>
 								<TableHead className="hidden sm:table-cell">Size</TableHead>
-								<TableHead className="hidden md:table-cell">Type</TableHead>
+								<TableHead className="hidden sm:table-cell">Type</TableHead>
 								<TableHead className="hidden sm:table-cell">Date</TableHead>
 								<TableHead className="text-right">Actions</TableHead>
 							</TableRow>
@@ -193,7 +240,7 @@ export default function FilesPage() {
 									<TableCell className="hidden sm:table-cell">
 										{formatFileSize(file.fileSize)}
 									</TableCell>
-									<TableCell className="hidden sm:table-cell">
+									<TableCell className="hidden sm:table-cell max-w-0 truncate">
 										{file.fileType}
 									</TableCell>
 									<TableCell className="hidden sm:table-cell">
@@ -209,14 +256,10 @@ export default function FilesPage() {
 												<Download className="sm:hidden" />
 												<span className="hidden sm:inline">Download</span>
 											</Button>
-											<Button
-												variant="destructive"
-												size="sm"
-												onClick={() => handleDelete(file)}
-											>
-												<Trash className="sm:hidden" />
-												<span className="hidden sm:inline">Delete</span>
-											</Button>
+											<DeleteFileModal
+												file={file}
+												onDeleted={() => revalidator.revalidate()}
+											/>
 										</div>
 									</TableCell>
 								</TableRow>
