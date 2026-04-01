@@ -15,12 +15,15 @@ export function getS3Client(): S3Client {
 	return s3Client;
 }
 
-export const createPresignedUrl = (key: string) => {
+export const createPresignedUrl = (
+	key: string,
+	contentType = "application/octet-stream",
+) => {
 	const client = getS3Client();
 	return client.presign(key, {
 		expiresIn: 3600, // 1 hour
 		method: "PUT",
-		type: "application/octet-stream",
+		type: contentType,
 	});
 };
 

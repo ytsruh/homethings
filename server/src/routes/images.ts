@@ -25,41 +25,48 @@ export const images = new Hono<{ Variables: { user: JWTPayload } }>();
 
 images.use("*", timeout(60000));
 
-images.post("/images/generate", createValidator(generateImageSchema), async (c) => {
-	const _user = c.get("user");
-	const body = c.req.valid("json");
+images.post(
+	"/images/generate",
+	createValidator(generateImageSchema),
+	async (c) => {
+		const _user = c.get("user");
+		const body = c.req.valid("json");
 
-	if (!process.env.OPENROUTER_API_KEY) {
-		throw new HTTPException(503, { message: "AI service not configured" });
-	}
+		if (!process.env.OPENROUTER_API_KEY) {
+			throw new HTTPException(503, { message: "AI service not configured" });
+		}
 
-	if (body.model && !isImageModel(body.model)) {
-		throwBadRequest(`Model '${body.model}' is not an image generation model`, {
-			code: "INVALID_MODEL",
-			availableModels: imageModels,
-		});
-	}
+		if (body.model && !isImageModel(body.model)) {
+			throwBadRequest(
+				`Model '${body.model}' is not an image generation model`,
+				{
+					code: "INVALID_MODEL",
+					availableModels: imageModels,
+				},
+			);
+		}
 
-	try {
-		const result = await ai.generateImage(body.prompt, {
-			model: body.model || defaultImageModel,
-			aspectRatio: body.aspectRatio,
-		});
-		return c.json(result);
-	} catch (error) {
-		console.error("Image generation error:", error);
-		if (error instanceof AIError) {
-			throw new HTTPException(error.statusCode as any, {
-				message: error.message,
-				cause: { code: error.code },
+		try {
+			const result = await ai.generateImage(body.prompt, {
+				model: body.model || defaultImageModel,
+				aspectRatio: body.aspectRatio,
 			});
+			return c.json(result);
+		} catch (error) {
+			console.error("Image generation error:", error);
+			if (error instanceof AIError) {
+				throw new HTTPException(error.statusCode as any, {
+					message: error.message,
+					cause: { code: error.code },
+				});
+			}
+			if (error instanceof Error) {
+				throw new HTTPException(500, { message: error.message });
+			}
+			throw error;
 		}
-		if (error instanceof Error) {
-			throw new HTTPException(500, { message: error.message });
-		}
-		throw error;
-	}
-});
+	},
+);
 
 images.get("/images/models", (c) => {
 	return c.json({

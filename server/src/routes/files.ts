@@ -49,7 +49,7 @@ filesRoutes.post(
 		const fileId = crypto.randomUUID();
 		const fileKey = `files/${fileId}-${body.fileName}`;
 
-		const presignedUrl = createPresignedUrl(fileKey);
+		const presignedUrl = createPresignedUrl(fileKey, body.fileType);
 
 		const now = new Date();
 		await database.insert(files).values({

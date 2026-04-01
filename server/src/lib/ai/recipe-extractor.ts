@@ -1,5 +1,5 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { generateText, Output, NoObjectGeneratedError } from "ai";
+import { generateText, NoObjectGeneratedError, Output } from "ai";
 import { z } from "zod/v4";
 
 const openrouter = createOpenRouter({

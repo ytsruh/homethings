@@ -178,13 +178,13 @@ recipesRoutes.patch(
 		};
 
 		if (body.title !== undefined) updateData.title = body.title;
-		if (body.description !== undefined) updateData.description = body.description;
+		if (body.description !== undefined)
+			updateData.description = body.description;
 		if (body.tags !== undefined) updateData.tags = JSON.stringify(body.tags);
 		if (body.ingredients !== undefined)
 			updateData.ingredients = JSON.stringify(body.ingredients);
 		if (body.steps !== undefined) updateData.steps = JSON.stringify(body.steps);
-		if (body.imageKey !== undefined)
-			updateData.imageKey = body.imageKey;
+		if (body.imageKey !== undefined) updateData.imageKey = body.imageKey;
 
 		await database
 			.update(recipes)
@@ -252,7 +252,7 @@ recipesRoutes.post(
 
 		const fileExt = body.fileType.split("/")[1];
 		const imageKey = `recipes/${params.id}.${fileExt}`;
-		const presignedUrl = createPresignedUrl(imageKey);
+		const presignedUrl = createPresignedUrl(imageKey, body.fileType);
 
 		return c.json({ imageKey, presignedUrl });
 	},
