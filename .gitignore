@@ -6,6 +6,10 @@ node_modules
 *.db-shm
 *.db-wal
 
+# API
+/api/data/*
+/api/tmp
+
 # React Router
 .react-router/
 .wrangler/
