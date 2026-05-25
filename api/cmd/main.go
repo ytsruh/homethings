@@ -25,6 +25,11 @@ func main() {
 
 	jwtService := utils.NewJWTService(env.JWT_SECRET)
 
+	_, err = utils.LoadStorageConfig()
+	if err != nil {
+		log.Fatalf("Failed to load storage config: %v", err)
+	}
+
 	handler := routes.NewHandler(database, jwtService)
 
 	e := echo.New()

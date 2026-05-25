@@ -11,16 +11,18 @@ import (
 )
 
 type Handler struct {
-	authCtrl   *controllers.AuthController
-	authMw     *middleware.AuthMiddleware
-	jwtService *utils.JWTService
+	authCtrl    *controllers.AuthController
+	recipesCtrl *controllers.RecipesController
+	authMw      *middleware.AuthMiddleware
+	jwtService  *utils.JWTService
 }
 
 func NewHandler(database *db.DB, jwtService *utils.JWTService) *Handler {
 	return &Handler{
-		authCtrl:   controllers.NewAuthController(database, jwtService),
-		authMw:     middleware.NewAuthMiddleware(jwtService),
-		jwtService: jwtService,
+		authCtrl:    controllers.NewAuthController(database, jwtService),
+		recipesCtrl: controllers.NewRecipesController(database),
+		authMw:      middleware.NewAuthMiddleware(jwtService),
+		jwtService:  jwtService,
 	}
 }
 
@@ -38,4 +40,14 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	auth.POST("/logout", h.authCtrl.Logout)
 	auth.GET("/me", h.authCtrl.Me)
 	auth.PATCH("/me", h.authCtrl.UpdateProfile)
+
+	api := e.Group("/api")
+	api.POST("/recipes/extract", h.recipesCtrl.Extract)
+	api.GET("/recipes", h.recipesCtrl.List)
+	api.GET("/recipes/:id", h.recipesCtrl.Get)
+	api.POST("/recipes", h.recipesCtrl.Create)
+	api.PATCH("/recipes/:id", h.recipesCtrl.Update)
+	api.DELETE("/recipes/:id", h.recipesCtrl.Delete)
+	api.POST("/recipes/:id/upload-url", h.recipesCtrl.GetUploadURL)
+	api.GET("/recipes/:id/image-url", h.recipesCtrl.GetImageURL)
 }

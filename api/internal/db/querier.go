@@ -6,12 +6,19 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 type Querier interface {
+	CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Recipe, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteRecipe(ctx context.Context, id string) (Recipe, error)
+	GetRecipe(ctx context.Context, id string) (Recipe, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserByID(ctx context.Context, id string) (User, error)
+	ListRecipes(ctx context.Context) ([]Recipe, error)
+	ListRecipesByTag(ctx context.Context, dollar_1 sql.NullString) ([]Recipe, error)
+	UpdateRecipe(ctx context.Context, arg UpdateRecipeParams) (Recipe, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 	UpdateUserNameEmail(ctx context.Context, arg UpdateUserNameEmailParams) (User, error)
 	UpdateUserPassword(ctx context.Context, arg UpdateUserPasswordParams) (User, error)

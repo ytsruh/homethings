@@ -63,6 +63,9 @@ func NewConnection(dbPath, tursoURL, tursoAuthToken string) (*DB, error) {
 		_ = db.Close()
 		return nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
+	fmt.Println("----------------------------------------")
+	fmt.Println("successfully applied database migrations")
+	fmt.Println("----------------------------------------")
 
 	if _, err := db.syncDb.Pull(ctx); err != nil {
 		fmt.Printf("warning: failed to pull remote changes on startup: %v\n", err)

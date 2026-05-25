@@ -4,6 +4,22 @@
 
 package db
 
+import (
+	"database/sql"
+)
+
+type Recipe struct {
+	ID          string
+	Title       string
+	Description sql.NullString
+	Tags        sql.NullString
+	Ingredients sql.NullString
+	Steps       sql.NullString
+	ImageKey    sql.NullString
+	CreatedAt   int64
+	UpdatedAt   int64
+}
+
 type User struct {
 	ID           string
 	Email        string
