@@ -11,18 +11,22 @@ import (
 )
 
 type Handler struct {
-	authCtrl    *controllers.AuthController
-	recipesCtrl *controllers.RecipesController
-	authMw      *middleware.AuthMiddleware
-	jwtService  *utils.JWTService
+	authCtrl           *controllers.AuthController
+	recipesCtrl        *controllers.RecipesController
+	notesCtrl          *controllers.NotesController
+	notesCommentsCtrl  *controllers.NotesCommentsController
+	authMw             *middleware.AuthMiddleware
+	jwtService         *utils.JWTService
 }
 
 func NewHandler(database *db.DB, jwtService *utils.JWTService) *Handler {
 	return &Handler{
-		authCtrl:    controllers.NewAuthController(database, jwtService),
-		recipesCtrl: controllers.NewRecipesController(database),
-		authMw:      middleware.NewAuthMiddleware(jwtService),
-		jwtService:  jwtService,
+		authCtrl:           controllers.NewAuthController(database, jwtService),
+		recipesCtrl:        controllers.NewRecipesController(database),
+		notesCtrl:          controllers.NewNotesController(database),
+		notesCommentsCtrl:  controllers.NewNotesCommentsController(database),
+		authMw:             middleware.NewAuthMiddleware(jwtService),
+		jwtService:         jwtService,
 	}
 }
 
@@ -42,6 +46,7 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	auth.PATCH("/me", h.authCtrl.UpdateProfile)
 
 	api := e.Group("/api")
+	api.Use(h.authMw.RequireAuth)
 	api.POST("/recipes/extract", h.recipesCtrl.Extract)
 	api.GET("/recipes", h.recipesCtrl.List)
 	api.GET("/recipes/:id", h.recipesCtrl.Get)
@@ -50,4 +55,12 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	api.DELETE("/recipes/:id", h.recipesCtrl.Delete)
 	api.POST("/recipes/:id/upload-url", h.recipesCtrl.GetUploadURL)
 	api.GET("/recipes/:id/image-url", h.recipesCtrl.GetImageURL)
+
+	api.GET("/notes", h.notesCtrl.List)
+	api.GET("/notes/:id", h.notesCtrl.Get)
+	api.POST("/notes", h.notesCtrl.Create)
+	api.PATCH("/notes/:id", h.notesCtrl.Update)
+	api.DELETE("/notes/:id", h.notesCtrl.Delete)
+	api.POST("/notes/:id/comments", h.notesCommentsCtrl.Create)
+	api.DELETE("/notes/:id/comments/:commentId", h.notesCommentsCtrl.Delete)
 }

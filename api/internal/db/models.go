@@ -8,6 +8,24 @@ import (
 	"database/sql"
 )
 
+type Note struct {
+	ID        string
+	Title     string
+	Body      sql.NullString
+	Priority  string
+	Completed int64
+	CreatedBy string
+	CreatedAt int64
+	UpdatedAt int64
+}
+
+type NotesComment struct {
+	ID        string
+	Comment   string
+	NoteID    string
+	CreatedAt int64
+}
+
 type Recipe struct {
 	ID          string
 	Title       string

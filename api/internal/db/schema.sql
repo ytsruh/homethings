@@ -19,3 +19,21 @@ CREATE TABLE IF NOT EXISTS recipes (
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS notes (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    body TEXT,
+    priority TEXT DEFAULT 'medium' NOT NULL,
+    completed INTEGER DEFAULT false NOT NULL,
+    created_by TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS notes_comments (
+    id TEXT PRIMARY KEY,
+    comment TEXT NOT NULL,
+    note_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+);
