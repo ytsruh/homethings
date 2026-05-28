@@ -28,7 +28,8 @@ import {
 	extractRecipeFromImage,
 	type Recipe,
 	RecipeResponseSchema,
-} from "~/lib/schemas/recipes";
+} from "~/lib/recipes";
+
 import type { Route } from "./+types/index";
 
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
