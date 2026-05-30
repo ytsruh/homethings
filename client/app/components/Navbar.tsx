@@ -1,9 +1,6 @@
 import {
-	Bot,
-	Folder,
 	Home,
 	House,
-	Image,
 	Menu,
 	NotebookPen,
 	User as UserIcon,
@@ -136,21 +133,6 @@ export const menuItems = [
 		title: "Dashboard",
 		url: "/app",
 		icon: Home,
-	},
-	{
-		title: "Chat",
-		url: "/app/chat",
-		icon: Bot,
-	},
-	{
-		title: "Images",
-		url: "/app/images",
-		icon: Image,
-	},
-	{
-		title: "Files",
-		url: "/app/files",
-		icon: Folder,
 	},
 	{
 		title: "Notes",

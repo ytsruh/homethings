@@ -1,202 +1,28 @@
-# Homethings Development Guide
+# Homethings
 
-This monorepo contains a personal homelab with a React frontend and Bun/Hono backend.
+## Repo Structure
 
-## Project Structure
+Two independent packages with no workspace config:
+- `api/` — Go backend (Echo, sqlc-generated db layer)
+- `client/` — React Router v7 frontend (file-based routing under `app/routes/`)
 
-```
-/client          # React Router frontend (React 19, TypeScript, Tailwind v4)
-/server          # Bun/Hono backend (TypeScript, Drizzle ORM, SQLite)
-```
+## Key Facts
 
-## Build Commands
+- **Database**: SQLite via sqlc. Schema at `api/internal/db/schema.sql`, queries at `api/internal/db/queries/*.sql`. Run `make sqlc` after changing either to regenerate `internal/db/*.sql.go`. Database uses Turso cloud (SQLite-compatible) and syncs a copy of the database to the local filesystem.
+- **Auth**: JWT-based. `utils/jwt.go` handles signing/validation.
+- **Storage**: Cloudflare R2 via AWS SDK v2. Config loaded from env via `utils/storage.go`.
+- **Env vars**: Both packages use `.env` (gitignored). Copy `.env.example` as a template. All required vars documented in `api/.env.example` and `client/.env.example`.
+- **Cloudflare deploy**: Client builds to `build/client/`, served via Wrangler. `.wrangler/`, `.react-router/`, `build/` are gitignored.
+- **React Client**: Makes use of React Router v7 with file-based routing and framework mode and uses Bun (not npm/yarn/pnpm)
 
-### Client (`cd client`)
+## Architecture Notes
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Build for production |
-| `npm run start` | Build and serve production build |
-| `npm run typecheck` | Run TypeScript type checking |
+- Go module: `ytsruh.com/homethings`
+- Client dev server proxies API to `VITE_API_BASE_URL` (default `http://localhost:3000`)
+- React Router v7 uses framework mode (not a traditional SPA) with file-based routing
+- TailwindCSS v4 with `@tailwindcss/vite` plugin
 
-### Server (`cd server`)
+## What to Avoid
 
-| Command | Description |
-|---------|-------------|
-| `bun --hot src/index.ts` | Start dev server with hot reload |
-| `bun src/index.ts` | Start production server |
-| `npm run lint` | Run Biome linter |
-| `npm run lint:fix` | Fix linting issues automatically |
-| `npm run db:generate` | Generate Drizzle migrations |
-| `npm run db:migrate` | Run Drizzle migrations |
-| `npm run db:studio` | Open Drizzle Studio |
-
-### Running a Single Test
-
-No test framework is currently configured in this project.
-
-## Environment Variables
-
-Create a `.env` file in `/server`:
-
-```bash
-# Required
-OPENROUTER_API_KEY=your_key_here
-
-# Optional (with defaults)
-PORT=3000
-DATABASE_URL=file:./local.db
-```
-
-## Code Style
-
-### Running the Linter
-
-```bash
-# Client
-cd client && bunx biome check .
-
-# Server
-cd server && bun run lint
-cd server && bun run lint:fix
-```
-
-### TypeScript Conventions
-
-- No not leave any Type errors in the code
-- Always use explicit types for function parameters and return types
-- Use `type` for simple type aliases, `interface` for objects
-- Use Zod for runtime validation (especially API inputs)
-
-### Naming Conventions
-
-- **Files**: kebab-case (`notes.ts`, `my-component.tsx`)
-- **Components**: PascalCase (`NotesList.tsx`)
-- **Functions**: camelCase (`getNotes`, `createNote`)
-- **Constants**: SCREAMING_SNAKE_CASE for config values
-- **Types/Interfaces**: PascalCase (`Note`, `UserPayload`)
-
-### Import Conventions
-
-```typescript
-// Standard library
-import { Hono } from "hono";
-import { useState } from "react";
-
-// Third-party
-import { z } from "zod";
-import { toast } from "sonner";
-
-// Relative imports (server)
-import { database } from "~/db";
-import { notes } from "~/db/schema";
-import { throwNotFound } from "~/middleware/http-exception";
-
-// Relative imports (client)
-import { Badge } from "~/components/ui/badge";
-import { createNote, type Note } from "~/lib/notes";
-```
-
-- Use `~` alias for project-relative imports (configured in tsconfig)
-- Group imports: standard library → third-party → relative
-- Alphabetize within groups
-
-### Error Handling
-
-**Server (Hono)**:
-```typescript
-// Use helper functions for common errors
-import { throwNotFound, throwServerError } from "~/middleware/http-exception";
-
-// 404
-if (!note) {
-  throwNotFound("Note not found");
-  return;
-}
-
-// 500
-if (!created) {
-  throwServerError();
-  return;
-}
-```
-
-**Client (React)**:
-```typescript
-try {
-  const result = await apiCall();
-} catch (error) {
-  console.error("Failed to fetch:", error);
-  toast.error("Failed to fetch data");
-}
-```
-
-### Database (Drizzle ORM)
-
-- Define schemas in `server/src/db/schema.ts`
-- Use `drizzle-orm` for queries
-- Run migrations with `npm run db:generate` then `npm run db:migrate`
-- Use SQLite for local development
-
-### React Patterns
-
-- Use React Router loaders for data fetching
-- Use `useLoaderData` for accessing loader data
-- Use `sonner` for toast notifications
-- Use React Router actions for data sending (non GET Requests)
-- Use Radix UI primitives for accessible components
-- Use Tailwind CSS for styling (v4)
-
-### API Design (Hono)
-
-```typescript
-// Route with validation
-notesRoutes.post(
-  "/notes",
-  createValidator(CreateNoteRequestSchema),
-  async (c) => {
-    const user = c.get("user");
-    const body = c.req.valid("json");
-    // ...
-    return c.json(createdNote);
-  }
-);
-
-// Route with query params
-notesRoutes.get(
-  "/notes",
-  createValidator(ListNotesQuerySchema, "query"),
-  async (c) => {
-    const query = c.req.valid("query");
-    // ...
-  }
-);
-```
-
-### Component Structure
-
-```typescript
-// Functional component with props
-export function MyComponent({ title, onClick }: MyComponentProps) {
-  return (
-    <div>
-      <h1>{title}</h1>
-      <button onClick={onClick}>Click</button>
-    </div>
-  );
-}
-
-// Types in same file or adjacent .types.ts file
-type MyComponentProps = {
-  title: string;
-  onClick: () => void;
-};
-```
-
-## Additional Notes
-
-- No test framework is currently set up
-- Database is SQLite/Turso
-- API documentation available at `/docs` when server is running
-- OpenAPI spec available at `/openapi.json`
+- Do not commit `.env` files or `*.db*` files (SQLite WAL/shm are also gitignored)
+- Do not manually edit `internal/db/*.sql.go` — these are generated by sqlc

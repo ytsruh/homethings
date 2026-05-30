@@ -6,8 +6,7 @@ import { ThemeProvider } from "~/components/theme-provider";
 import { ModeToggle } from "~/components/theme-toggle";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { login } from "~/lib/auth";
-import { loginForm } from "~/lib/schema";
+import { login, loginForm } from "~/lib/auth";
 
 export async function clientAction({ request }: { request: Request }) {
 	const formData = await request.formData();

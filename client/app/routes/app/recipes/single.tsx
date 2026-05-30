@@ -25,7 +25,8 @@ import {
 	RecipeResponseSchema,
 	removeRecipeImage,
 	uploadRecipeImage,
-} from "~/lib/schemas/recipes";
+} from "~/lib/recipes";
+
 import type { Route } from "./+types/single";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {

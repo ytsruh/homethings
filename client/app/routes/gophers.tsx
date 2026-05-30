@@ -32,7 +32,7 @@ export default function ProjectsGophers() {
 			<title>Chris Hurst | Gophers</title>
 			<meta
 				name="description"
-				content="A collection of Go gopher mascots in various themes"
+				content="A collection of AI generated Go gopher mascots in various themes"
 			/>
 			<section className="w-full">
 				<PageTitle
