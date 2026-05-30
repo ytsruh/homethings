@@ -12,8 +12,6 @@ export default [
     route("projects", "routes/projects.tsx"),
     route("projects/gophers", "routes/gophers.tsx"),
     route("work-history", "routes/work-history.tsx"),
-    route("blog", "routes/blog.tsx"),
-    route("blog/:slug", "routes/blog-single.tsx"),
     route("now", "routes/now.tsx"),
     route("contact", "routes/contact.tsx"),
   ]),

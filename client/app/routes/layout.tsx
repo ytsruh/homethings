@@ -25,9 +25,7 @@ export default function SiteLayout() {
 						</Link>
 						<Link
 							to="/projects"
-							className={
-								location.pathname.includes("/projects") ? "text-theme" : ""
-							}
+							className={location.pathname === "/projects" ? "text-theme" : ""}
 						>
 							Projects
 						</Link>
@@ -40,12 +38,14 @@ export default function SiteLayout() {
 							Work History
 						</Link>
 						<Link
-							to="/blog"
+							to="/projects/gophers"
 							className={
-								location.pathname.includes("/blog") ? "text-theme" : ""
+								location.pathname.includes("/projects/gophers")
+									? "text-theme"
+									: ""
 							}
 						>
-							Blog
+							Gophers
 						</Link>
 						<Link
 							to="/now"
@@ -54,7 +54,10 @@ export default function SiteLayout() {
 							Now
 						</Link>
 						<Link to="/contact">
-							<button className="bg-theme px-6 py-2 font-bold hover:cursor-pointer rounded-xl">
+							<button
+								type="button"
+								className="bg-theme px-6 py-2 font-bold hover:cursor-pointer rounded-xl"
+							>
 								Contact me
 							</button>
 						</Link>
@@ -63,6 +66,7 @@ export default function SiteLayout() {
 						className="md:hidden hover:cursor-pointer"
 						onClick={toggleMenu}
 						aria-label="Menu"
+						type="button"
 					>
 						<svg
 							width="26"
@@ -70,6 +74,8 @@ export default function SiteLayout() {
 							viewBox="0 0 26 18"
 							fill="none"
 							xmlns="http://www.w3.org/2000/svg"
+							role="img"
+							aria-label="Menu"
 						>
 							<path
 								d="M13 17.5H0.25V14.6667H13V17.5ZM25.75 10.4167H0.25V7.58333H25.75V10.4167ZM25.75 3.33333H13V0.5H25.75V3.33333Z"
