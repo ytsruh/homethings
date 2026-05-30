@@ -1,16 +1,17 @@
-node_modules
+# Global
 .DS_Store
 .env
+
+# Go / API
+/api/data/*
+/api/tmp
 *.db
 *.db-info
 *.db-shm
 *.db-wal
 
-# API
-/api/data/*
-/api/tmp
-
 # React Router
+node_modules
 .react-router/
 .wrangler/
 build/
