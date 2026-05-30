@@ -24,7 +24,7 @@ type UserPayload struct {
 
 const (
 	CookieName   = "auth_token"
-	CookieDomain = "homethings.ytsruh.com"
+	CookieDomain = "api.ytsruh.com"
 )
 
 func NewJWTService(secret string) *JWTService {
