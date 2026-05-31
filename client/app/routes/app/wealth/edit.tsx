@@ -1,12 +1,22 @@
 import { Trash } from "lucide-react";
 import { useState } from "react";
-import { redirect, useLoaderData } from "react-router";
+import { Form, Link, redirect, useLoaderData } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
-import { deleteAccount, getAccounts, updateAccount } from "~/lib/wealth";
+import { getAccounts, updateAccount } from "~/lib/wealth";
 import type { Route } from "./+types/edit";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
@@ -28,21 +38,25 @@ export async function clientAction({
 }: Route.ClientActionArgs) {
 	const { accountId } = params;
 	const formData = await request.formData();
-	const intent = formData.get("intent");
 
-	if (intent === "delete") {
-		try {
-			await deleteAccount(accountId);
-			toast.success("Account deleted");
-			return redirect("/app/wealth");
-		} catch (error) {
-			console.error("Failed to delete account:", error);
-			toast.error("Failed to delete account");
-			return { ok: false };
-		}
+	const name = formData.get("name") as string;
+	const type = formData.get("type") as "asset" | "liability";
+	const isLiquid = formData.get("isLiquid") === "true";
+	const isClosed = formData.get("isClosed") === "true";
+
+	if (!name?.trim()) {
+		return { error: "Name is required" };
 	}
 
-	return { ok: false };
+	try {
+		await updateAccount(accountId, { name, type, isLiquid, isClosed });
+		toast.success("Account updated");
+		return { ok: true };
+	} catch (error) {
+		console.error("Failed to update account:", error);
+		toast.error("Failed to update account");
+		return { ok: false };
+	}
 }
 
 export default function WealthAccountEditPage() {
@@ -52,24 +66,6 @@ export default function WealthAccountEditPage() {
 	const [type, setType] = useState<"asset" | "liability">(account.type);
 	const [isLiquid, setIsLiquid] = useState(account.isLiquid);
 	const [isClosed, setIsClosed] = useState(account.isClosed);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-
-	async function handleUpdate() {
-		if (!name.trim()) {
-			toast.error("Name is required");
-			return;
-		}
-		setIsSubmitting(true);
-		try {
-			await updateAccount(account.id, { name, type, isLiquid, isClosed });
-			toast.success("Account updated");
-		} catch (error) {
-			console.error("Failed to update account:", error);
-			toast.error("Failed to update account");
-		} finally {
-			setIsSubmitting(false);
-		}
-	}
 
 	return (
 		<>
@@ -77,18 +73,50 @@ export default function WealthAccountEditPage() {
 			<div className="space-y-6">
 				<div className="flex items-center justify-between">
 					<Button variant="ghost" size="sm" asChild>
-						<a href="/app/wealth">&#8592; Back</a>
+						<Link to="/app/wealth">&#8592; Back</Link>
 					</Button>
 				</div>
 
 				<div className="border rounded-lg p-6 w-full lg:w-2/3">
-					<h1 className="text-2xl font-bold mb-6">Edit Account</h1>
+					<div className="flex items-center justify-between mb-6">
+						<h1 className="text-2xl font-bold">Edit Account</h1>
+						<Dialog>
+							<DialogTrigger asChild>
+								<Button type="button" variant="destructive">
+									<Trash className="size-4" />
+								</Button>
+							</DialogTrigger>
+							<DialogContent>
+								<DialogHeader>
+									<DialogTitle>Delete Account</DialogTitle>
+									<DialogDescription>
+										Are you sure you want to delete "{account.name}"? This
+										action cannot be undone.
+									</DialogDescription>
+								</DialogHeader>
+								<DialogFooter>
+									<DialogClose asChild>
+										<Button variant="secondary">Cancel</Button>
+									</DialogClose>
+									<Form
+										action={`/app/wealth/${account.id}/delete`}
+										method="post"
+									>
+										<Button type="submit" variant="destructive">
+											Delete
+										</Button>
+									</Form>
+								</DialogFooter>
+							</DialogContent>
+						</Dialog>
+					</div>
 
-					<div className="space-y-6">
+					<Form method="post" className="space-y-6">
 						<div className="space-y-2">
 							<Label htmlFor="name">Name</Label>
 							<Input
 								id="name"
+								name="name"
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 							/>
@@ -96,6 +124,7 @@ export default function WealthAccountEditPage() {
 
 						<div className="space-y-2">
 							<Label>Type</Label>
+							<input type="hidden" name="type" value={type} />
 							<div className="flex gap-4">
 								<Button
 									type="button"
@@ -125,6 +154,7 @@ export default function WealthAccountEditPage() {
 							</div>
 							<Switch
 								id="isLiquid"
+								name="isLiquid"
 								checked={isLiquid}
 								onCheckedChange={setIsLiquid}
 							/>
@@ -139,27 +169,16 @@ export default function WealthAccountEditPage() {
 							</div>
 							<Switch
 								id="isClosed"
+								name="isClosed"
 								checked={isClosed}
 								onCheckedChange={setIsClosed}
 							/>
 						</div>
 
-						<div className="w-full items-center justify-between flex gap-2 pt-4">
-							<form method="post">
-								<input type="hidden" name="intent" value="delete" />
-								<Button
-									type="submit"
-									variant="destructive"
-									disabled={isSubmitting}
-								>
-									<Trash className="size-4" />
-								</Button>
-							</form>
-							<Button onClick={handleUpdate} disabled={isSubmitting}>
-								{isSubmitting ? "Saving..." : "Save Changes"}
-							</Button>
+						<div className="w-full items-center justify-end flex gap-2 pt-4">
+							<Button type="submit">Save Changes</Button>
 						</div>
-					</div>
+					</Form>
 				</div>
 			</div>
 		</>

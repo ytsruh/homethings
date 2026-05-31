@@ -30,6 +30,7 @@ export default [
       route("recipes/:recipeId/delete", "routes/app/recipes/delete.tsx"),
       route("wealth", "routes/app/wealth/index.tsx"),
       route("wealth/:accountId/edit", "routes/app/wealth/edit.tsx"),
+      route("wealth/:accountId/delete", "routes/app/wealth/delete.tsx"),
       route("profile", "routes/app/profile.tsx"),
       route("feedback", "routes/app/feedback.tsx"),
     ]),

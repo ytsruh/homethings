@@ -19,6 +19,7 @@ import {
 } from "~/components/ui/collapsible";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
@@ -241,13 +242,15 @@ export default function WealthPage() {
 									</Label>
 								</div>
 								<DialogFooter>
-									<Button
-										type="button"
-										variant="outline"
-										onClick={() => setIsCreateOpen(false)}
-									>
-										Cancel
-									</Button>
+									<DialogClose asChild>
+										<Button
+											type="button"
+											variant="outline"
+											onClick={() => setIsCreateOpen(false)}
+										>
+											Cancel
+										</Button>
+									</DialogClose>
 									<Button type="submit" disabled={isSubmitting}>
 										{isSubmitting ? "Creating..." : "Create"}
 									</Button>
@@ -336,7 +339,6 @@ export default function WealthPage() {
 							accounts={assetAccounts}
 							accountValues={accountValues}
 							month={month}
-							
 							defaultOpen
 						/>
 						<AccountSection
@@ -344,7 +346,6 @@ export default function WealthPage() {
 							accounts={liabilityAccounts}
 							accountValues={accountValues}
 							month={month}
-							
 							defaultOpen
 						/>
 						<AccountSection
@@ -352,7 +353,6 @@ export default function WealthPage() {
 							accounts={closedAccounts}
 							accountValues={accountValues}
 							month={month}
-							
 							defaultOpen={false}
 							muted
 						/>
@@ -455,17 +455,11 @@ function EditableAccountRow({
 	);
 }
 
-function ClosedAccountRow({
-	account,
-}: {
-	account: WealthAccount;
-}) {
+function ClosedAccountRow({ account }: { account: WealthAccount }) {
 	return (
 		<tr className="border-b last:border-b-0">
 			<td className="p-3 font-medium cursor-pointer hover:text-theme">
-				<Link to={`/app/wealth/${account.id}/edit`}>
-					{account.name}
-				</Link>
+				<Link to={`/app/wealth/${account.id}/edit`}>{account.name}</Link>
 			</td>
 			<td className="p-3 text-right">
 				<Link
@@ -518,10 +512,7 @@ function AccountSection({
 						<tbody>
 							{accounts.map((account) =>
 								muted ? (
-									<ClosedAccountRow
-										key={account.id}
-										account={account}
-									/>
+									<ClosedAccountRow key={account.id} account={account} />
 								) : (
 									<EditableAccountRow
 										key={account.id}
@@ -530,7 +521,6 @@ function AccountSection({
 										editingCell={editingCell}
 										setEditingCell={setEditingCell}
 										month={month}
-										
 									/>
 								),
 							)}
