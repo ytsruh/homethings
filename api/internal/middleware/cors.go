@@ -25,7 +25,7 @@ func CORS() echo.MiddlewareFunc {
 
 			c.Response().Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 			c.Response().Header().Set("Access-Control-Allow-Credentials", "true")
-			c.Response().Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS")
+			c.Response().Header().Set("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
 			c.Response().Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
 			if c.Request().Method == http.MethodOptions {

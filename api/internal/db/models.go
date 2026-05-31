@@ -45,3 +45,21 @@ type User struct {
 	Name         string
 	CreatedAt    int64
 }
+
+type WealthAccount struct {
+	ID        string
+	Name      string
+	Type      string
+	IsLiquid  int64
+	IsClosed  int64
+	UserID    string
+	CreatedAt int64
+}
+
+type WealthAccountValue struct {
+	ID        string
+	AccountID string
+	YearMonth string
+	Value     int64
+	CreatedAt int64
+}

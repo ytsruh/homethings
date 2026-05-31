@@ -10,12 +10,13 @@ require (
 	github.com/go-playground/validator/v10 v10.16.0
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/google/uuid v1.6.0
-
 	github.com/labstack/echo/v4 v4.15.2
 	github.com/pressly/goose/v3 v3.19.1
 	golang.org/x/crypto v0.50.0
 	turso.tech/database/tursogo v0.6.1
 )
+
+require github.com/mattn/go-sqlite3 v1.14.42
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.10 // indirect
