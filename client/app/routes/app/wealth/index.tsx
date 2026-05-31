@@ -1,5 +1,6 @@
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import PageHeader from "~/components/PageHeader";
 import { Badge } from "~/components/ui/badge";
@@ -22,60 +23,25 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Switch } from "~/components/ui/switch";
 import {
+	formatCurrency,
+	formatPercent,
+	getCurrentYearMonth,
+	getNextMonth,
+	getPreviousMonth,
+	formatMonthDisplay,
+} from "~/lib/utils";
+import {
 	createAccount,
-	deleteAccount,
 	getAccounts,
 	getAllMonthsData,
 	getTotals,
 	type Totals,
-	updateAccount,
 	upsertValue,
 	type WealthAccount,
 } from "~/lib/wealth";
 
-function formatCurrency(value: number): string {
-	return new Intl.NumberFormat("en-GB", {
-		style: "currency",
-		currency: "GBP",
-		minimumFractionDigits: 0,
-		maximumFractionDigits: 0,
-	}).format(value / 100);
-}
-
-function formatPercent(value: number): string {
-	return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
-}
-
-function getCurrentYearMonth(): string {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = String(now.getMonth() + 1).padStart(2, "0");
-	return `${year}-${month}`;
-}
-
-function getNextMonth(yearMonth: string): string {
-	const [year, month] = yearMonth.split("-").map(Number);
-	if (month === 12) {
-		return `${year + 1}-01`;
-	}
-	return `${year}-${String(month + 1).padStart(2, "0")}`;
-}
-
-function getPreviousMonth(yearMonth: string): string {
-	const [year, month] = yearMonth.split("-").map(Number);
-	if (month === 1) {
-		return `${year - 1}-12`;
-	}
-	return `${year}-${String(month - 1).padStart(2, "0")}`;
-}
-
-function formatMonthDisplay(yearMonth: string): string {
-	const [year, month] = yearMonth.split("-");
-	const date = new Date(Number(year), Number(month) - 1);
-	return date.toLocaleDateString("en-GB", { month: "long", year: "numeric" });
-}
-
 export default function WealthPage() {
+	const navigate = useNavigate();
 	const [currentMonth, setCurrentMonth] = useState(getCurrentYearMonth());
 	const [accounts, setAccounts] = useState<WealthAccount[]>([]);
 	const [accountValues, setAccountValues] = useState<Record<string, number>>(
@@ -96,17 +62,6 @@ export default function WealthPage() {
 	);
 	const [newAccountLiquid, setNewAccountLiquid] = useState(false);
 	const [isCreating, setIsCreating] = useState(false);
-
-	const [editingAccount, setEditingAccount] = useState<WealthAccount | null>(
-		null,
-	);
-	const [editAccountName, setEditAccountName] = useState("");
-	const [editAccountType, setEditAccountType] = useState<"asset" | "liability">(
-		"asset",
-	);
-	const [editAccountLiquid, setEditAccountLiquid] = useState(false);
-	const [editAccountClosed, setEditAccountClosed] = useState(false);
-	const [isUpdating, setIsUpdating] = useState(false);
 
 	useEffect(() => {
 		loadData();
@@ -170,52 +125,6 @@ export default function WealthPage() {
 			toast.error("Failed to create account");
 		} finally {
 			setIsCreating(false);
-		}
-	}
-
-	function openEditAccount(account: WealthAccount) {
-		setEditingAccount(account);
-		setEditAccountName(account.name);
-		setEditAccountType(account.type);
-		setEditAccountLiquid(account.isLiquid);
-		setEditAccountClosed(account.isClosed);
-	}
-
-	async function handleUpdateAccount() {
-		if (!editingAccount || !editAccountName.trim()) {
-			return;
-		}
-		setIsUpdating(true);
-		try {
-			await updateAccount(editingAccount.id, {
-				name: editAccountName,
-				type: editAccountType,
-				isLiquid: editAccountLiquid,
-				isClosed: editAccountClosed,
-			});
-			toast.success("Account updated");
-			setEditingAccount(null);
-			await loadData();
-		} catch (error) {
-			console.error("Failed to update account:", error);
-			toast.error("Failed to update account");
-		} finally {
-			setIsUpdating(false);
-		}
-	}
-
-	async function handleDeleteAccount() {
-		if (!editingAccount) return;
-		if (!confirm(`Delete "${editingAccount.name}"? This cannot be undone.`))
-			return;
-		try {
-			await deleteAccount(editingAccount.id);
-			toast.success("Account deleted");
-			setEditingAccount(null);
-			await loadData();
-		} catch (error) {
-			console.error("Failed to delete account:", error);
-			toast.error("Failed to delete account");
 		}
 	}
 
@@ -453,7 +362,7 @@ export default function WealthPage() {
 													>
 														<td
 															className="p-3 font-medium cursor-pointer hover:text-theme flex items-center gap-2"
-															onClick={() => openEditAccount(account)}
+															onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
 														>
 															{account.name}
 															{account.isLiquid && (
@@ -528,7 +437,7 @@ export default function WealthPage() {
 													>
 														<td
 															className="p-3 font-medium cursor-pointer hover:text-theme"
-															onClick={() => openEditAccount(account)}
+															onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
 														>
 															{account.name}
 														</td>
@@ -597,7 +506,7 @@ export default function WealthPage() {
 														>
 															<td
 																className="p-3 font-medium cursor-pointer hover:text-theme"
-																onClick={() => openEditAccount(account)}
+																onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
 															>
 																{account.name}
 															</td>
@@ -605,7 +514,7 @@ export default function WealthPage() {
 																<Button
 																	variant="ghost"
 																	size="sm"
-																	onClick={() => openEditAccount(account)}
+																	onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
 																>
 																	Restore
 																</Button>
@@ -620,97 +529,6 @@ export default function WealthPage() {
 						)}
 					</div>
 				)}
-
-				<Dialog
-					open={!!editingAccount}
-					onOpenChange={(open) => !open && setEditingAccount(null)}
-				>
-					<DialogContent>
-						<DialogHeader>
-							<DialogTitle>Edit Account</DialogTitle>
-							<DialogDescription>
-								Modify account details or close the account.
-							</DialogDescription>
-						</DialogHeader>
-						{editingAccount && (
-							<div className="space-y-4 py-4">
-								<div className="space-y-2">
-									<Label htmlFor="edit-name">Name</Label>
-									<Input
-										id="edit-name"
-										value={editAccountName}
-										onChange={(e) => setEditAccountName(e.target.value)}
-									/>
-								</div>
-								<div className="space-y-2">
-									<Label>Type</Label>
-									<div className="flex gap-4">
-										<Button
-											type="button"
-											variant={
-												editAccountType === "asset" ? "default" : "outline"
-											}
-											onClick={() => setEditAccountType("asset")}
-										>
-											Asset
-										</Button>
-										<Button
-											type="button"
-											variant={
-												editAccountType === "liability" ? "default" : "outline"
-											}
-											onClick={() => setEditAccountType("liability")}
-										>
-											Liability
-										</Button>
-									</div>
-								</div>
-								<div className="flex items-center justify-between">
-									<div>
-										<Label htmlFor="edit-liquid">Liquid Asset</Label>
-										<p className="text-sm text-muted-foreground">
-											Include in liquid assets calculation
-										</p>
-									</div>
-									<Switch
-										id="edit-liquid"
-										checked={editAccountLiquid}
-										onCheckedChange={setEditAccountLiquid}
-									/>
-								</div>
-								<div className="flex items-center justify-between">
-									<div>
-										<Label htmlFor="edit-closed">Closed</Label>
-										<p className="text-sm text-muted-foreground">
-											Hide from active accounts
-										</p>
-									</div>
-									<Switch
-										id="edit-closed"
-										checked={editAccountClosed}
-										onCheckedChange={setEditAccountClosed}
-									/>
-								</div>
-							</div>
-						)}
-						<DialogFooter className="flex-row justify-between">
-							<Button variant="destructive" onClick={handleDeleteAccount}>
-								Delete
-							</Button>
-							<div className="flex gap-2">
-								<Button
-									variant="outline"
-									onClick={() => setEditingAccount(null)}
-								>
-									Cancel
-								</Button>
-								<Button onClick={handleUpdateAccount} disabled={isUpdating}>
-									{isUpdating ? "Saving..." : "Save"}
-								</Button>
-							</div>
-						</DialogFooter>
-					</DialogContent>
-				</Dialog>
 			</div>
 		</>
 	);
