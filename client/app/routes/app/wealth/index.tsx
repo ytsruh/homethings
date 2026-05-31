@@ -1,6 +1,13 @@
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
+import {
+	Form,
+	Link,
+	useActionData,
+	useLoaderData,
+	useNavigate,
+	useNavigation,
+} from "react-router";
 import { toast } from "sonner";
 import PageHeader from "~/components/PageHeader";
 import { Badge } from "~/components/ui/badge";
@@ -21,153 +28,115 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { Switch } from "~/components/ui/switch";
 import {
 	formatCurrency,
+	formatMonthDisplay,
 	formatPercent,
 	getCurrentYearMonth,
 	getNextMonth,
 	getPreviousMonth,
-	formatMonthDisplay,
 } from "~/lib/utils";
 import {
 	createAccount,
 	getAccounts,
 	getAllMonthsData,
 	getTotals,
-	type Totals,
 	upsertValue,
 	type WealthAccount,
 } from "~/lib/wealth";
 
-export default function WealthPage() {
-	const navigate = useNavigate();
-	const [currentMonth, setCurrentMonth] = useState(getCurrentYearMonth());
-	const [accounts, setAccounts] = useState<WealthAccount[]>([]);
-	const [accountValues, setAccountValues] = useState<Record<string, number>>(
-		{},
-	);
-	const [totals, setTotals] = useState<Totals | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const [editingCell, setEditingCell] = useState<{
-		accountId: string;
-		value: string;
-	} | null>(null);
-	const [availableMonths, setAvailableMonths] = useState<string[]>([]);
+import type { Route } from "./+types/index";
 
-	const [isCreateOpen, setIsCreateOpen] = useState(false);
-	const [newAccountName, setNewAccountName] = useState("");
-	const [newAccountType, setNewAccountType] = useState<"asset" | "liability">(
-		"asset",
-	);
-	const [newAccountLiquid, setNewAccountLiquid] = useState(false);
-	const [isCreating, setIsCreating] = useState(false);
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
+	const url = new URL(request.url);
+	const monthParam = url.searchParams.get("month");
+	const defaultMonth = getCurrentYearMonth();
 
-	useEffect(() => {
-		loadData();
-	}, [currentMonth]);
+	const month = monthParam || defaultMonth;
 
-	async function loadData() {
-		setIsLoading(true);
-		try {
-			const [accountsData, allMonthsData] = await Promise.all([
-				getAccounts(),
-				getAllMonthsData(),
-			]);
-			setAccounts(accountsData);
+	const monthRegex = /^\d{4}-(0[1-9]|1[0-2])$/;
+	if (!monthRegex.test(month)) {
+		throw { redirect: `/app/wealth?month=${defaultMonth}` };
+	}
 
-			const months = allMonthsData.map((m) => m.yearMonth).sort();
-			setAvailableMonths(months);
+	try {
+		const [accountsData, allMonthsData] = await Promise.all([
+			getAccounts(),
+			getAllMonthsData(),
+		]);
 
-			const valuesMap: Record<string, number> = {};
-			const currentData = allMonthsData.find(
-				(m) => m.yearMonth === currentMonth,
-			);
-			if (currentData) {
-				for (const av of currentData.accounts) {
-					if (av.value !== null && av.value !== undefined) {
-						valuesMap[av.account.id] = av.value;
-					}
+		const months = allMonthsData.map((m) => m.yearMonth).sort();
+
+		const valuesMap: Record<string, number> = {};
+		const currentData = allMonthsData.find((m) => m.yearMonth === month);
+		if (currentData) {
+			for (const av of currentData.accounts) {
+				if (av.value !== null && av.value !== undefined) {
+					valuesMap[av.account.id] = av.value;
 				}
 			}
-			setAccountValues(valuesMap);
-
-			const totalsResponse = await getTotals(currentMonth);
-			setTotals(totalsResponse);
-		} catch (error) {
-			console.error("Failed to load data:", error);
-			toast.error("Failed to load wealth data");
-		} finally {
-			setIsLoading(false);
 		}
+
+		const totalsResponse = await getTotals(month);
+
+		return {
+			month,
+			accounts: accountsData,
+			accountValues: valuesMap,
+			availableMonths: months,
+			totals: totalsResponse,
+		};
+	} catch (error) {
+		console.error("Failed to load wealth data:", error);
+		throw { redirect: `/app/wealth?month=${defaultMonth}` };
+	}
+}
+
+export async function clientAction({ request }: Route.ClientActionArgs) {
+	const formData = await request.formData();
+	const name = formData.get("name") as string;
+	const type = formData.get("type") as "asset" | "liability";
+	const isLiquid = formData.get("isLiquid") === "true";
+
+	if (!name?.trim()) {
+		return { error: "Name is required", intent: "createAccount" };
 	}
 
-	async function handleCreateAccount() {
-		if (!newAccountName.trim()) {
-			toast.error("Name is required");
-			return;
-		}
-		setIsCreating(true);
-		try {
-			await createAccount({
-				name: newAccountName,
-				type: newAccountType,
-				isLiquid: newAccountLiquid,
-			});
-			toast.success("Account created");
+	try {
+		await createAccount({ name, type, isLiquid });
+		return { success: true, intent: "createAccount" };
+	} catch (error) {
+		console.error("Failed to create account:", error);
+		return { error: "Failed to create account", intent: "createAccount" };
+	}
+}
+
+export default function WealthPage() {
+	const { month, accounts, accountValues, totals } =
+		useLoaderData<typeof clientLoader>();
+	const actionData = useActionData<typeof clientAction>();
+	const navigation = useNavigation();
+	const navigate = useNavigate();
+
+	const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+	const isSubmitting = navigation.state === "submitting";
+
+	useEffect(() => {
+		if (actionData?.success && actionData.intent === "createAccount") {
 			setIsCreateOpen(false);
-			setNewAccountName("");
-			setNewAccountType("asset");
-			setNewAccountLiquid(false);
-			await loadData();
-		} catch (error) {
-			console.error("Failed to create account:", error);
-			toast.error("Failed to create account");
-		} finally {
-			setIsCreating(false);
 		}
-	}
-
-	function startEditing(accountId: string, currentValue: number | undefined) {
-		setEditingCell({
-			accountId,
-			value: currentValue !== undefined ? String(currentValue / 100) : "",
-		});
-	}
-
-	async function handleSaveValue(accountId: string) {
-		if (!editingCell) return;
-		const valueStr = editingCell.value.replace(/[^0-9.-]/g, "");
-		const valueInPounds = parseFloat(valueStr);
-		if (isNaN(valueInPounds)) {
-			setEditingCell(null);
-			return;
+		if (actionData?.error && actionData.intent === "createAccount") {
+			toast.error(actionData.error);
 		}
-		const valueInPence = Math.round(valueInPounds * 100);
-		try {
-			await upsertValue(accountId, currentMonth, valueInPence);
-			toast.success("Value saved");
-			setEditingCell(null);
-			await loadData();
-		} catch (error) {
-			console.error("Failed to save value:", error);
-			toast.error("Failed to save value");
-		}
-	}
-
-	function handleKeyDown(e: React.KeyboardEvent, accountId: string) {
-		if (e.key === "Enter") {
-			handleSaveValue(accountId);
-		} else if (e.key === "Escape") {
-			setEditingCell(null);
-		}
-	}
+	}, [actionData]);
 
 	const activeAccounts = accounts.filter((a) => !a.isClosed);
 	const assetAccounts = activeAccounts.filter((a) => a.type === "asset");
 	const liabilityAccounts = activeAccounts.filter(
 		(a) => a.type === "liability",
 	);
+	const closedAccounts = accounts.filter((a) => a.isClosed);
 
 	return (
 		<>
@@ -181,17 +150,21 @@ export default function WealthPage() {
 						<Button
 							variant="outline"
 							size="sm"
-							onClick={() => setCurrentMonth(getPreviousMonth(currentMonth))}
+							onClick={() =>
+								navigate(`/app/wealth?month=${getPreviousMonth(month)}`)
+							}
 						>
 							←
 						</Button>
 						<span className="text-lg font-semibold min-w-[140px] text-center">
-							{formatMonthDisplay(currentMonth)}
+							{formatMonthDisplay(month)}
 						</span>
 						<Button
 							variant="outline"
 							size="sm"
-							onClick={() => setCurrentMonth(getNextMonth(currentMonth))}
+							onClick={() =>
+								navigate(`/app/wealth?month=${getNextMonth(month)}`)
+							}
 						>
 							→
 						</Button>
@@ -207,37 +180,43 @@ export default function WealthPage() {
 									Create a new asset or liability account.
 								</DialogDescription>
 							</DialogHeader>
-							<div className="space-y-4 py-4">
+							<Form method="post" className="space-y-4 py-4">
 								<div className="space-y-2">
 									<Label htmlFor="name">Name</Label>
 									<Input
 										id="name"
+										name="name"
 										placeholder="e.g., House, Car, Savings"
-										value={newAccountName}
-										onChange={(e) => setNewAccountName(e.target.value)}
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="type">Type</Label>
+									<Label>Type</Label>
 									<div className="flex gap-4">
-										<Button
-											type="button"
-											variant={
-												newAccountType === "asset" ? "default" : "outline"
-											}
-											onClick={() => setNewAccountType("asset")}
-										>
-											Asset
-										</Button>
-										<Button
-											type="button"
-											variant={
-												newAccountType === "liability" ? "default" : "outline"
-											}
-											onClick={() => setNewAccountType("liability")}
-										>
-											Liability
-										</Button>
+										<input
+											type="radio"
+											name="type"
+											value="asset"
+											id="type-asset"
+											className="sr-only"
+											defaultChecked
+										/>
+										<Label htmlFor="type-asset" className="cursor-pointer">
+											<Button type="button" variant="default">
+												Asset
+											</Button>
+										</Label>
+										<input
+											type="radio"
+											name="type"
+											value="liability"
+											id="type-liability"
+											className="sr-only"
+										/>
+										<Label htmlFor="type-liability" className="cursor-pointer">
+											<Button type="button" variant="outline">
+												Liability
+											</Button>
+										</Label>
 									</div>
 								</div>
 								<div className="flex items-center justify-between">
@@ -247,29 +226,38 @@ export default function WealthPage() {
 											Include in liquid assets calculation
 										</p>
 									</div>
-									<Switch
+									<input
+										type="checkbox"
+										name="isLiquid"
+										value="true"
 										id="liquid"
-										checked={newAccountLiquid}
-										onCheckedChange={setNewAccountLiquid}
+										className="sr-only peer"
 									/>
+									<Label
+										htmlFor="liquid"
+										className="cursor-pointer relative inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 peer-data-[state=checked]:bg-primary peer-data-[state=unchecked]:bg-input hover:peer-data-[state=checked]:bg-primary/90"
+									>
+										<span className="pointer-events-none block size-4 rounded-full bg-background shadow-sm transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0" />
+									</Label>
 								</div>
-							</div>
-							<DialogFooter>
-								<Button
-									variant="outline"
-									onClick={() => setIsCreateOpen(false)}
-								>
-									Cancel
-								</Button>
-								<Button onClick={handleCreateAccount} disabled={isCreating}>
-									{isCreating ? "Creating..." : "Create"}
-								</Button>
-							</DialogFooter>
+								<DialogFooter>
+									<Button
+										type="button"
+										variant="outline"
+										onClick={() => setIsCreateOpen(false)}
+									>
+										Cancel
+									</Button>
+									<Button type="submit" disabled={isSubmitting}>
+										{isSubmitting ? "Creating..." : "Create"}
+									</Button>
+								</DialogFooter>
+							</Form>
 						</DialogContent>
 					</Dialog>
 				</div>
 
-				{isLoading ? (
+				{navigation.state === "loading" ? (
 					<div className="text-center py-12 text-muted-foreground">
 						Loading...
 					</div>
@@ -343,193 +331,213 @@ export default function WealthPage() {
 								</div>
 							</div>
 						)}
-						{assetAccounts.length > 0 && (
-							<Collapsible defaultOpen className="border rounded-lg p-2">
-								<CollapsibleTrigger asChild>
-									<div className="flex items-center justify-between cursor-pointer hover:text-theme py-2">
-										<span className="text-xl">Assets</span>
-										<ChevronDownIcon />
-									</div>
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<div className="text-muted-foreground">
-										<table className="w-full">
-											<tbody>
-												{assetAccounts.map((account) => (
-													<tr
-														key={account.id}
-														className="border-b last:border-b-0"
-													>
-														<td
-															className="p-3 font-medium cursor-pointer hover:text-theme flex items-center gap-2"
-															onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
-														>
-															{account.name}
-															{account.isLiquid && (
-																<Badge
-																	className="text-xs text-muted-foreground"
-																	variant="secondary"
-																>
-																	Liquid
-																</Badge>
-															)}
-														</td>
-														<td className="p-3 text-right">
-															{editingCell?.accountId === account.id ? (
-																<Input
-																	type="text"
-																	className="w-32 text-right ml-auto"
-																	value={editingCell.value}
-																	onChange={(e) =>
-																		setEditingCell({
-																			accountId: account.id,
-																			value: e.target.value,
-																		})
-																	}
-																	onKeyDown={(e) =>
-																		handleKeyDown(e, account.id)
-																	}
-																	onBlur={() => handleSaveValue(account.id)}
-																	autoFocus
-																/>
-															) : (
-																<Button
-																	variant="ghost"
-																	className="font-mono w-full justify-end"
-																	onClick={() =>
-																		startEditing(
-																			account.id,
-																			accountValues[account.id],
-																		)
-																	}
-																>
-																	{accountValues[account.id] !== undefined
-																		? formatCurrency(accountValues[account.id])
-																		: "Enter value"}
-																</Button>
-															)}
-														</td>
-													</tr>
-												))}
-											</tbody>
-										</table>
-									</div>
-								</CollapsibleContent>
-							</Collapsible>
-						)}
-
-						{liabilityAccounts.length > 0 && (
-							<Collapsible defaultOpen className="border rounded-lg p-2">
-								<CollapsibleTrigger asChild>
-									<div className="flex items-center justify-between cursor-pointer hover:text-theme py-2">
-										<span className="text-xl">Liabilities</span>
-										<ChevronDownIcon />
-									</div>
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<div className="text-muted-foreground">
-										<table className="w-full">
-											<tbody>
-												{liabilityAccounts.map((account) => (
-													<tr
-														key={account.id}
-														className="border-b last:border-b-0"
-													>
-														<td
-															className="p-3 font-medium cursor-pointer hover:text-theme"
-															onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
-														>
-															{account.name}
-														</td>
-														<td className="p-3 text-right">
-															{editingCell?.accountId === account.id ? (
-																<Input
-																	type="text"
-																	className="w-32 text-right ml-auto"
-																	value={editingCell.value}
-																	onChange={(e) =>
-																		setEditingCell({
-																			accountId: account.id,
-																			value: e.target.value,
-																		})
-																	}
-																	onKeyDown={(e) =>
-																		handleKeyDown(e, account.id)
-																	}
-																	onBlur={() => handleSaveValue(account.id)}
-																	autoFocus
-																/>
-															) : (
-																<Button
-																	variant="ghost"
-																	className="font-mono w-full justify-end"
-																	onClick={() =>
-																		startEditing(
-																			account.id,
-																			accountValues[account.id],
-																		)
-																	}
-																>
-																	{accountValues[account.id] !== undefined
-																		? formatCurrency(accountValues[account.id])
-																		: "Enter value"}
-																</Button>
-															)}
-														</td>
-													</tr>
-												))}
-											</tbody>
-										</table>
-									</div>
-								</CollapsibleContent>
-							</Collapsible>
-						)}
-
-						{accounts.filter((a) => a.isClosed).length > 0 && (
-							<Collapsible className="border rounded-lg p-2">
-								<CollapsibleTrigger asChild>
-									<div className="flex items-center justify-between cursor-pointer text-muted-foreground hover:text-theme py-2">
-										<span className="text-xl">Closed Accounts</span>
-										<ChevronDownIcon className="" />
-									</div>
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<div className="text-muted-foreground opacity-60">
-										<table className="w-full">
-											<tbody>
-												{accounts
-													.filter((a) => a.isClosed)
-													.map((account) => (
-														<tr
-															key={account.id}
-															className="border-b last:border-b-0"
-														>
-															<td
-																className="p-3 font-medium cursor-pointer hover:text-theme"
-																onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
-															>
-																{account.name}
-															</td>
-															<td className="p-3 text-right">
-																<Button
-																	variant="ghost"
-																	size="sm"
-																	onClick={() => navigate(`/app/wealth/${account.id}/edit`)}
-																>
-																	Restore
-																</Button>
-															</td>
-														</tr>
-													))}
-											</tbody>
-										</table>
-									</div>
-								</CollapsibleContent>
-							</Collapsible>
-						)}
+						<AccountSection
+							title="Assets"
+							accounts={assetAccounts}
+							accountValues={accountValues}
+							month={month}
+							
+							defaultOpen
+						/>
+						<AccountSection
+							title="Liabilities"
+							accounts={liabilityAccounts}
+							accountValues={accountValues}
+							month={month}
+							
+							defaultOpen
+						/>
+						<AccountSection
+							title="Closed Accounts"
+							accounts={closedAccounts}
+							accountValues={accountValues}
+							month={month}
+							
+							defaultOpen={false}
+							muted
+						/>
 					</div>
 				)}
 			</div>
 		</>
+	);
+}
+
+type EditingCell = { accountId: string; value: string } | null;
+
+function EditableAccountRow({
+	account,
+	value,
+	editingCell,
+	setEditingCell,
+	month,
+}: {
+	account: WealthAccount;
+	value: number | undefined;
+	editingCell: EditingCell;
+	setEditingCell: React.Dispatch<React.SetStateAction<EditingCell>>;
+	month: string;
+}) {
+	async function handleSaveValue(accountId: string) {
+		if (!editingCell) return;
+		const valueStr = editingCell.value.replace(/[^0-9.-]/g, "");
+		const valueInPounds = parseFloat(valueStr);
+		if (Number.isNaN(valueInPounds)) {
+			setEditingCell(null);
+			return;
+		}
+		const valueInPence = Math.round(valueInPounds * 100);
+		try {
+			await upsertValue(accountId, month, valueInPence);
+			toast.success("Value saved");
+			setEditingCell(null);
+		} catch (error) {
+			console.error("Failed to save value:", error);
+			toast.error("Failed to save value");
+		}
+	}
+
+	function handleKeyDown(e: React.KeyboardEvent, accountId: string) {
+		if (e.key === "Enter") {
+			handleSaveValue(accountId);
+		} else if (e.key === "Escape") {
+			setEditingCell(null);
+		}
+	}
+
+	return (
+		<tr className="border-b last:border-b-0">
+			<td className="p-3 font-medium flex items-center gap-2">
+				<Link
+					to={`/app/wealth/${account.id}/edit`}
+					className="hover:text-theme"
+				>
+					{account.name}
+				</Link>
+				{account.isLiquid && (
+					<Badge className="text-xs text-muted-foreground" variant="secondary">
+						Liquid
+					</Badge>
+				)}
+			</td>
+			<td className="p-3 text-right">
+				{editingCell?.accountId === account.id ? (
+					<Input
+						type="text"
+						className="w-32 text-right ml-auto"
+						value={editingCell.value}
+						onChange={(e) =>
+							setEditingCell({
+								accountId: account.id,
+								value: e.target.value,
+							})
+						}
+						onKeyDown={(e) => handleKeyDown(e, account.id)}
+						onBlur={() => handleSaveValue(account.id)}
+						autoFocus
+					/>
+				) : (
+					<Button
+						variant="ghost"
+						className="font-mono w-full justify-end"
+						onClick={() =>
+							setEditingCell({
+								accountId: account.id,
+								value: value !== undefined ? String(value / 100) : "",
+							})
+						}
+					>
+						{value !== undefined ? formatCurrency(value) : "Enter value"}
+					</Button>
+				)}
+			</td>
+		</tr>
+	);
+}
+
+function ClosedAccountRow({
+	account,
+}: {
+	account: WealthAccount;
+}) {
+	return (
+		<tr className="border-b last:border-b-0">
+			<td className="p-3 font-medium cursor-pointer hover:text-theme">
+				<Link to={`/app/wealth/${account.id}/edit`}>
+					{account.name}
+				</Link>
+			</td>
+			<td className="p-3 text-right">
+				<Link
+					to={`/app/wealth/${account.id}/edit`}
+					className="text-sm text-muted-foreground hover:text-theme"
+				>
+					Restore
+				</Link>
+			</td>
+		</tr>
+	);
+}
+
+function AccountSection({
+	title,
+	accounts,
+	accountValues,
+	month,
+	defaultOpen = true,
+	muted = false,
+}: {
+	title: string;
+	accounts: WealthAccount[];
+	accountValues: Record<string, number>;
+	month: string;
+	defaultOpen?: boolean;
+	muted?: boolean;
+}) {
+	const [editingCell, setEditingCell] = useState<EditingCell>(null);
+
+	if (accounts.length === 0) return null;
+
+	return (
+		<Collapsible defaultOpen={defaultOpen} className="border rounded-lg p-2">
+			<CollapsibleTrigger asChild>
+				<div className="flex items-center justify-between cursor-pointer hover:text-theme py-2">
+					<span className={`text-xl ${muted ? "text-muted-foreground" : ""}`}>
+						{title}
+					</span>
+					<ChevronDownIcon className={muted ? "text-muted-foreground" : ""} />
+				</div>
+			</CollapsibleTrigger>
+			<CollapsibleContent>
+				<div
+					className={
+						muted ? "text-muted-foreground opacity-60" : "text-muted-foreground"
+					}
+				>
+					<table className="w-full">
+						<tbody>
+							{accounts.map((account) =>
+								muted ? (
+									<ClosedAccountRow
+										key={account.id}
+										account={account}
+									/>
+								) : (
+									<EditableAccountRow
+										key={account.id}
+										account={account}
+										value={accountValues[account.id]}
+										editingCell={editingCell}
+										setEditingCell={setEditingCell}
+										month={month}
+										
+									/>
+								),
+							)}
+						</tbody>
+					</table>
+				</div>
+			</CollapsibleContent>
+		</Collapsible>
 	);
 }
