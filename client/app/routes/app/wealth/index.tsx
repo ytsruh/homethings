@@ -257,7 +257,7 @@ export default function WealthPage() {
 		<>
 			<title>Wealth | Homethings</title>
 			<meta name="description" content="Track your net worth" />
-			<div className="space-y-6">
+			<div className="h-full w-full">
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 					<PageHeader
 						title="Wealth"
@@ -369,7 +369,7 @@ export default function WealthPage() {
 						Loading...
 					</div>
 				) : (
-					<div className="space-y-5">
+					<div className="h-full">
 						{assetAccounts.length > 0 && (
 							<div>
 								<h3 className="text-lg font-semibold mb-3">Assets</h3>
