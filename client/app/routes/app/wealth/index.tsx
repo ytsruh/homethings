@@ -452,10 +452,18 @@ export default function WealthPage() {
 														className="border-b last:border-b-0"
 													>
 														<td
-															className="p-3 font-medium cursor-pointer hover:text-theme"
+															className="p-3 font-medium cursor-pointer hover:text-theme flex items-center gap-2"
 															onClick={() => openEditAccount(account)}
 														>
 															{account.name}
+															{account.isLiquid && (
+																<Badge
+																	className="text-xs text-muted-foreground"
+																	variant="secondary"
+																>
+																	Liquid
+																</Badge>
+															)}
 														</td>
 														<td className="p-3 text-right">
 															{editingCell?.accountId === account.id ? (
@@ -486,14 +494,6 @@ export default function WealthPage() {
 																		)
 																	}
 																>
-																	{account.isLiquid && (
-																		<Badge
-																			variant="secondary"
-																			className="mr-2 text-xs"
-																		>
-																			L
-																		</Badge>
-																	)}
 																	{accountValues[account.id] !== undefined
 																		? formatCurrency(accountValues[account.id])
 																		: "Enter value"}

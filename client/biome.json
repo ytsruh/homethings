@@ -16,6 +16,10 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
+			"a11y": {
+				"useKeyWithClickEvents": "off",
+				"useKeyWithMouseEvents": "off"
+			},
 			"suspicious": { "noUnknownAtRules": "off" }
 		}
 	},
