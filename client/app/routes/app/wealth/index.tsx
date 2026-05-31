@@ -1,8 +1,14 @@
+import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import PageHeader from "~/components/PageHeader";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "~/components/ui/collapsible";
 import {
 	Dialog,
 	DialogContent,
@@ -109,10 +115,9 @@ export default function WealthPage() {
 	async function loadData() {
 		setIsLoading(true);
 		try {
-			const [accountsData, allMonthsData, totalsData] = await Promise.all([
+			const [accountsData, allMonthsData] = await Promise.all([
 				getAccounts(),
 				getAllMonthsData(),
-				getTotals(currentMonth),
 			]);
 			setAccounts(accountsData);
 
@@ -125,13 +130,15 @@ export default function WealthPage() {
 			);
 			if (currentData) {
 				for (const av of currentData.accounts) {
-					if (av.value !== null) {
+					if (av.value !== null && av.value !== undefined) {
 						valuesMap[av.account.id] = av.value;
 					}
 				}
 			}
 			setAccountValues(valuesMap);
-			setTotals(totalsData);
+
+			const totalsResponse = await getTotals(currentMonth);
+			setTotals(totalsResponse);
 		} catch (error) {
 			console.error("Failed to load data:", error);
 			toast.error("Failed to load wealth data");
@@ -257,12 +264,29 @@ export default function WealthPage() {
 		<>
 			<title>Wealth | Homethings</title>
 			<meta name="description" content="Track your net worth" />
-			<div className="h-full w-full">
-				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-					<PageHeader
-						title="Wealth"
-						subtitle="Track your net worth over time"
-					/>
+			<div className="h-full w-full overflow-y-auto">
+				<PageHeader title="Wealth" subtitle="Track your net worth over time" />
+
+				<div className="flex flex-col sm:flex-row gap-y-2 sm:gap-y-0 items-center justify-between">
+					<div className="flex items-center justify-center gap-4">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setCurrentMonth(getPreviousMonth(currentMonth))}
+						>
+							←
+						</Button>
+						<span className="text-lg font-semibold min-w-[140px] text-center">
+							{formatMonthDisplay(currentMonth)}
+						</span>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setCurrentMonth(getNextMonth(currentMonth))}
+						>
+							→
+						</Button>
+					</div>
 					<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
 						<DialogTrigger asChild>
 							<Button>Add Account</Button>
@@ -336,187 +360,12 @@ export default function WealthPage() {
 					</Dialog>
 				</div>
 
-				<div className="flex items-center justify-center gap-4">
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentMonth(getPreviousMonth(currentMonth))}
-						disabled={
-							availableMonths.length === 0 ||
-							!availableMonths.includes(getPreviousMonth(currentMonth))
-						}
-					>
-						←
-					</Button>
-					<span className="text-lg font-semibold min-w-[140px] text-center">
-						{formatMonthDisplay(currentMonth)}
-					</span>
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setCurrentMonth(getNextMonth(currentMonth))}
-						disabled={
-							currentMonth >= getCurrentYearMonth() ||
-							!availableMonths.includes(getNextMonth(currentMonth))
-						}
-					>
-						→
-					</Button>
-				</div>
-
 				{isLoading ? (
 					<div className="text-center py-12 text-muted-foreground">
 						Loading...
 					</div>
 				) : (
-					<div className="h-full">
-						{assetAccounts.length > 0 && (
-							<div>
-								<h3 className="text-lg font-semibold mb-3">Assets</h3>
-								<div className="border rounded-lg overflow-hidden">
-									<table className="w-full">
-										<tbody>
-											{assetAccounts.map((account) => (
-												<tr
-													key={account.id}
-													className="border-b last:border-b-0"
-												>
-													<td className="p-3 font-medium">{account.name}</td>
-													<td className="p-3 text-right">
-														{editingCell?.accountId === account.id ? (
-															<Input
-																type="text"
-																className="w-32 text-right ml-auto"
-																value={editingCell.value}
-																onChange={(e) =>
-																	setEditingCell({
-																		accountId: account.id,
-																		value: e.target.value,
-																	})
-																}
-																onKeyDown={(e) => handleKeyDown(e, account.id)}
-																onBlur={() => handleSaveValue(account.id)}
-																autoFocus
-															/>
-														) : (
-															<Button
-																variant="ghost"
-																className="font-mono w-full justify-end"
-																onClick={() =>
-																	startEditing(
-																		account.id,
-																		accountValues[account.id],
-																	)
-																}
-															>
-																{account.isLiquid && (
-																	<Badge
-																		variant="secondary"
-																		className="mr-2 text-xs"
-																	>
-																		L
-																	</Badge>
-																)}
-																{accountValues[account.id] !== undefined
-																	? formatCurrency(accountValues[account.id])
-																	: "Enter value"}
-															</Button>
-														)}
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						)}
-
-						{liabilityAccounts.length > 0 && (
-							<div>
-								<h3 className="text-lg font-semibold mb-3">Liabilities</h3>
-								<div className="border rounded-lg overflow-hidden">
-									<table className="w-full">
-										<tbody>
-											{liabilityAccounts.map((account) => (
-												<tr
-													key={account.id}
-													className="border-b last:border-b-0"
-												>
-													<td className="p-3 font-medium">{account.name}</td>
-													<td className="p-3 text-right">
-														{editingCell?.accountId === account.id ? (
-															<Input
-																type="text"
-																className="w-32 text-right ml-auto"
-																value={editingCell.value}
-																onChange={(e) =>
-																	setEditingCell({
-																		accountId: account.id,
-																		value: e.target.value,
-																	})
-																}
-																onKeyDown={(e) => handleKeyDown(e, account.id)}
-																onBlur={() => handleSaveValue(account.id)}
-																autoFocus
-															/>
-														) : (
-															<Button
-																variant="ghost"
-																className="font-mono w-full justify-end"
-																onClick={() =>
-																	startEditing(
-																		account.id,
-																		accountValues[account.id],
-																	)
-																}
-															>
-																{accountValues[account.id] !== undefined
-																	? formatCurrency(accountValues[account.id])
-																	: "Enter value"}
-															</Button>
-														)}
-													</td>
-												</tr>
-											))}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						)}
-
-						{accounts.filter((a) => a.isClosed).length > 0 && (
-							<div>
-								<h3 className="text-lg font-semibold mb-3 text-muted-foreground">
-									Closed Accounts
-								</h3>
-								<div className="border rounded-lg overflow-hidden opacity-60">
-									<table className="w-full">
-										<tbody>
-											{accounts
-												.filter((a) => a.isClosed)
-												.map((account) => (
-													<tr
-														key={account.id}
-														className="border-b last:border-b-0"
-													>
-														<td className="p-3 font-medium">{account.name}</td>
-														<td className="p-3 text-right">
-															<Button
-																variant="ghost"
-																size="sm"
-																onClick={() => openEditAccount(account)}
-															>
-																Restore
-															</Button>
-														</td>
-													</tr>
-												))}
-										</tbody>
-									</table>
-								</div>
-							</div>
-						)}
-
+					<div className="flex flex-col gap-y-5 py-2">
 						{totals && (
 							<div className="border rounded-lg p-4 bg-muted/50">
 								<h3 className="text-lg font-semibold mb-4">Summary</h3>
@@ -525,7 +374,7 @@ export default function WealthPage() {
 										<p className="text-sm text-muted-foreground">
 											Total Assets
 										</p>
-										<p className="text-2xl font-mono">
+										<p className="text-2xl text-theme">
 											{formatCurrency(totals.totalAssets)}
 										</p>
 									</div>
@@ -533,17 +382,13 @@ export default function WealthPage() {
 										<p className="text-sm text-muted-foreground">
 											Total Liabilities
 										</p>
-										<p className="text-2xl font-mono text-red-500">
+										<p className="text-2xl text-destructive">
 											{formatCurrency(totals.totalLiabilities)}
 										</p>
 									</div>
 									<div className="col-span-2 border-t pt-4">
 										<p className="text-sm text-muted-foreground">Net Worth</p>
-										<p
-											className={`text-3xl font-mono font-bold ${
-												totals.netWorth >= 0 ? "text-green-500" : "text-red-500"
-											}`}
-										>
+										<p className="text-3xl font-bold">
 											{formatCurrency(totals.netWorth)}
 										</p>
 									</div>
@@ -551,23 +396,23 @@ export default function WealthPage() {
 										<p className="text-sm text-muted-foreground">
 											Liquid Assets
 										</p>
-										<p className="text-xl font-mono">
+										<p className="text-xl">
 											{formatCurrency(totals.liquidAssets)}
 										</p>
 									</div>
 									<div>
 										<p className="text-sm text-muted-foreground">Liquid %</p>
-										<p className="text-xl font-mono">
+										<p className="text-xl">
 											{totals.liquidPercent.toFixed(1)}%
 										</p>
 									</div>
 									<div>
 										<p className="text-sm text-muted-foreground">MoM Change</p>
 										<p
-											className={`text-xl font-mono ${
+											className={`text-xl ${
 												totals.moMChange >= 0
-													? "text-green-500"
-													: "text-red-500"
+													? "text-theme"
+													: "text-destructive"
 											}`}
 										>
 											{formatCurrency(totals.moMChange)} (
@@ -577,10 +422,10 @@ export default function WealthPage() {
 									<div>
 										<p className="text-sm text-muted-foreground">YoY Change</p>
 										<p
-											className={`text-xl font-mono ${
+											className={`text-xl ${
 												totals.yoYPercent >= 0
-													? "text-green-500"
-													: "text-red-500"
+													? "text-theme"
+													: "text-destructive"
 											}`}
 										>
 											{formatPercent(totals.yoYPercent)}
@@ -588,6 +433,190 @@ export default function WealthPage() {
 									</div>
 								</div>
 							</div>
+						)}
+						{assetAccounts.length > 0 && (
+							<Collapsible defaultOpen className="border rounded-lg p-2">
+								<CollapsibleTrigger asChild>
+									<div className="flex items-center justify-between cursor-pointer hover:text-theme py-2">
+										<span className="text-xl">Assets</span>
+										<ChevronDownIcon />
+									</div>
+								</CollapsibleTrigger>
+								<CollapsibleContent>
+									<div className="text-muted-foreground">
+										<table className="w-full">
+											<tbody>
+												{assetAccounts.map((account) => (
+													<tr
+														key={account.id}
+														className="border-b last:border-b-0"
+													>
+														<td
+															className="p-3 font-medium cursor-pointer hover:text-theme"
+															onClick={() => openEditAccount(account)}
+														>
+															{account.name}
+														</td>
+														<td className="p-3 text-right">
+															{editingCell?.accountId === account.id ? (
+																<Input
+																	type="text"
+																	className="w-32 text-right ml-auto"
+																	value={editingCell.value}
+																	onChange={(e) =>
+																		setEditingCell({
+																			accountId: account.id,
+																			value: e.target.value,
+																		})
+																	}
+																	onKeyDown={(e) =>
+																		handleKeyDown(e, account.id)
+																	}
+																	onBlur={() => handleSaveValue(account.id)}
+																	autoFocus
+																/>
+															) : (
+																<Button
+																	variant="ghost"
+																	className="font-mono w-full justify-end"
+																	onClick={() =>
+																		startEditing(
+																			account.id,
+																			accountValues[account.id],
+																		)
+																	}
+																>
+																	{account.isLiquid && (
+																		<Badge
+																			variant="secondary"
+																			className="mr-2 text-xs"
+																		>
+																			L
+																		</Badge>
+																	)}
+																	{accountValues[account.id] !== undefined
+																		? formatCurrency(accountValues[account.id])
+																		: "Enter value"}
+																</Button>
+															)}
+														</td>
+													</tr>
+												))}
+											</tbody>
+										</table>
+									</div>
+								</CollapsibleContent>
+							</Collapsible>
+						)}
+
+						{liabilityAccounts.length > 0 && (
+							<Collapsible defaultOpen className="border rounded-lg p-2">
+								<CollapsibleTrigger asChild>
+									<div className="flex items-center justify-between cursor-pointer hover:text-theme py-2">
+										<span className="text-xl">Liabilities</span>
+										<ChevronDownIcon />
+									</div>
+								</CollapsibleTrigger>
+								<CollapsibleContent>
+									<div className="text-muted-foreground">
+										<table className="w-full">
+											<tbody>
+												{liabilityAccounts.map((account) => (
+													<tr
+														key={account.id}
+														className="border-b last:border-b-0"
+													>
+														<td
+															className="p-3 font-medium cursor-pointer hover:text-theme"
+															onClick={() => openEditAccount(account)}
+														>
+															{account.name}
+														</td>
+														<td className="p-3 text-right">
+															{editingCell?.accountId === account.id ? (
+																<Input
+																	type="text"
+																	className="w-32 text-right ml-auto"
+																	value={editingCell.value}
+																	onChange={(e) =>
+																		setEditingCell({
+																			accountId: account.id,
+																			value: e.target.value,
+																		})
+																	}
+																	onKeyDown={(e) =>
+																		handleKeyDown(e, account.id)
+																	}
+																	onBlur={() => handleSaveValue(account.id)}
+																	autoFocus
+																/>
+															) : (
+																<Button
+																	variant="ghost"
+																	className="font-mono w-full justify-end"
+																	onClick={() =>
+																		startEditing(
+																			account.id,
+																			accountValues[account.id],
+																		)
+																	}
+																>
+																	{accountValues[account.id] !== undefined
+																		? formatCurrency(accountValues[account.id])
+																		: "Enter value"}
+																</Button>
+															)}
+														</td>
+													</tr>
+												))}
+											</tbody>
+										</table>
+									</div>
+								</CollapsibleContent>
+							</Collapsible>
+						)}
+
+						{accounts.filter((a) => a.isClosed).length > 0 && (
+							<Collapsible className="border rounded-lg p-2">
+								<CollapsibleTrigger asChild>
+									<div className="flex items-center justify-between cursor-pointer text-muted-foreground hover:text-theme py-2">
+										<span className="text-xl">Closed Accounts</span>
+										<ChevronDownIcon className="" />
+									</div>
+								</CollapsibleTrigger>
+								<CollapsibleContent>
+									<div className="text-muted-foreground opacity-60">
+										<table className="w-full">
+											<tbody>
+												{accounts
+													.filter((a) => a.isClosed)
+													.map((account) => (
+														<tr
+															key={account.id}
+															className="border-b last:border-b-0"
+														>
+															<td
+																className="p-3 font-medium cursor-pointer hover:text-theme"
+																onClick={() => openEditAccount(account)}
+															>
+																{account.name}
+															</td>
+															<td className="p-3 text-right">
+																<Button
+																	variant="ghost"
+																	size="sm"
+																	onClick={() => openEditAccount(account)}
+																>
+																	Restore
+																</Button>
+															</td>
+														</tr>
+													))}
+											</tbody>
+										</table>
+									</div>
+								</CollapsibleContent>
+							</Collapsible>
 						)}
 					</div>
 				)}

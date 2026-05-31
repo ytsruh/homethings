@@ -469,13 +469,13 @@ func computeNetWorthForMonth(userID string, database *db.DB, yearMonth string) i
 }
 
 type MonthData struct {
-	YearMonth string
-	Accounts  []AccountWithValueForMonth
+	YearMonth string                     `json:"yearMonth"`
+	Accounts  []AccountWithValueForMonth `json:"accounts"`
 }
 
 type AccountWithValueForMonth struct {
-	Account AccountResponse
-	Value   *int64
+	Account AccountResponse `json:"account"`
+	Value   *int64           `json:"value"`
 }
 
 func (ctrl *WealthController) GetAllMonthsData(c echo.Context) error {

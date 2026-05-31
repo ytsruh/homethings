@@ -82,6 +82,8 @@ func parseValue(val string) (int64, bool) {
 	return int64(valFloat * 100), true
 }
 
+// Example usage:
+// USER_ID=<your-user-id> DATABASE_PATH=./data/homethings.db CSV_PATH=./data/Money.csv go run ./cmd/import_wealth/
 func main() {
 	dbPath := os.Getenv("DATABASE_PATH")
 	if dbPath == "" {

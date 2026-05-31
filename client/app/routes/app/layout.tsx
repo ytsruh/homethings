@@ -58,7 +58,7 @@ export default function AppLayout() {
 		<ThemeProvider defaultTheme="dark" storageKey="ui-theme">
 			<AuthProvider user={user}>
 				<SidebarProvider defaultOpen={false}>
-					<main className="h-screen w-screen overflow-hidden flex flex-col">
+					<main className="min-h-screen w-screen overflow-hidden flex flex-col">
 						<Navbar user={user} />
 						<div className="px-1 sm:px-5 flex flex-col h-full">
 							<BreadcrumbNav />
