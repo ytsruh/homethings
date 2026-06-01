@@ -1,13 +1,6 @@
 import { ChevronDownIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-	Form,
-	Link,
-	useActionData,
-	useLoaderData,
-	useNavigate,
-	useNavigation,
-} from "react-router";
+import { Link, useFetcher, useNavigate, useNavigation } from "react-router";
 import { toast } from "sonner";
 import PageHeader from "~/components/PageHeader";
 import { Badge } from "~/components/ui/badge";
@@ -112,25 +105,24 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	}
 }
 
-export default function WealthPage() {
-	const { month, accounts, accountValues, totals } =
-		useLoaderData<typeof clientLoader>();
-	const actionData = useActionData<typeof clientAction>();
+export default function WealthPage({ loaderData }: Route.ComponentProps) {
+	const { month, accounts, accountValues, totals } = loaderData;
+	const createFetcher = useFetcher();
 	const navigation = useNavigation();
 	const navigate = useNavigate();
 
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-	const isSubmitting = navigation.state === "submitting";
+	const isSubmitting = createFetcher.state === "submitting";
 
 	useEffect(() => {
-		if (actionData?.success && actionData.intent === "createAccount") {
+		if (createFetcher.data?.success) {
 			setIsCreateOpen(false);
 		}
-		if (actionData?.error && actionData.intent === "createAccount") {
-			toast.error(actionData.error);
+		if (createFetcher.data?.error) {
+			toast.error(createFetcher.data.error);
 		}
-	}, [actionData]);
+	}, [createFetcher.data]);
 
 	const activeAccounts = accounts.filter((a) => !a.isClosed);
 	const assetAccounts = activeAccounts.filter((a) => a.type === "asset");
@@ -181,7 +173,7 @@ export default function WealthPage() {
 									Create a new asset or liability account.
 								</DialogDescription>
 							</DialogHeader>
-							<Form method="post" className="space-y-4 py-4">
+							<createFetcher.Form method="post" className="space-y-4 py-4">
 								<div className="space-y-2">
 									<Label htmlFor="name">Name</Label>
 									<Input
@@ -255,7 +247,7 @@ export default function WealthPage() {
 										{isSubmitting ? "Creating..." : "Create"}
 									</Button>
 								</DialogFooter>
-							</Form>
+							</createFetcher.Form>
 						</DialogContent>
 					</Dialog>
 				</div>

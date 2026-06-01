@@ -1,11 +1,5 @@
 import { useId, useRef, useState } from "react";
-import {
-	Form,
-	Link,
-	redirect,
-	useLoaderData,
-	useNavigation,
-} from "react-router";
+import { Form, Link, redirect, useNavigation } from "react-router";
 import { toast } from "~/components/Toaster";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -102,8 +96,8 @@ export async function clientAction({
 type Ingredient = { name: string | null; amount: string | null; key: number };
 type Step = { text: string; key: number };
 
-export default function RecipeEditPage() {
-	const { recipe } = useLoaderData<typeof clientLoader>();
+export default function RecipeEditPage({ loaderData }: Route.ComponentProps) {
+	const { recipe } = loaderData;
 	const navigation = useNavigation();
 	const isSubmitting = navigation.state === "submitting";
 	const id = useId();

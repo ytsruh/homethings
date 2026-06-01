@@ -1,6 +1,6 @@
 import { Trash } from "lucide-react";
 import { useState } from "react";
-import { Form, Link, redirect, useLoaderData } from "react-router";
+import { Link, redirect, useFetcher } from "react-router";
 import { toast } from "sonner";
 import { Button } from "~/components/ui/button";
 import {
@@ -59,13 +59,19 @@ export async function clientAction({
 	}
 }
 
-export default function WealthAccountEditPage() {
-	const { account } = useLoaderData<typeof clientLoader>();
+export default function WealthAccountEditPage({
+	loaderData,
+}: Route.ComponentProps) {
+	const { account } = loaderData;
+	const editFetcher = useFetcher();
+	const deleteFetcher = useFetcher();
 
 	const [name, setName] = useState(account.name);
 	const [type, setType] = useState<"asset" | "liability">(account.type);
 	const [isLiquid, setIsLiquid] = useState(account.isLiquid);
 	const [isClosed, setIsClosed] = useState(account.isClosed);
+
+	const isSaving = editFetcher.state !== "idle";
 
 	return (
 		<>
@@ -98,20 +104,20 @@ export default function WealthAccountEditPage() {
 									<DialogClose asChild>
 										<Button variant="secondary">Cancel</Button>
 									</DialogClose>
-									<Form
+									<deleteFetcher.Form
 										action={`/app/wealth/${account.id}/delete`}
 										method="post"
 									>
 										<Button type="submit" variant="destructive">
 											Delete
 										</Button>
-									</Form>
+									</deleteFetcher.Form>
 								</DialogFooter>
 							</DialogContent>
 						</Dialog>
 					</div>
 
-					<Form method="post" className="space-y-6">
+					<editFetcher.Form method="post" className="space-y-6">
 						<div className="space-y-2">
 							<Label htmlFor="name">Name</Label>
 							<Input
@@ -176,9 +182,11 @@ export default function WealthAccountEditPage() {
 						</div>
 
 						<div className="w-full items-center justify-end flex gap-2 pt-4">
-							<Button type="submit">Save Changes</Button>
+							<Button type="submit" disabled={isSaving}>
+								{isSaving ? "Saving..." : "Save Changes"}
+							</Button>
 						</div>
-					</Form>
+					</editFetcher.Form>
 				</div>
 			</div>
 		</>

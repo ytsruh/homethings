@@ -4,7 +4,6 @@ import {
 	Link,
 	redirect,
 	useFetcher,
-	useLoaderData,
 	useNavigate,
 	useSearchParams,
 } from "react-router";
@@ -114,9 +113,9 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	}
 }
 
-export default function RecipesPage() {
+export default function RecipesPage({ loaderData }: Route.ComponentProps) {
 	const id = useId();
-	const { recipes, imageUrls } = useLoaderData<typeof clientLoader>();
+	const { recipes, imageUrls } = loaderData;
 	const [searchQuery, setSearchQuery] = useState("");
 	const [searchParams, setSearchParams] = useSearchParams();
 	const activeTag = searchParams.get("tag") || null;

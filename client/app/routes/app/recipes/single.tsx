@@ -1,12 +1,6 @@
 import { ImageIcon, Pencil, Trash2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import {
-	Link,
-	redirect,
-	useFetcher,
-	useLoaderData,
-	useRevalidator,
-} from "react-router";
+import { useRef, useState } from "react";
+import { Link, redirect, useFetcher, useRevalidator } from "react-router";
 import { toast } from "~/components/Toaster";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
@@ -53,8 +47,8 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 	return { recipe, imageUrl };
 }
 
-export default function RecipeDetailPage() {
-	const { recipe, imageUrl } = useLoaderData<typeof clientLoader>();
+export default function RecipeDetailPage({ loaderData }: Route.ComponentProps) {
+	const { recipe, imageUrl } = loaderData;
 
 	return (
 		<>
