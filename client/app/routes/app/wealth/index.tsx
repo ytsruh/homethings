@@ -23,6 +23,14 @@ import {
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "~/components/ui/select";
+import { Switch } from "~/components/ui/switch";
+import {
 	formatCurrency,
 	formatMonthDisplay,
 	formatPercent,
@@ -113,7 +121,7 @@ export default function WealthPage({ loaderData }: Route.ComponentProps) {
 
 	const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-	const isSubmitting = createFetcher.state === "submitting";
+	const isSubmitting = createFetcher.state !== "idle";
 
 	useEffect(() => {
 		if (createFetcher.data?.success) {
@@ -182,35 +190,17 @@ export default function WealthPage({ loaderData }: Route.ComponentProps) {
 										placeholder="e.g., House, Car, Savings"
 									/>
 								</div>
-								<div className="space-y-2">
-									<Label>Type</Label>
-									<div className="flex gap-4">
-										<input
-											type="radio"
-											name="type"
-											value="asset"
-											id="type-asset"
-											className="sr-only"
-											defaultChecked
-										/>
-										<Label htmlFor="type-asset" className="cursor-pointer">
-											<Button type="button" variant="default">
-												Asset
-											</Button>
-										</Label>
-										<input
-											type="radio"
-											name="type"
-											value="liability"
-											id="type-liability"
-											className="sr-only"
-										/>
-										<Label htmlFor="type-liability" className="cursor-pointer">
-											<Button type="button" variant="outline">
-												Liability
-											</Button>
-										</Label>
-									</div>
+								<div className="space-y-2 flex items-center justify-between">
+									<Label htmlFor="type">Type</Label>
+									<Select name="type" defaultValue="asset">
+										<SelectTrigger id="type">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="asset">Asset</SelectItem>
+											<SelectItem value="liability">Liability</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 								<div className="flex items-center justify-between">
 									<div>
@@ -219,19 +209,7 @@ export default function WealthPage({ loaderData }: Route.ComponentProps) {
 											Include in liquid assets calculation
 										</p>
 									</div>
-									<input
-										type="checkbox"
-										name="isLiquid"
-										value="true"
-										id="liquid"
-										className="sr-only peer"
-									/>
-									<Label
-										htmlFor="liquid"
-										className="cursor-pointer relative inline-flex h-[1.15rem] w-8 shrink-0 items-center rounded-full border border-transparent shadow-xs transition-all outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 peer-data-[state=checked]:bg-primary peer-data-[state=unchecked]:bg-input hover:peer-data-[state=checked]:bg-primary/90"
-									>
-										<span className="pointer-events-none block size-4 rounded-full bg-background shadow-sm transition-transform data-[state=checked]:translate-x-[calc(100%-2px)] data-[state=unchecked]:translate-x-0" />
-									</Label>
+									<Switch id="liquid" name="isLiquid" value="true" />
 								</div>
 								<DialogFooter>
 									<DialogClose asChild>

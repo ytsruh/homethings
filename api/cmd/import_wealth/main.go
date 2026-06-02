@@ -1,7 +1,7 @@
 package main
 
 import (
-	"database/sql"
+	"context"
 	"encoding/csv"
 	"fmt"
 	"log"
@@ -12,7 +12,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	_ "github.com/mattn/go-sqlite3"
+	turso "turso.tech/database/tursogo"
+	"ytsruh.com/homethings/internal/utils"
 )
 
 func parseMonthHeader(header string) string {
@@ -21,7 +22,7 @@ func parseMonthHeader(header string) string {
 		"Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12,
 	}
 
-	parts := strings.Split(header, " ")
+	parts := strings.Split(header, "-")
 	if len(parts) != 2 {
 		return ""
 	}
@@ -90,11 +91,33 @@ func main() {
 		dbPath = "homethings.db"
 	}
 
-	db, err := sql.Open("sqlite3", dbPath)
+	env, err := utils.LoadAndValidateEnv()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Failed to load environment: %v", err)
+	}
+
+	ctx := context.Background()
+
+	syncDb, err := turso.NewTursoSyncDb(ctx, turso.TursoSyncDbConfig{
+		Path:      dbPath,
+		RemoteUrl: env.TURSO_DATABASE_URL,
+		AuthToken: env.TURSO_AUTH_TOKEN,
+	})
+	if err != nil {
+		log.Fatalf("Failed to create turso sync db: %v", err)
+	}
+
+	db, err := syncDb.Connect(ctx)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	defer db.Close()
+
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
+	}
+
+	fmt.Println("Connected to Turso sync database")
 
 	userID := os.Getenv("USER_ID")
 	if userID == "" {
@@ -124,7 +147,7 @@ func main() {
 
 	headerRow := records[0]
 	monthHeaders := make([]string, 0)
-	for i := 1; i < len(headerRow); i++ {
+	for i := 2; i < len(headerRow); i++ {
 		ym := parseMonthHeader(headerRow[i])
 		if ym != "" {
 			monthHeaders = append(monthHeaders, ym)
@@ -137,10 +160,9 @@ func main() {
 
 	fmt.Printf("Found %d months from %s to %s\n", len(monthHeaders), monthHeaders[0], monthHeaders[len(monthHeaders)-1])
 
-	accountIDMap := make(map[string]string)
 	now := time.Now().Unix()
 
-	for rowIdx := 2; rowIdx < len(records); rowIdx++ {
+	for rowIdx := 1; rowIdx < len(records); rowIdx++ {
 		row := records[rowIdx]
 		if len(row) == 0 || row[0] == "" {
 			continue
@@ -156,10 +178,9 @@ func main() {
 			continue
 		}
 
-		isLiability := rowIdx >= 24 && rowIdx <= 28
+		isLiability := len(row) > 1 && strings.TrimSpace(row[1]) == "Liabilties"
 
 		accountID := uuid.New().String()
-		accountIDMap[accountName] = accountID
 
 		var isLiquid int64 = 0
 		liquidAccounts := []string{"Marcus Cash ISA", "Katie Marcus", "Halifax Savings", "Katie Freetrade", "Freetrade ISA", "Freetrade GIA", "Katie HL", "Katie ISA", "Halifax B2L", "LSEG ShareSave 22", "LSEG ShareSave 21"}
@@ -177,7 +198,7 @@ func main() {
 			accountType = "asset"
 		}
 
-		_, err = db.Exec(`
+		_, err = db.ExecContext(ctx, `
 			INSERT INTO wealth_accounts (id, name, type, is_liquid, is_closed, user_id, created_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?)
 		`, accountID, accountName, accountType, isLiquid, 0, userID, now)
@@ -185,7 +206,7 @@ func main() {
 			fmt.Printf("Error inserting account %s: %v\n", accountName, err)
 		}
 
-		for colIdx := 1; colIdx < len(row) && colIdx-1 < len(monthHeaders); colIdx++ {
+		for colIdx := 2; colIdx < len(row) && colIdx-2 < len(monthHeaders); colIdx++ {
 			val := row[colIdx]
 			valInt, hasValue := parseValue(val)
 			if !hasValue {
@@ -193,20 +214,59 @@ func main() {
 			}
 
 			valueID := uuid.New().String()
-			_, err = db.Exec(`
+			_, err = db.ExecContext(ctx, `
 				INSERT INTO wealth_account_values (id, account_id, year_month, value, created_at)
 				VALUES (?, ?, ?, ?, ?)
-			`, valueID, accountID, monthHeaders[colIdx-1], valInt, now)
+			`, valueID, accountID, monthHeaders[colIdx-2], valInt, now)
 			if err != nil {
 				fmt.Printf("Error inserting value for %s, month %s: %v\n", accountName, monthHeaders[colIdx-1], err)
 			}
 		}
 	}
 
-	fmt.Println("Import complete!")
+	fmt.Println("Import complete! Clearing any stale sync state...")
+	if _, err := syncDb.Pull(ctx); err != nil {
+		fmt.Printf("Warning: pull failed (may be expected if no remote changes): %v\n", err)
+	}
+
+	time.Sleep(1 * time.Second)
+
+	fmt.Println("Pushing to Turso...")
+	if err := syncDb.Push(ctx); err != nil {
+		log.Fatalf("Failed to push to Turso: %v", err)
+	}
+
+	for i := 0; i < 3; i++ {
+		time.Sleep(2 * time.Second)
+		stats, err := syncDb.Stats(ctx)
+		if err != nil {
+			log.Fatalf("Failed to get sync stats: %v", err)
+		}
+
+		if stats.CdcOperations == 0 {
+			break
+		}
+
+		fmt.Printf("Attempt %d: %d operations still pending, retrying push...\n", i+1, stats.CdcOperations)
+		if err := syncDb.Push(ctx); err != nil {
+			log.Fatalf("Failed to push to Turso: %v", err)
+		}
+	}
+
+	stats, err := syncDb.Stats(ctx)
+	if err != nil {
+		log.Fatalf("Failed to get sync stats: %v", err)
+	}
+
+	if stats.CdcOperations > 0 {
+		fmt.Printf("Warning: %d operations still pending. Data is likely synced but sync engine has lingering state.\n", stats.CdcOperations)
+		fmt.Println("Check Turso dashboard to confirm data reached the cloud.")
+	} else {
+		fmt.Println("Sync confirmed - all changes pushed to Turso cloud")
+	}
 
 	var totalAccounts, totalValues int64
-	db.QueryRow("SELECT COUNT(*) FROM wealth_accounts WHERE user_id = ?", userID).Scan(&totalAccounts)
-	db.QueryRow("SELECT COUNT(*) FROM wealth_account_values").Scan(&totalValues)
+	db.QueryRowContext(ctx, "SELECT COUNT(*) FROM wealth_accounts WHERE user_id = ?", userID).Scan(&totalAccounts)
+	db.QueryRowContext(ctx, "SELECT COUNT(*) FROM wealth_account_values").Scan(&totalValues)
 	fmt.Printf("Created %d accounts and %d values\n", totalAccounts, totalValues)
 }

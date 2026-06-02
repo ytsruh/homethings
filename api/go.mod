@@ -16,8 +16,6 @@ require (
 	turso.tech/database/tursogo v0.6.1
 )
 
-require github.com/mattn/go-sqlite3 v1.14.42
-
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.10 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.23 // indirect
