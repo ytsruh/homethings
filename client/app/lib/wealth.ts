@@ -44,8 +44,8 @@ export interface Totals {
 	liquidAssets: number;
 	liquidPercent: number;
 	moMChange: number;
-	moMPercent: number;
-	yoYPercent: number;
+	moMPercent: number | null;
+	yoYPercent: number | null;
 }
 
 export type CreateAccountInput = {

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -41,14 +40,14 @@ type AccountValueResponse struct {
 }
 
 type TotalsResponse struct {
-	TotalAssets     int64   `json:"totalAssets"`
-	TotalLiabilities int64   `json:"totalLiabilities"`
-	NetWorth        int64   `json:"netWorth"`
-	LiquidAssets    int64   `json:"liquidAssets"`
-	LiquidPercent   float64 `json:"liquidPercent"`
-	MoMChange       int64   `json:"moMChange"`
-	MoMPercent      float64 `json:"moMPercent"`
-	YoYPercent      float64 `json:"yoYPercent"`
+	TotalAssets      int64    `json:"totalAssets"`
+	TotalLiabilities int64    `json:"totalLiabilities"`
+	NetWorth         int64    `json:"netWorth"`
+	LiquidAssets     int64    `json:"liquidAssets"`
+	LiquidPercent    float64  `json:"liquidPercent"`
+	MoMChange        int64    `json:"moMChange"`
+	MoMPercent       *float64 `json:"moMPercent"`
+	YoYPercent       *float64 `json:"yoYPercent"`
 }
 
 type CreateAccountRequest struct {
@@ -375,19 +374,20 @@ func (ctrl *WealthController) GetTotals(c echo.Context) error {
 	prevMonth := getPreviousMonth(yearMonth)
 	prevNetWorth := computeNetWorthForMonth(user.UserID, ctrl.db, prevMonth)
 
-	var moMChange int64
-	var moMPercent float64
+	moMChange := netWorth - prevNetWorth
+	var moMPercent *float64
 	if prevNetWorth != 0 {
-		moMChange = netWorth - prevNetWorth
-		moMPercent = float64(moMChange) / float64(prevNetWorth) * 100
+		pct := float64(moMChange) / float64(prevNetWorth) * 100
+		moMPercent = &pct
 	}
 
 	yearAgo := getYearAgoMonth(yearMonth)
 	yearAgoNetWorth := computeNetWorthForMonth(user.UserID, ctrl.db, yearAgo)
 
-	var yoYPercent float64
+	var yoYPercent *float64
 	if yearAgoNetWorth != 0 {
-		yoYPercent = float64(netWorth-yearAgoNetWorth) / float64(yearAgoNetWorth) * 100
+		pct := float64(netWorth-yearAgoNetWorth) / float64(yearAgoNetWorth) * 100
+		yoYPercent = &pct
 	}
 
 	return c.JSON(http.StatusOK, TotalsResponse{
@@ -426,14 +426,14 @@ func getPreviousMonth(ym string) string {
 	if month == 1 {
 		return strconv.Itoa(year-1) + "-12"
 	}
-	return strconv.Itoa(year) + "-" + strconv.Itoa(month-1)
+	return fmt.Sprintf("%d-%02d", year, month-1)
 }
 
 func getYearAgoMonth(ym string) string {
 	year, _ := strconv.Atoi(ym[:4])
 	month, _ := strconv.Atoi(ym[5:])
 	year -= 1
-	return strconv.Itoa(year) + "-" + strings.Repeat("0", 2-len(strconv.Itoa(month))) + strconv.Itoa(month)
+	return fmt.Sprintf("%d-%02d", year, month)
 }
 
 func computeNetWorthForMonth(userID string, database *db.DB, yearMonth string) int64 {

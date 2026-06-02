@@ -69,18 +69,31 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 										totals.moMChange >= 0 ? "text-theme" : "text-destructive"
 									}`}
 								>
-									{formatCurrency(totals.moMChange)} (
-									{formatPercent(totals.moMPercent)})
+									{formatPercent(totals.moMPercent)}
+									{totals.moMChange !== null ? (
+										<span className="text-sm text-muted-foreground">
+											{" "}
+											({formatCurrency(totals.moMChange)})
+										</span>
+									) : (
+										<span className="text-sm text-muted-foreground"> (no prior data)</span>
+									)}
 								</p>
 							</div>
 							<div>
 								<p className="text-sm text-muted-foreground">YoY Change</p>
 								<p
 									className={`text-xl ${
-										totals.yoYPercent >= 0 ? "text-theme" : "text-destructive"
+										totals.yoYPercent !== null && totals.yoYPercent >= 0
+											? "text-theme"
+											: "text-destructive"
 									}`}
 								>
-									{formatPercent(totals.yoYPercent)}
+									{totals.yoYPercent !== null ? (
+										formatPercent(totals.yoYPercent)
+									) : (
+										<span className="text-sm text-muted-foreground">no prior data</span>
+									)}
 								</p>
 							</div>
 						</div>
