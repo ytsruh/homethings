@@ -30,7 +30,7 @@ import {
 	type NotePriority,
 	updateNote,
 } from "~/lib/notes";
-import type { Route } from "./+types/index";
+import type { Route } from "./+types/single";
 
 export async function clientLoader({
 	params,
