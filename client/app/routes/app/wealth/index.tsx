@@ -245,7 +245,7 @@ export default function WealthPage({ loaderData }: Route.ComponentProps) {
 											Total Assets
 										</p>
 										<p className="text-2xl text-theme">
-											{formatCurrency(totals.totalAssets)}
+											{formatCurrency(totals.totalAssets ?? 0)}
 										</p>
 									</div>
 									<div>
@@ -253,13 +253,13 @@ export default function WealthPage({ loaderData }: Route.ComponentProps) {
 											Total Liabilities
 										</p>
 										<p className="text-2xl text-destructive">
-											{formatCurrency(totals.totalLiabilities)}
+											{formatCurrency(totals.totalLiabilities ?? 0)}
 										</p>
 									</div>
 									<div className="col-span-2 border-t pt-4">
 										<p className="text-sm text-muted-foreground">Net Worth</p>
 										<p className="text-3xl font-bold">
-											{formatCurrency(totals.netWorth)}
+											{formatCurrency(totals.netWorth ?? 0)}
 										</p>
 									</div>
 									<div>
@@ -267,25 +267,25 @@ export default function WealthPage({ loaderData }: Route.ComponentProps) {
 											Liquid Assets
 										</p>
 										<p className="text-xl">
-											{formatCurrency(totals.liquidAssets)}
+											{formatCurrency(totals.liquidAssets ?? 0)}
 										</p>
 									</div>
 									<div>
 										<p className="text-sm text-muted-foreground">Liquid %</p>
 										<p className="text-xl">
-											{totals.liquidPercent.toFixed(1)}%
+											{(totals.liquidPercent ?? 0).toFixed(1)}%
 										</p>
 									</div>
 									<div>
 										<p className="text-sm text-muted-foreground">MoM Change</p>
 										<p
 											className={`text-xl ${
-												totals.moMChange >= 0
+												(totals.moMChange ?? 0) >= 0
 													? "text-theme"
 													: "text-destructive"
 											}`}
 										>
-											{formatPercent(totals.moMPercent)}
+											{formatPercent(totals.moMPercent ?? 0)}
 											{totals.moMChange !== null ? (
 												<span className="text-sm text-muted-foreground">
 													{" "}
