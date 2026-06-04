@@ -41,8 +41,8 @@ export async function clientAction({
 
 	const name = formData.get("name") as string;
 	const type = formData.get("type") as "asset" | "liability";
-	const isLiquid = formData.get("isLiquid") === "true";
-	const isClosed = formData.get("isClosed") === "true";
+	const isLiquid = formData.get("isLiquid") === "on";
+	const isClosed = formData.get("isClosed") === "on";
 
 	if (!name?.trim()) {
 		return { error: "Name is required" };
