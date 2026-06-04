@@ -30,6 +30,7 @@ import {
 	type NotePriority,
 	updateNote,
 } from "~/lib/notes";
+import type { Route } from "./+types/single";
 
 export async function clientLoader({
 	params,
@@ -80,11 +81,7 @@ export async function clientAction({
 	return { success: false, error: "Unknown action" };
 }
 
-export default function NoteDetailPage({
-	loaderData,
-}: {
-	loaderData: Awaited<ReturnType<typeof clientLoader>>;
-}) {
+export default function NoteDetailPage({ loaderData }: Route.ComponentProps) {
 	const { note: initialNote, comments: initialComments } = loaderData;
 	const navigate = useNavigate();
 

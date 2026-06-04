@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-	Link,
-	useLoaderData,
-	useNavigate,
-	useSearchParams,
-} from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import PageHeader from "~/components/PageHeader";
 import { Badge } from "~/components/ui/badge";
@@ -35,6 +30,7 @@ import {
 	type Note,
 	type NotePriority,
 } from "~/lib/notes";
+import type { Route } from "./+types";
 
 export async function clientLoader({ request }: { request: Request }) {
 	const url = new URL(request.url);
@@ -51,8 +47,8 @@ export async function clientLoader({ request }: { request: Request }) {
 
 type FilterType = "incomplete" | "completed";
 
-export default function NotesPage() {
-	const initialData = useLoaderData<typeof clientLoader>();
+export default function NotesPage({ loaderData }: Route.ComponentProps) {
+	const initialData = loaderData;
 	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();
 	const [notes, setNotes] = useState<Note[]>(initialData.notes);

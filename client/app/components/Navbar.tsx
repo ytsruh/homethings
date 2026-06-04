@@ -5,6 +5,7 @@ import {
 	NotebookPen,
 	User as UserIcon,
 	UtensilsCrossed,
+	Wallet,
 	X,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -143,6 +144,11 @@ export const menuItems = [
 		title: "Recipes",
 		url: "/app/recipes",
 		icon: UtensilsCrossed,
+	},
+	{
+		title: "Wealth",
+		url: "/app/wealth",
+		icon: Wallet,
 	},
 	{
 		title: "Profile",

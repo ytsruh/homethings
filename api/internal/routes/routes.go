@@ -15,6 +15,7 @@ type Handler struct {
 	recipesCtrl        *controllers.RecipesController
 	notesCtrl          *controllers.NotesController
 	notesCommentsCtrl  *controllers.NotesCommentsController
+	wealthCtrl         *controllers.WealthController
 	authMw             *middleware.AuthMiddleware
 	jwtService         *utils.JWTService
 }
@@ -25,6 +26,7 @@ func NewHandler(database *db.DB, jwtService *utils.JWTService) *Handler {
 		recipesCtrl:        controllers.NewRecipesController(database),
 		notesCtrl:          controllers.NewNotesController(database),
 		notesCommentsCtrl:  controllers.NewNotesCommentsController(database),
+		wealthCtrl:         controllers.NewWealthController(database),
 		authMw:             middleware.NewAuthMiddleware(jwtService),
 		jwtService:         jwtService,
 	}
@@ -63,4 +65,14 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	api.DELETE("/notes/:id", h.notesCtrl.Delete)
 	api.POST("/notes/:id/comments", h.notesCommentsCtrl.Create)
 	api.DELETE("/notes/:id/comments/:commentId", h.notesCommentsCtrl.Delete)
+
+	// Wealth / Net Worth
+	api.GET("/wealth/accounts", h.wealthCtrl.ListAccounts)
+	api.POST("/wealth/accounts", h.wealthCtrl.CreateAccount)
+	api.PATCH("/wealth/accounts/:id", h.wealthCtrl.UpdateAccount)
+	api.DELETE("/wealth/accounts/:id", h.wealthCtrl.DeleteAccount)
+	api.GET("/wealth/values/:yearMonth", h.wealthCtrl.GetValuesByMonth)
+	api.PUT("/wealth/values", h.wealthCtrl.UpsertValue)
+	api.GET("/wealth/totals/:yearMonth", h.wealthCtrl.GetTotals)
+	api.GET("/wealth/all-months", h.wealthCtrl.GetAllMonthsData)
 }
