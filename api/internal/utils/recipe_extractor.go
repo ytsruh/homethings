@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const EXTRACTION_MODEL = "google/gemini-3-flash-preview"
+const EXTRACTION_MODEL = "openai/gpt-4o-mini"
 
 type Ingredient struct {
 	Name   string `json:"name"`
@@ -27,7 +27,7 @@ type ExtractedRecipe struct {
 }
 
 type OpenRouterMessage struct {
-	Role    string          `json:"role"`
+	Role    string              `json:"role"`
 	Content []OpenRouterContent `json:"content"`
 }
 
@@ -36,11 +36,16 @@ type OpenRouterContent struct {
 	Text string `json:"text,omitempty"`
 }
 
+type OpenRouterResponseFormat struct {
+	Type string `json:"type"`
+}
+
 type OpenRouterRequest struct {
-	Model    string                `json:"model"`
-	Messages []OpenRouterMessage  `json:"messages"`
-	MaxTokens int                  `json:"max_output_tokens,omitempty"`
-	Temperature float64           `json:"temperature,omitempty"`
+	Model          string                    `json:"model"`
+	Messages       []OpenRouterMessage       `json:"messages"`
+	MaxTokens      int                       `json:"max_output_tokens,omitempty"`
+	Temperature    float64                   `json:"temperature,omitempty"`
+	ResponseFormat *OpenRouterResponseFormat `json:"response_format,omitempty"`
 }
 
 type OpenRouterResponse struct {
@@ -63,15 +68,15 @@ func ExtractRecipeFromImage(imageDataURI string) (*ExtractedRecipe, error) {
 		return nil, fmt.Errorf("OpenRouter API key not configured")
 	}
 
-	systemPrompt := `You are a recipe extraction assistant. Analyze the provided image and extract all recipe information.
-Return a structured JSON response with the following fields:
-- title: The name of the recipe
-- description: A brief description (optional)
-- tags: Relevant tags for the recipe (e.g. 'breakfast', 'quick', 'vegetarian', 'dessert')
-- ingredients: List of ingredients with name and amount
-- steps: Ordered list of preparation steps
+	systemPrompt := `You are a recipe extraction assistant Your job is to review the image and extract the recipe information from the image. Do not guess what the recipe is, use only the image to extract the information. Analyze the provided image and extract all recipe information in a structured JSON format.
+	Return a structured JSON response with the following fields:
+	- title: The name of the recipe
+	- description: A brief description (optional)
+	- tags: Relevant tags for the recipe (e.g. 'breakfast', 'quick', 'vegetarian', 'dessert')
+	- ingredients: List of ingredients with name and amount
+	- steps: Ordered list of preparation steps
 
-IMPORTANT: Return ONLY a raw JSON object. Do NOT wrap it in markdown code fences. Do NOT include any prose, preamble, or explanation before or after the JSON. Your entire response must be parseable as JSON starting with { and ending with }.`
+	IMPORTANT: Return ONLY a raw JSON object. Do NOT wrap it in markdown code fences. Do NOT include any prose, preamble, or explanation before or after the JSON. Your entire response must be parseable as JSON starting with { and ending with }.`
 
 	reqBody := OpenRouterRequest{
 		Model: EXTRACTION_MODEL,
@@ -84,8 +89,9 @@ IMPORTANT: Return ONLY a raw JSON object. Do NOT wrap it in markdown code fences
 				},
 			},
 		},
-		MaxTokens: 4096,
-		Temperature: 0.3,
+		MaxTokens:      4096,
+		Temperature:    0.3,
+		ResponseFormat: &OpenRouterResponseFormat{Type: "json_object"},
 	}
 
 	jsonBody, err := json.Marshal(reqBody)
