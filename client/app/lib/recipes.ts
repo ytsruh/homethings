@@ -111,7 +111,7 @@ export async function extractRecipeFromImage(imageData: string): Promise<Recipe>
 
 	if (!response.ok) {
 		const error = await response.json().catch(() => ({}));
-		throw new Error(error.error || "Failed to extract recipe from image");
+		throw new Error(error.message || "Failed to extract recipe from image");
 	}
 
 	const text = await response.text();

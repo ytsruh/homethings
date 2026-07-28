@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
+	"strings"
 	"time"
 )
 
@@ -69,7 +71,7 @@ Return a structured JSON response with the following fields:
 - ingredients: List of ingredients with name and amount
 - steps: Ordered list of preparation steps
 
-IMPORTANT: Return ONLY valid JSON matching this schema. No markdown code blocks, no explanations, just the raw JSON object.`
+IMPORTANT: Return ONLY a raw JSON object. Do NOT wrap it in markdown code fences. Do NOT include any prose, preamble, or explanation before or after the JSON. Your entire response must be parseable as JSON starting with { and ending with }.`
 
 	reqBody := OpenRouterRequest{
 		Model: EXTRACTION_MODEL,
@@ -120,12 +122,38 @@ IMPORTANT: Return ONLY valid JSON matching this schema. No markdown code blocks,
 	}
 
 	content := openRouterResp.Choices[0].Message.Content
-	content = string(bytes.Trim([]byte(content), "\"")) // Remove surrounding quotes if any
+	extracted, err := extractJSONObject(content)
+	if err != nil {
+		snippet := content
+		if len(snippet) > 200 {
+			snippet = snippet[:200] + "..."
+		}
+		return nil, fmt.Errorf("failed to parse extracted recipe: %w (raw: %q)", err, snippet)
+	}
 
 	var recipe ExtractedRecipe
-	if err := json.Unmarshal([]byte(content), &recipe); err != nil {
+	if err := json.Unmarshal([]byte(extracted), &recipe); err != nil {
 		return nil, fmt.Errorf("failed to parse extracted recipe: %w", err)
 	}
 
 	return &recipe, nil
+}
+
+var markdownFenceRe = regexp.MustCompile("(?s)```(?:json)?\\s*(.*?)\\s*```")
+
+func extractJSONObject(content string) (string, error) {
+	trimmed := strings.TrimSpace(content)
+	trimmed = strings.Trim(trimmed, "\"'`")
+
+	if m := markdownFenceRe.FindStringSubmatch(trimmed); m != nil {
+		trimmed = strings.TrimSpace(m[1])
+	}
+
+	start := strings.Index(trimmed, "{")
+	end := strings.LastIndex(trimmed, "}")
+	if start == -1 || end == -1 || end <= start {
+		return "", fmt.Errorf("no JSON object found in response")
+	}
+
+	return trimmed[start : end+1], nil
 }

@@ -173,26 +173,21 @@ export default function RecipesPage({ loaderData }: Route.ComponentProps) {
 		setExtracting(true);
 
 		try {
-			const reader = new FileReader();
-			reader.onload = async (event) => {
-				const base64 = event.target?.result as string;
-				const recipe = await extractRecipeFromImage(base64);
-				toast({
-					title: "Success",
-					description: `Recipe "${recipe.title}" created from image`,
-				});
-				setExtractOpen(false);
-				navigate(`/app/recipes/${recipe.id}`);
-			};
-			reader.onerror = () => {
-				toast({
-					title: "Error",
-					description: "Failed to read image file",
-					type: "destructive",
-				});
-				setExtracting(false);
-			};
-			reader.readAsDataURL(file);
+			const base64 = await new Promise<string>((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onload = () => resolve(reader.result as string);
+				reader.onerror = () =>
+					reject(new Error("Failed to read image file"));
+				reader.readAsDataURL(file);
+			});
+
+			const recipe = await extractRecipeFromImage(base64);
+			toast({
+				title: "Success",
+				description: `Recipe "${recipe.title}" created from image`,
+			});
+			setExtractOpen(false);
+			navigate(`/app/recipes/${recipe.id}`);
 		} catch (error) {
 			console.error("Failed to extract recipe:", error);
 			toast({
