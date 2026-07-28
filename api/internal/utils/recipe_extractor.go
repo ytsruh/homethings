@@ -31,9 +31,14 @@ type OpenRouterMessage struct {
 	Content []OpenRouterContent `json:"content"`
 }
 
+type OpenRouterImageURL struct {
+	URL string `json:"url"`
+}
+
 type OpenRouterContent struct {
-	Type string `json:"type"`
-	Text string `json:"text,omitempty"`
+	Type     string             `json:"type"`
+	Text     string             `json:"text,omitempty"`
+	ImageURL *OpenRouterImageURL `json:"image_url,omitempty"`
 }
 
 type OpenRouterResponseFormat struct {
@@ -68,13 +73,15 @@ func ExtractRecipeFromImage(imageDataURI string) (*ExtractedRecipe, error) {
 		return nil, fmt.Errorf("OpenRouter API key not configured")
 	}
 
-	systemPrompt := `You are a recipe extraction assistant Your job is to review the image and extract the recipe information from the image. Do not guess what the recipe is, use only the image to extract the information. Analyze the provided image and extract all recipe information in a structured JSON format.
+	systemPrompt := `You are a recipe extraction assistant. Your job is to review the image and extract the recipe information from the image. Do not guess what the recipe is, use only the image to extract the information. Analyze the provided image and extract all recipe information in a structured JSON format.
 	Return a structured JSON response with the following fields:
 	- title: The name of the recipe
 	- description: A brief description (optional)
 	- tags: Relevant tags for the recipe (e.g. 'breakfast', 'quick', 'vegetarian', 'dessert')
 	- ingredients: List of ingredients with name and amount
 	- steps: Ordered list of preparation steps
+
+	If the image does not clearly show a recipe, is unreadable, or contains no ingredients or steps, return exactly this object and nothing else: {"title": "", "description": "", "tags": [], "ingredients": [], "steps": []}. Never invent a recipe that is not visible in the image.
 
 	IMPORTANT: Return ONLY a raw JSON object. Do NOT wrap it in markdown code fences. Do NOT include any prose, preamble, or explanation before or after the JSON. Your entire response must be parseable as JSON starting with { and ending with }.`
 
@@ -85,7 +92,7 @@ func ExtractRecipeFromImage(imageDataURI string) (*ExtractedRecipe, error) {
 				Role: "user",
 				Content: []OpenRouterContent{
 					{Type: "text", Text: systemPrompt},
-					{Type: "image", Text: imageDataURI},
+					{Type: "image_url", ImageURL: &OpenRouterImageURL{URL: imageDataURI}},
 				},
 			},
 		},
