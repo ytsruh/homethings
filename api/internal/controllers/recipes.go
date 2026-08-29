@@ -47,7 +47,7 @@ type RecipeResponse struct {
 
 type CreateRecipeRequest struct {
 	Title       string       `json:"title" validate:"required"`
-	Description *string     `json:"description"`
+	Description *string      `json:"description"`
 	Tags        []string     `json:"tags"`
 	Ingredients []Ingredient `json:"ingredients"`
 	Steps       []string     `json:"steps"`
@@ -55,12 +55,12 @@ type CreateRecipeRequest struct {
 }
 
 type UpdateRecipeRequest struct {
-	Title       *string      `json:"title"`
-	Description *string      `json:"description"`
-	Tags        []string     `json:"tags"`
-	Ingredients []Ingredient `json:"ingredients"`
-	Steps       []string     `json:"steps"`
-	ImageKey    *string      `json:"imageKey"`
+	Title       *string         `json:"title"`
+	Description *string         `json:"description"`
+	Tags        []string        `json:"tags"`
+	Ingredients []Ingredient    `json:"ingredients"`
+	Steps       []string        `json:"steps"`
+	ImageKey    json.RawMessage `json:"imageKey"`
 }
 
 type ExtractRecipeRequest struct {
@@ -300,11 +300,24 @@ func (ctrl *RecipesController) Update(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"message": "Recipe not found"})
 	}
 
-	if req.ImageKey == nil && existing.ImageKey.Valid {
-		imageKeyStr := existing.ImageKey.String
-		if imageKeyStr != "" {
-			_ = utils.DeleteObject(imageKeyStr)
+	imageKey := existing.ImageKey
+	trimmedImageKey := strings.TrimSpace(string(req.ImageKey))
+	switch {
+	case len(req.ImageKey) == 0:
+	case trimmedImageKey == "null":
+		if existing.ImageKey.Valid && existing.ImageKey.String != "" {
+			_ = utils.DeleteObject(existing.ImageKey.String)
 		}
+		imageKey = sql.NullString{}
+	default:
+		var newImageKey string
+		if err := json.Unmarshal(req.ImageKey, &newImageKey); err != nil || newImageKey == "" {
+			return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid image key"})
+		}
+		if existing.ImageKey.Valid && existing.ImageKey.String != "" && existing.ImageKey.String != newImageKey {
+			_ = utils.DeleteObject(existing.ImageKey.String)
+		}
+		imageKey = sql.NullString{String: newImageKey, Valid: true}
 	}
 
 	title := existing.Title
@@ -333,11 +346,6 @@ func (ctrl *RecipesController) Update(c echo.Context) error {
 	if req.Steps != nil {
 		stepsJSON, _ := json.Marshal(req.Steps)
 		steps = sql.NullString{String: string(stepsJSON), Valid: true}
-	}
-
-	imageKey := existing.ImageKey
-	if req.ImageKey != nil {
-		imageKey = utils.StringToNullStringPtr(req.ImageKey)
 	}
 
 	now := time.Now().Unix()
@@ -425,7 +433,7 @@ func (ctrl *RecipesController) GetUploadURL(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]string{
-		"imageKey":    imageKey,
+		"imageKey":     imageKey,
 		"presignedUrl": presignedURL,
 	})
 }
