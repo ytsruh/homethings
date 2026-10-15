@@ -24,6 +24,7 @@ export default [
       route("logout", "routes/app/logout.tsx"),
       route("notes", "routes/app/notes/index.tsx"),
       route("notes/:noteId", "routes/app/notes/single.tsx"),
+      route("chat", "routes/app/chat.tsx"),
       route("recipes", "routes/app/recipes/index.tsx"),
       route("recipes/:recipeId", "routes/app/recipes/single.tsx"),
       route("recipes/:recipeId/edit", "routes/app/recipes/edit.tsx"),

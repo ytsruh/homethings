@@ -2,6 +2,7 @@ import {
 	Home,
 	House,
 	Menu,
+	MessageSquare,
 	NotebookPen,
 	User as UserIcon,
 	UtensilsCrossed,
@@ -138,6 +139,11 @@ export const menuItems = [
 		title: "Notes",
 		url: "/app/notes",
 		icon: NotebookPen,
+	},
+	{
+		title: "Chat",
+		url: "/app/chat",
+		icon: MessageSquare,
 	},
 	{
 		title: "Recipes",
