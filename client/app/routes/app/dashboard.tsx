@@ -1,25 +1,6 @@
 import PageHeader from "~/components/PageHeader";
-import {
-	formatCurrency,
-	formatPercent,
-	getCurrentYearMonth,
-} from "~/lib/utils";
-import { getTotals } from "~/lib/wealth";
-import type { Route } from "./+types/dashboard";
 
-export async function clientLoader(_: Route.ClientLoaderArgs) {
-	try {
-		const totals = await getTotals(getCurrentYearMonth());
-		return { totals };
-	} catch (error) {
-		console.error("Failed to load wealth totals:", error);
-		return { totals: null };
-	}
-}
-
-export default function Dashboard({ loaderData }: Route.ComponentProps) {
-	const { totals } = loaderData;
-
+export default function Dashboard() {
 	return (
 		<>
 			<title>Dashboard | Homethings</title>
@@ -29,76 +10,6 @@ export default function Dashboard({ loaderData }: Route.ComponentProps) {
 					title="Dashboard"
 					subtitle="Welcome to Homethings"
 				></PageHeader>
-
-				{totals && (
-					<div className="border rounded-lg p-4 bg-muted/50">
-						<h3 className="text-lg font-semibold mb-4">Wealth Summary</h3>
-						<div className="grid grid-cols-2 gap-4">
-							<div>
-								<p className="text-sm text-muted-foreground">Total Assets</p>
-								<p className="text-2xl text-theme">
-									{formatCurrency(totals.totalAssets ?? 0)}
-								</p>
-							</div>
-							<div>
-								<p className="text-sm text-muted-foreground">
-									Total Liabilities
-								</p>
-								<p className="text-2xl text-destructive">
-									{formatCurrency(totals.totalLiabilities ?? 0)}
-								</p>
-							</div>
-							<div className="col-span-2 border-t pt-4">
-								<p className="text-sm text-muted-foreground">Net Worth</p>
-								<p className="text-3xl font-bold">
-									{formatCurrency(totals.netWorth ?? 0)}
-								</p>
-							</div>
-							<div>
-								<p className="text-sm text-muted-foreground">Liquid Assets</p>
-								<p className="text-xl">{formatCurrency(totals.liquidAssets ?? 0)}</p>
-							</div>
-							<div>
-								<p className="text-sm text-muted-foreground">Liquid %</p>
-								<p className="text-xl">{(totals.liquidPercent ?? 0).toFixed(1)}%</p>
-							</div>
-							<div>
-								<p className="text-sm text-muted-foreground">MoM Change</p>
-								<p
-									className={`text-xl ${
-										(totals.moMChange ?? 0) >= 0 ? "text-theme" : "text-destructive"
-									}`}
-								>
-									{formatPercent(totals.moMPercent ?? 0)}
-									{totals.moMChange !== null ? (
-										<span className="text-sm text-muted-foreground">
-											{" "}
-											({formatCurrency(totals.moMChange)})
-										</span>
-									) : (
-										<span className="text-sm text-muted-foreground"> (no prior data)</span>
-									)}
-								</p>
-							</div>
-							<div>
-								<p className="text-sm text-muted-foreground">YoY Change</p>
-								<p
-									className={`text-xl ${
-										totals.yoYPercent !== null && totals.yoYPercent >= 0
-											? "text-theme"
-											: "text-destructive"
-									}`}
-								>
-									{totals.yoYPercent !== null ? (
-										formatPercent(totals.yoYPercent)
-									) : (
-										<span className="text-sm text-muted-foreground">no prior data</span>
-									)}
-								</p>
-							</div>
-						</div>
-					</div>
-				)}
 			</div>
 		</>
 	);
