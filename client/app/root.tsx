@@ -47,7 +47,27 @@ export function Layout({ children }: { children: React.ReactNode }) {
 					sizes="96x96"
 					href="/favicon-96x96.png"
 				/>
-				<meta name="theme-color" content="#ffffff" />
+				<meta
+					name="theme-color"
+					media="(prefers-color-scheme: light)"
+					content="#ffffff"
+				/>
+				<meta
+					name="theme-color"
+					media="(prefers-color-scheme: dark)"
+					content="#09090b"
+				/>
+				{/* Blocking theme script: runs before first paint so the statically-served
+			    SPA fallback (__spa-fallback.html) and pre-hydration HTML already carry
+			    the correct `.dark` class. Without this, the page paints white and only
+			    flips to dark later in ThemeProvider's useEffect (white FOUC / spinner
+			    flash on /app first load). Logic mirrors ThemeProvider (ui-theme,
+			    default dark, system support). */}
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `try{var s=localStorage.getItem("ui-theme")||"dark";var t=s==="system"?(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"):s;var d=document.documentElement;d.classList.remove("light","dark");d.classList.add(t);d.style.colorScheme=t;var m=document.querySelector('meta[name="theme-color"][media="(prefers-color-scheme: dark)"]');if(t==="dark"&&m){m.setAttribute("content","#09090b");}}catch(e){}`,
+					}}
+				/>
 			</head>
 			<body>
 				{children}
@@ -70,7 +90,7 @@ export default function App() {
 
 export function HydrateFallback() {
 	return (
-		<div className="flex items-center justify-center h-screen">
+		<div className="flex min-h-screen items-center justify-center bg-background text-foreground">
 			<LoadingSpinner />
 		</div>
 	);

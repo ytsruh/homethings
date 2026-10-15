@@ -4,7 +4,7 @@ import { toast } from "~/components/Toaster";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { getCurrentUser, type User, updateUser } from "~/lib/auth";
+import { getCurrentUser, setCachedUser, type User, updateUser } from "~/lib/auth";
 import type { Route } from "./+types/profile";
 
 export async function clientLoader(_args: Route.ClientLoaderArgs) {
@@ -21,6 +21,8 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
 	try {
 		await updateUser({ name: name || undefined });
+		const { user } = await getCurrentUser();
+		setCachedUser(user);
 		toast({ title: "Success", description: "Profile updated successfully" });
 		return { ok: true };
 	} catch (error) {
