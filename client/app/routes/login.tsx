@@ -19,7 +19,7 @@ export async function clientAction({ request }: { request: Request }) {
 		return redirect("/app");
 	} catch (error) {
 		if (error instanceof ZodError) {
-			const message = error.errors[0]?.message || "Validation error";
+			const message = error.issues[0]?.message || "Validation error";
 			toast({ title: "Error", description: message, type: "destructive" });
 			return { error: message };
 		}
