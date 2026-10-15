@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -16,6 +18,8 @@ func CORS() echo.MiddlewareFunc {
 			if origin == "" {
 				allowedOrigin = "https://www.ytsruh.com"
 			} else if strings.HasPrefix(origin, "http://localhost") {
+				allowedOrigin = origin
+			} else if isLocalNetworkOrigin(origin) {
 				allowedOrigin = origin
 			} else if strings.Contains(origin, "ytsruh.workers.dev") {
 				allowedOrigin = origin
@@ -35,4 +39,26 @@ func CORS() echo.MiddlewareFunc {
 			return next(c)
 		}
 	}
+}
+
+// isLocalNetworkOrigin reports whether the origin URL points at loopback or a
+// private LAN address (10/8, 172.16/12, 192.168/16, IPv6 unique-local). This
+// lets dev builds served on the local network make credentialed API calls.
+func isLocalNetworkOrigin(origin string) bool {
+	u, err := url.Parse(origin)
+	if err != nil {
+		return false
+	}
+	if u.Scheme != "http" && u.Scheme != "https" {
+		return false
+	}
+	host := u.Hostname()
+	if host == "localhost" {
+		return true
+	}
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return false
+	}
+	return ip.IsLoopback() || ip.IsPrivate()
 }

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"ytsruh.com/homethings/internal/ai"
 	"ytsruh.com/homethings/internal/controllers"
 	"ytsruh.com/homethings/internal/db"
 	"ytsruh.com/homethings/internal/middleware"
@@ -11,22 +12,24 @@ import (
 )
 
 type Handler struct {
-	authCtrl           *controllers.AuthController
-	recipesCtrl        *controllers.RecipesController
-	notesCtrl          *controllers.NotesController
-	notesCommentsCtrl  *controllers.NotesCommentsController
-	authMw             *middleware.AuthMiddleware
-	jwtService         *utils.JWTService
+	authCtrl          *controllers.AuthController
+	recipesCtrl       *controllers.RecipesController
+	notesCtrl         *controllers.NotesController
+	notesCommentsCtrl *controllers.NotesCommentsController
+	aiCtrl            *ai.Handler
+	authMw            *middleware.AuthMiddleware
+	jwtService        *utils.JWTService
 }
 
 func NewHandler(database *db.DB, jwtService *utils.JWTService) *Handler {
 	return &Handler{
-		authCtrl:           controllers.NewAuthController(database, jwtService),
-		recipesCtrl:        controllers.NewRecipesController(database),
-		notesCtrl:          controllers.NewNotesController(database),
-		notesCommentsCtrl:  controllers.NewNotesCommentsController(database),
-		authMw:             middleware.NewAuthMiddleware(jwtService),
-		jwtService:         jwtService,
+		authCtrl:          controllers.NewAuthController(database, jwtService),
+		recipesCtrl:       controllers.NewRecipesController(database),
+		notesCtrl:         controllers.NewNotesController(database),
+		notesCommentsCtrl: controllers.NewNotesCommentsController(database),
+		aiCtrl:            ai.NewHandler(),
+		authMw:            middleware.NewAuthMiddleware(jwtService),
+		jwtService:        jwtService,
 	}
 }
 
@@ -63,4 +66,7 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	api.DELETE("/notes/:id", h.notesCtrl.Delete)
 	api.POST("/notes/:id/comments", h.notesCommentsCtrl.Create)
 	api.DELETE("/notes/:id/comments/:commentId", h.notesCommentsCtrl.Delete)
+
+	api.POST("/chat", h.aiCtrl.Chat)
+	api.GET("/chat/models", h.aiCtrl.Models)
 }

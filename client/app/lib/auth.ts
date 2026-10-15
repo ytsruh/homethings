@@ -26,6 +26,15 @@ interface AuthError {
   message?: string;
 }
 
+export class AuthHttpError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "AuthHttpError";
+    this.status = status;
+  }
+}
+
 function getAuthUrl(endpoint: string): string {
   return `${API_BASE_URL}${endpoint}`;
 }
@@ -36,9 +45,70 @@ async function handleResponse<T>(response: Response): Promise<T> {
       error: "An unexpected error occurred",
       message: "An unexpected error occurred",
     }))) as AuthError;
-    throw new Error(error.error || error.message || "Request failed");
+    throw new AuthHttpError(
+      response.status,
+      error.error || error.message || "Request failed",
+    );
   }
   return response.json() as Promise<T>;
+}
+
+// Short-lived session snapshot of the authenticated user. sessionStorage (not
+// localStorage) so the snapshot dies with the tab/browser and can never leak
+// to the next user of a shared device. The HttpOnly auth cookie remains the
+// source of truth; this only avoids blocking first paint on a network fetch.
+const USER_CACHE_KEY = "ht:user-cache:v1";
+const USER_CACHE_TTL_MS = 5 * 60 * 1000;
+
+interface CachedUser {
+  user: User;
+  fetchedAt: number;
+}
+
+function readCache(): CachedUser | null {
+  try {
+    if (typeof sessionStorage === "undefined") return null;
+    const raw = sessionStorage.getItem(USER_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as CachedUser;
+    if (!parsed?.user?.id || typeof parsed.fetchedAt !== "number") {
+      sessionStorage.removeItem(USER_CACHE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function getCachedUser(): { user: User; fresh: boolean } | null {
+  const cached = readCache();
+  if (!cached) return null;
+  return {
+    user: cached.user,
+    fresh: Date.now() - cached.fetchedAt < USER_CACHE_TTL_MS,
+  };
+}
+
+export function setCachedUser(user: User): void {
+  try {
+    if (typeof sessionStorage === "undefined") return;
+    sessionStorage.setItem(
+      USER_CACHE_KEY,
+      JSON.stringify({ user, fetchedAt: Date.now() } satisfies CachedUser),
+    );
+  } catch {
+    // Storage full or unavailable (private mode) — caching is best-effort.
+  }
+}
+
+export function clearCachedUser(): void {
+  try {
+    if (typeof sessionStorage === "undefined") return;
+    sessionStorage.removeItem(USER_CACHE_KEY);
+  } catch {
+    // Ignore — see above.
+  }
 }
 
 export async function login(
@@ -54,14 +124,20 @@ export async function login(
     body: JSON.stringify({ email, password }),
   });
 
-  return handleResponse<LoginResponse>(response);
+  const result = await handleResponse<LoginResponse>(response);
+  setCachedUser(result.user);
+  return result;
 }
 
 export async function logout(): Promise<void> {
-  await fetch(getAuthUrl("/auth/logout"), {
-    method: "POST",
-    credentials: "include",
-  });
+  try {
+    await fetch(getAuthUrl("/auth/logout"), {
+      method: "POST",
+      credentials: "include",
+    });
+  } finally {
+    clearCachedUser();
+  }
 }
 
 export async function getCurrentUser(): Promise<{ user: User }> {
@@ -71,15 +147,6 @@ export async function getCurrentUser(): Promise<{ user: User }> {
   });
 
   return handleResponse<{ user: User }>(response);
-}
-
-export async function checkAuth(): Promise<User | null> {
-  try {
-    const { user } = await getCurrentUser();
-    return user;
-  } catch {
-    return null;
-  }
 }
 
 export interface UpdateUserRequest {

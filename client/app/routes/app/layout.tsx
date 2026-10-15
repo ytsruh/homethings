@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
 	Link,
 	Outlet,
 	redirect,
 	useLoaderData,
 	useNavigation,
+	useRevalidator,
 } from "react-router";
 import { BreadcrumbNav } from "~/components/BreadcrumbNav";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
@@ -22,20 +23,80 @@ import {
 	SidebarProvider,
 } from "~/components/ui/sidebar";
 import { AuthProvider } from "~/hooks/use-auth";
-import { checkAuth } from "~/lib/auth";
+import {
+	AuthHttpError,
+	clearCachedUser,
+	getCachedUser,
+	getCurrentUser,
+	setCachedUser,
+} from "~/lib/auth";
 
 export async function clientLoader() {
-	const user = await checkAuth();
-	if (!user) {
+	// Cache-first: a fresh snapshot resolves synchronously so first paint never
+	// waits on the network. Stale snapshots also resolve synchronously and are
+	// refreshed in the background by AppLayout. Only a definitive 401 clears the
+	// cache and redirects; other failures (offline, 5xx) keep stale data.
+	const cached = getCachedUser();
+	if (cached?.fresh) {
+		return { user: cached.user, stale: false };
+	}
+	try {
+		const { user } = await getCurrentUser();
+		setCachedUser(user);
+		return { user, stale: false };
+	} catch (error) {
+		if (error instanceof AuthHttpError && error.status === 401) {
+			clearCachedUser();
+			throw redirect("/login");
+		}
+		if (cached) {
+			return { user: cached.user, stale: true };
+		}
 		throw redirect("/login");
 	}
-	return { user };
+}
+
+export function HydrateFallback() {
+	return (
+		<div className="flex min-h-screen flex-col bg-background text-foreground">
+			<div className="h-14 border-b border-border" />
+			<div className="flex flex-1 items-center justify-center">
+				<LoadingSpinner />
+			</div>
+		</div>
+	);
 }
 
 export default function AppLayout() {
-	const { user } = useLoaderData<typeof clientLoader>();
+	const { user, stale } = useLoaderData<typeof clientLoader>();
 	const navigation = useNavigation();
+	const revalidator = useRevalidator();
 	const isNavigating = Boolean(navigation.location);
+	// One background refresh per page while the snapshot is stale. Guarded by
+	// location key so offline retries can't loop; revalidation never suspends
+	// the visible UI.
+	const revalidatedFor = useRef<string | null>(null);
+
+	useEffect(() => {
+		const key = navigation.location?.key ?? "initial";
+		if (stale && revalidatedFor.current !== key && revalidator.state === "idle") {
+			revalidatedFor.current = key;
+			revalidator.revalidate();
+		}
+	}, [stale, navigation.location?.key, revalidator]);
+
+	// After sleep or a hidden tab, the snapshot may have expired while away.
+	// Refresh on return to foreground instead of on a timer.
+	useEffect(() => {
+		const onVisible = () => {
+			if (document.visibilityState !== "visible") return;
+			if (revalidator.state !== "idle") return;
+			const cached = getCachedUser();
+			if (!cached || !cached.fresh) revalidator.revalidate();
+		};
+		document.addEventListener("visibilitychange", onVisible);
+		return () => document.removeEventListener("visibilitychange", onVisible);
+	}, [revalidator]);
 
 	useEffect(() => {
 		if (!("ontouchstart" in window)) return;
@@ -96,15 +157,15 @@ export default function AppLayout() {
 								</Sidebar>
 								<div
 									data-pull-prevent
-									className="p-1 md:p-2 w-full h-full overflow-y-auto"
+									className="relative p-1 md:p-2 w-full h-full overflow-y-auto"
 								>
-									{isNavigating ? (
-										<div className="flex items-center justify-center h-full">
-											<LoadingSpinner />
-										</div>
-									) : (
-										<Outlet />
+									{isNavigating && (
+										<div
+											aria-hidden
+											className="pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 animate-pulse bg-theme"
+										/>
 									)}
+									<Outlet />
 								</div>
 							</div>
 						</div>
