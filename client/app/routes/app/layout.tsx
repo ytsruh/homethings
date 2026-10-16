@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	Link,
 	Outlet,
@@ -71,7 +71,22 @@ export default function AppLayout() {
 	const { user, stale } = useLoaderData<typeof clientLoader>();
 	const navigation = useNavigation();
 	const revalidator = useRevalidator();
-	const isNavigating = Boolean(navigation.location);
+	// Non-blocking indicator only: keep <Outlet/> mounted so loader
+	// revalidations (path changes AND search-param-only changes like
+	// ?tag= / ?filter=) never flash/unmount page content.
+	const isLoading = navigation.state === "loading";
+	// Delay the bar so fast navigations (<250ms) never flash it at all.
+	// Only genuinely slow loader transitions show an indicator.
+	const [showBar, setShowBar] = useState(false);
+
+	useEffect(() => {
+		if (!isLoading) {
+			setShowBar(false);
+			return;
+		}
+		const t = setTimeout(() => setShowBar(true), 250);
+		return () => clearTimeout(t);
+	}, [isLoading]);
 	// One background refresh per page while the snapshot is stale. Guarded by
 	// location key so offline retries can't loop; revalidation never suspends
 	// the visible UI.
@@ -79,7 +94,11 @@ export default function AppLayout() {
 
 	useEffect(() => {
 		const key = navigation.location?.key ?? "initial";
-		if (stale && revalidatedFor.current !== key && revalidator.state === "idle") {
+		if (
+			stale &&
+			revalidatedFor.current !== key &&
+			revalidator.state === "idle"
+		) {
 			revalidatedFor.current = key;
 			revalidator.revalidate();
 		}
@@ -159,12 +178,14 @@ export default function AppLayout() {
 									data-pull-prevent
 									className="relative p-1 md:p-2 w-full h-full overflow-y-auto"
 								>
-									{isNavigating && (
-										<div
-											aria-hidden
-											className="pointer-events-none absolute inset-x-0 top-0 z-50 h-0.5 animate-pulse bg-theme"
-										/>
-									)}
+									<div
+										aria-hidden={!showBar}
+										className={`pointer-events-none absolute top-0 right-0 left-0 z-10 h-0.5 overflow-hidden transition-opacity duration-150 ${
+											showBar ? "opacity-100" : "opacity-0"
+										}`}
+									>
+										<div className="h-full w-full origin-left animate-pulse bg-muted-foreground/40" />
+									</div>
 									<Outlet />
 								</div>
 							</div>
