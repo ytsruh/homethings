@@ -157,8 +157,13 @@ export default function RecipeEditPage({ loaderData }: Route.ComponentProps) {
 			<Form method="post">
 				<div className="space-y-6">
 					<div className="flex items-center justify-between">
-						<Button variant="ghost" size="sm" asChild>
-							<Link to={`/app/recipes/${recipe.id}`}>&#8592; Back</Link>
+						<Button
+							variant="ghost"
+							size="sm"
+							render={<Link to={`/app/recipes/${recipe.id}`} />}
+							nativeButton={false}
+						>
+							&#8592; Back
 						</Button>
 						<Button type="submit" disabled={isSubmitting}>
 							{isSubmitting ? "Saving..." : "Save"}

@@ -16,6 +16,7 @@ type Handler struct {
 	recipesCtrl       *controllers.RecipesController
 	notesCtrl         *controllers.NotesController
 	notesCommentsCtrl *controllers.NotesCommentsController
+	statsCtrl         *controllers.StatsController
 	aiCtrl            *ai.Handler
 	authMw            *middleware.AuthMiddleware
 	jwtService        *utils.JWTService
@@ -27,7 +28,8 @@ func NewHandler(database *db.DB, jwtService *utils.JWTService) *Handler {
 		recipesCtrl:       controllers.NewRecipesController(database),
 		notesCtrl:         controllers.NewNotesController(database),
 		notesCommentsCtrl: controllers.NewNotesCommentsController(database),
-		aiCtrl:            ai.NewHandler(),
+		statsCtrl:         controllers.NewStatsController(database),
+		aiCtrl:            ai.NewHandler(database),
 		authMw:            middleware.NewAuthMiddleware(jwtService),
 		jwtService:        jwtService,
 	}
@@ -67,6 +69,15 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 	api.POST("/notes/:id/comments", h.notesCommentsCtrl.Create)
 	api.DELETE("/notes/:id/comments/:commentId", h.notesCommentsCtrl.Delete)
 
+	api.GET("/stats", h.statsCtrl.Summary)
+
 	api.POST("/chat", h.aiCtrl.Chat)
 	api.GET("/chat/models", h.aiCtrl.Models)
+	api.POST("/chat/sessions", h.aiCtrl.CreateSession)
+	api.GET("/chat/sessions", h.aiCtrl.ListSessions)
+	api.GET("/chat/usage", h.aiCtrl.UsageSummary)
+	api.GET("/chat/usage/daily", h.aiCtrl.DailyUsage)
+	api.GET("/chat/sessions/:id", h.aiCtrl.GetSession)
+	api.PATCH("/chat/sessions/:id", h.aiCtrl.RenameSession)
+	api.DELETE("/chat/sessions/:id", h.aiCtrl.DeleteSession)
 }

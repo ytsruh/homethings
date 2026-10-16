@@ -176,8 +176,7 @@ export default function RecipesPage({ loaderData }: Route.ComponentProps) {
 			const base64 = await new Promise<string>((resolve, reject) => {
 				const reader = new FileReader();
 				reader.onload = () => resolve(reader.result as string);
-				reader.onerror = () =>
-					reject(new Error("Failed to read image file"));
+				reader.onerror = () => reject(new Error("Failed to read image file"));
 				reader.readAsDataURL(file);
 			});
 
@@ -235,11 +234,9 @@ export default function RecipesPage({ loaderData }: Route.ComponentProps) {
 							onChange={handleExtractFromImage}
 						/>
 						<Dialog>
-							<DialogTrigger asChild>
-								<Button>
-									<Plus className="h-4 w-4 mr-2" />
-									New Recipe
-								</Button>
+							<DialogTrigger render={<Button />}>
+								<Plus className="h-4 w-4 mr-2" />
+								New Recipe
 							</DialogTrigger>
 							<DialogContent>
 								<DialogHeader>
@@ -296,8 +293,8 @@ export default function RecipesPage({ loaderData }: Route.ComponentProps) {
 										/>
 									</div>
 									<DialogFooter>
-										<DialogClose asChild>
-											<Button variant="outline">Cancel</Button>
+										<DialogClose render={<Button variant="outline" />}>
+											Cancel
 										</DialogClose>
 										<Button type="submit" disabled={fetcher.state !== "idle"}>
 											{fetcher.state !== "idle" ? "Creating..." : "Create"}

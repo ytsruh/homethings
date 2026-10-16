@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
@@ -50,6 +51,7 @@ function getPageTitle(pathname: string): string {
 		notes: "Notes",
 		recipes: "Recipes",
 		profile: "Profile",
+		usage: "Usage",
 		feedback: "Feedback",
 	};
 
@@ -80,34 +82,43 @@ export function Navbar({ user }: NavbarProps) {
 				<div className="ml-auto flex items-center space-x-4">
 					<ModeToggle />
 					<DropdownMenu>
-						<DropdownMenuTrigger asChild className="hover:cursor-pointer">
-							<Avatar>
-								<AvatarImage alt={user.name} />
-								<AvatarFallback>
-									{user.name
-										.split(" ")
-										.map((n) => n[0])
-										.join("")
-										.toUpperCase()
-										.slice(0, 2)}
-								</AvatarFallback>
-							</Avatar>
+						<DropdownMenuTrigger
+							render={<Avatar />}
+							nativeButton={false}
+							className="hover:cursor-pointer"
+						>
+							<AvatarImage alt={user.name} />
+							<AvatarFallback>
+								{user.name
+									.split(" ")
+									.map((n) => n[0])
+									.join("")
+									.toUpperCase()
+									.slice(0, 2)}
+							</AvatarFallback>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="min-w-[12rem]">
-							<DropdownMenuLabel>
-								<div className="flex flex-col space-y-1">
-									<p className="text-sm font-medium leading-none">
-										{user.name}
-									</p>
-									<p className="text-xs leading-none text-muted-foreground">
-										{user.email}
-									</p>
-								</div>
-							</DropdownMenuLabel>
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>
+									<div className="flex flex-col space-y-1">
+										<p className="text-sm font-medium leading-none">
+											{user.name}
+										</p>
+										<p className="text-xs leading-none text-muted-foreground">
+											{user.email}
+										</p>
+									</div>
+								</DropdownMenuLabel>
+							</DropdownMenuGroup>
 							<DropdownMenuSeparator />
 							<Link to="/app/profile">
 								<DropdownMenuItem className="hover:cursor-pointer">
 									Profile
+								</DropdownMenuItem>
+							</Link>
+							<Link to="/app/usage">
+								<DropdownMenuItem className="hover:cursor-pointer">
+									Usage
 								</DropdownMenuItem>
 							</Link>
 							<Link to="/app/feedback">
@@ -202,11 +213,9 @@ function AppSidebar() {
 								{menuItems.map((item) => {
 									return (
 										<SidebarMenuItem key={item.title}>
-											<SidebarMenuButton asChild>
-												<Link to={item.url}>
-													<item.icon />
-													<span>{item.title}</span>
-												</Link>
+											<SidebarMenuButton render={<Link to={item.url} />}>
+												<item.icon />
+												<span>{item.title}</span>
 											</SidebarMenuButton>
 										</SidebarMenuItem>
 									);

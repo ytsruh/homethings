@@ -12,6 +12,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
+	"ytsruh.com/homethings/internal/ai"
 	"ytsruh.com/homethings/internal/db"
 	"ytsruh.com/homethings/internal/utils"
 )
@@ -135,10 +136,15 @@ func (ctrl *RecipesController) Extract(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid image data. Expected base64 data URI."})
 	}
 
-	extracted, err := utils.ExtractRecipeFromImage(req.ImageData)
+	extracted, err := ai.ExtractRecipeFromImage(c.Request().Context(), req.ImageData)
 	if err != nil {
-		fmt.Println("AI extraction failed:", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"message": "Failed to extract recipe from image: " + err.Error()})
+		if chatErr, ok := err.(interface{ LogDetail() string }); ok {
+			c.Logger().Warnf("recipe extraction failed: detail=%s", chatErr.LogDetail())
+		} else {
+			c.Logger().Warnf("recipe extraction failed: err=%v", err)
+		}
+		status, body := ai.MapRecipeError(err)
+		return c.JSON(status, body)
 	}
 
 	if extracted.Title == "" {

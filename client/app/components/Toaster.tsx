@@ -1,31 +1,13 @@
-import { CircleAlert } from "lucide-react";
-import { toast as sonnerToast } from "sonner";
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
+import { toast as toastManager } from "~/components/ui/toast";
 
-/** Abstracted toast function */
+/** Abstracted toast function (Base UI toast manager). */
 export function toast(toast: Omit<ToastProps, "id">) {
 	const type = toast.type || "default";
-	return sonnerToast.custom((id) => (
-		<Toaster
-			id={id}
-			title={toast.title}
-			description={toast.description}
-			type={type}
-		/>
-	));
-}
-
-/** A fully custom toast that still maintains the animations and interactions. */
-function Toaster(props: ToastProps) {
-	const { title, description, type } = props;
-
-	return (
-		<Alert variant={type} className={`w-sm`}>
-			<CircleAlert className={`size-4`} />
-			<AlertTitle>{title}</AlertTitle>
-			<AlertDescription>{description}</AlertDescription>
-		</Alert>
-	);
+	return toastManager.add({
+		title: toast.title,
+		description: toast.description,
+		type: type === "destructive" ? "error" : "info",
+	});
 }
 
 interface ToastProps {
