@@ -27,7 +27,7 @@ func NewHandler(database *db.DB, jwtService *utils.JWTService) *Handler {
 		recipesCtrl:       controllers.NewRecipesController(database),
 		notesCtrl:         controllers.NewNotesController(database),
 		notesCommentsCtrl: controllers.NewNotesCommentsController(database),
-		aiCtrl:            ai.NewHandler(),
+		aiCtrl:            ai.NewHandler(database),
 		authMw:            middleware.NewAuthMiddleware(jwtService),
 		jwtService:        jwtService,
 	}
@@ -69,4 +69,10 @@ func (h *Handler) RegisterRoutes(e *echo.Echo) {
 
 	api.POST("/chat", h.aiCtrl.Chat)
 	api.GET("/chat/models", h.aiCtrl.Models)
+	api.POST("/chat/sessions", h.aiCtrl.CreateSession)
+	api.GET("/chat/sessions", h.aiCtrl.ListSessions)
+	api.GET("/chat/usage", h.aiCtrl.UsageSummary)
+	api.GET("/chat/sessions/:id", h.aiCtrl.GetSession)
+	api.PATCH("/chat/sessions/:id", h.aiCtrl.RenameSession)
+	api.DELETE("/chat/sessions/:id", h.aiCtrl.DeleteSession)
 }

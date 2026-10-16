@@ -8,6 +8,36 @@ import (
 	"database/sql"
 )
 
+type ChatMessage struct {
+	ID        string
+	SessionID string
+	Role      string
+	Content   string
+	CreatedAt int64
+}
+
+type ChatSession struct {
+	ID        string
+	UserID    string
+	Model     string
+	Title     string
+	CreatedAt int64
+	UpdatedAt int64
+	DeletedAt sql.NullInt64
+}
+
+type ChatTokenUsage struct {
+	ID               string
+	SessionID        string
+	MessageID        sql.NullString
+	UserID           string
+	Model            string
+	PromptTokens     sql.NullInt64
+	CompletionTokens sql.NullInt64
+	TotalTokens      sql.NullInt64
+	CreatedAt        int64
+}
+
 type Note struct {
 	ID        string
 	Title     string

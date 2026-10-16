@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	gommonlog "github.com/labstack/gommon/log"
 	"ytsruh.com/homethings/internal/db"
 	"ytsruh.com/homethings/internal/routes"
 	"ytsruh.com/homethings/internal/utils"
@@ -34,6 +35,9 @@ func main() {
 
 	e := echo.New()
 	e.HideBanner = true
+	// Echo defaults to ERROR level, which silences the chat handler's WARN
+	// diagnostics. INFO keeps startup/request logs while showing them.
+	e.Logger.SetLevel(gommonlog.INFO)
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

@@ -39,14 +39,18 @@ func (c Config) chatCompletionsStream(ctx context.Context, model string, message
 	client := &http.Client{Timeout: 120 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("chat request failed: %w", err)
+		return nil, &chatError{
+			Code:       codeProviderError,
+			Message:    "The AI service failed. Please try again.",
+			StatusCode: http.StatusBadGateway,
+			detail:     err.Error(),
+		}
 	}
 
 	if resp.StatusCode != http.StatusOK {
 		defer resp.Body.Close()
 		detail, _ := io.ReadAll(io.LimitReader(resp.Body, 4<<10))
-		return nil, fmt.Errorf("cloudflare chat completions returned status %d: %s",
-			resp.StatusCode, strings.TrimSpace(string(detail)))
+		return nil, mapUpstreamError(resp.StatusCode, strings.TrimSpace(string(detail)))
 	}
 
 	return resp, nil
