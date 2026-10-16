@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
 	DropdownMenuSeparator,
@@ -96,16 +97,18 @@ export function Navbar({ user }: NavbarProps) {
 							</AvatarFallback>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="min-w-[12rem]">
-							<DropdownMenuLabel>
-								<div className="flex flex-col space-y-1">
-									<p className="text-sm font-medium leading-none">
-										{user.name}
-									</p>
-									<p className="text-xs leading-none text-muted-foreground">
-										{user.email}
-									</p>
-								</div>
-							</DropdownMenuLabel>
+							<DropdownMenuGroup>
+								<DropdownMenuLabel>
+									<div className="flex flex-col space-y-1">
+										<p className="text-sm font-medium leading-none">
+											{user.name}
+										</p>
+										<p className="text-xs leading-none text-muted-foreground">
+											{user.email}
+										</p>
+									</div>
+								</DropdownMenuLabel>
+							</DropdownMenuGroup>
 							<DropdownMenuSeparator />
 							<Link to="/app/profile">
 								<DropdownMenuItem className="hover:cursor-pointer">
