@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
-import { toast } from "sonner";
 import PageHeader from "~/components/PageHeader";
+import { toast } from "~/components/Toaster";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -77,7 +77,11 @@ export default function NotesPage({ loaderData }: Route.ComponentProps) {
 
 	async function handleCreateNote() {
 		if (!newNoteTitle.trim()) {
-			toast.error("Title is required");
+			toast({
+				title: "Error",
+				description: "Title is required",
+				type: "destructive",
+			});
 			return;
 		}
 
@@ -96,7 +100,11 @@ export default function NotesPage({ loaderData }: Route.ComponentProps) {
 			navigate(`/app/notes/${newNote.id}`);
 		} catch (error) {
 			console.error("Failed to create note:", error);
-			toast.error("Failed to create note");
+			toast({
+				title: "Error",
+				description: "Failed to create note",
+				type: "destructive",
+			});
 		} finally {
 			setIsLoading(false);
 		}

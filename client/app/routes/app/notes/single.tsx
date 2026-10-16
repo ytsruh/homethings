@@ -1,7 +1,7 @@
 import { Trash2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link, redirect, useNavigate } from "react-router";
-import { toast } from "sonner";
+import { toast } from "~/components/Toaster";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader } from "~/components/ui/card";
 import {
@@ -115,10 +115,14 @@ export default function NoteDetailPage({ loaderData }: Route.ComponentProps) {
 				priority,
 			});
 			setNote(updatedNote);
-			toast.success("Note saved");
+			toast({ title: "Success", description: "Note saved" });
 		} catch (error) {
 			console.error("Failed to save note:", error);
-			toast.error("Failed to save note");
+			toast({
+				title: "Error",
+				description: "Failed to save note",
+				type: "destructive",
+			});
 		} finally {
 			setIsSaving(false);
 		}
@@ -132,24 +136,36 @@ export default function NoteDetailPage({ loaderData }: Route.ComponentProps) {
 			setNote(updatedNote);
 		} catch (error) {
 			console.error("Failed to update note:", error);
-			toast.error("Failed to update note");
+			toast({
+				title: "Error",
+				description: "Failed to update note",
+				type: "destructive",
+			});
 		}
 	}
 
 	async function handleDelete() {
 		try {
 			await deleteNote(note.id);
-			toast.success("Note deleted");
+			toast({ title: "Success", description: "Note deleted" });
 			navigate("/app/notes");
 		} catch (error) {
 			console.error("Failed to delete note:", error);
-			toast.error("Failed to delete note");
+			toast({
+				title: "Error",
+				description: "Failed to delete note",
+				type: "destructive",
+			});
 		}
 	}
 
 	async function handleAddComment() {
 		if (!newComment.trim()) {
-			toast.error("Comment cannot be empty");
+			toast({
+				title: "Error",
+				description: "Comment cannot be empty",
+				type: "destructive",
+			});
 			return;
 		}
 
@@ -158,10 +174,14 @@ export default function NoteDetailPage({ loaderData }: Route.ComponentProps) {
 			const comment = await addComment(note.id, newComment);
 			setComments((prev) => [comment, ...prev]);
 			setNewComment("");
-			toast.success("Comment added");
+			toast({ title: "Success", description: "Comment added" });
 		} catch (error) {
 			console.error("Failed to add comment:", error);
-			toast.error("Failed to add comment");
+			toast({
+				title: "Error",
+				description: "Failed to add comment",
+				type: "destructive",
+			});
 		} finally {
 			setIsAddingComment(false);
 		}
@@ -178,10 +198,14 @@ export default function NoteDetailPage({ loaderData }: Route.ComponentProps) {
 		try {
 			await deleteComment(note.id, commentToDelete);
 			setComments((prev) => prev.filter((c) => c.id !== commentToDelete));
-			toast.success("Comment deleted");
+			toast({ title: "Success", description: "Comment deleted" });
 		} catch (error) {
 			console.error("Failed to delete comment:", error);
-			toast.error("Failed to delete comment");
+			toast({
+				title: "Error",
+				description: "Failed to delete comment",
+				type: "destructive",
+			});
 		} finally {
 			setIsDeleteCommentOpen(false);
 			setCommentToDelete(null);

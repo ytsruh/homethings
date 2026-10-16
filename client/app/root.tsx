@@ -8,8 +8,8 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 import "./styles.css";
-import { Toaster } from "sonner";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
+import { Toaster } from "~/components/ui/toast";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
