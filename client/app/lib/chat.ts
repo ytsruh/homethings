@@ -102,3 +102,46 @@ export async function deleteChatSession(id: string): Promise<void> {
 		throw new Error(error.message || "Request failed");
 	}
 }
+
+export interface ChatUsageByModel {
+	model: string;
+	turns: number;
+	promptTokens: number;
+	completionTokens: number;
+	totalTokens: number;
+}
+
+export interface ChatDailyUsageRow extends ChatUsageByModel {
+	date: string;
+}
+
+export interface ChatDailyUsage {
+	days: number;
+	since: number;
+	totals: ChatUsageByModel[];
+	daily: ChatDailyUsageRow[];
+}
+
+export async function getChatUsage(): Promise<ChatUsageByModel[]> {
+	const response = await fetch(getApiUrl("/api/chat/usage"), {
+		credentials: "include",
+	});
+	const data = await handleResponse<{ models: ChatUsageByModel[] }>(response);
+	return data.models ?? [];
+}
+
+export async function getChatDailyUsage(days = 30): Promise<ChatDailyUsage> {
+	const response = await fetch(
+		getApiUrl(`/api/chat/usage/daily?days=${days}`),
+		{
+			credentials: "include",
+		},
+	);
+	const data = await handleResponse<ChatDailyUsage>(response);
+	return {
+		days: data.days ?? days,
+		since: data.since ?? 0,
+		totals: data.totals ?? [],
+		daily: data.daily ?? [],
+	};
+}

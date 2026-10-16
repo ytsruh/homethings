@@ -125,6 +125,63 @@ func (q *Queries) CreateChatTokenUsage(ctx context.Context, arg CreateChatTokenU
 	return i, err
 }
 
+const dailyTokenUsageByUser = `-- name: DailyTokenUsageByUser :many
+SELECT date(created_at, 'unixepoch') AS day,
+    model,
+    COUNT(*) AS turns,
+    CAST(COALESCE(SUM(prompt_tokens), 0) AS INTEGER) AS prompt_tokens,
+    CAST(COALESCE(SUM(completion_tokens), 0) AS INTEGER) AS completion_tokens,
+    CAST(COALESCE(SUM(total_tokens), 0) AS INTEGER) AS total_tokens
+FROM chat_token_usage
+WHERE user_id = ? AND created_at >= ?
+GROUP BY day, model
+ORDER BY day ASC, model ASC
+`
+
+type DailyTokenUsageByUserParams struct {
+	UserID    string
+	CreatedAt int64
+}
+
+type DailyTokenUsageByUserRow struct {
+	Day              interface{}
+	Model            string
+	Turns            int64
+	PromptTokens     int64
+	CompletionTokens int64
+	TotalTokens      int64
+}
+
+func (q *Queries) DailyTokenUsageByUser(ctx context.Context, arg DailyTokenUsageByUserParams) ([]DailyTokenUsageByUserRow, error) {
+	rows, err := q.db.QueryContext(ctx, dailyTokenUsageByUser, arg.UserID, arg.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []DailyTokenUsageByUserRow
+	for rows.Next() {
+		var i DailyTokenUsageByUserRow
+		if err := rows.Scan(
+			&i.Day,
+			&i.Model,
+			&i.Turns,
+			&i.PromptTokens,
+			&i.CompletionTokens,
+			&i.TotalTokens,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getChatSession = `-- name: GetChatSession :one
 SELECT id, user_id, model, title, created_at, updated_at, deleted_at FROM chat_sessions
 WHERE id = ? AND user_id = ? AND deleted_at IS NULL
@@ -285,6 +342,60 @@ func (q *Queries) SumTokenUsageByUser(ctx context.Context, userID string) ([]Sum
 	var items []SumTokenUsageByUserRow
 	for rows.Next() {
 		var i SumTokenUsageByUserRow
+		if err := rows.Scan(
+			&i.Model,
+			&i.Turns,
+			&i.PromptTokens,
+			&i.CompletionTokens,
+			&i.TotalTokens,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const sumTokenUsageSinceByUser = `-- name: SumTokenUsageSinceByUser :many
+SELECT model,
+    COUNT(*) AS turns,
+    CAST(COALESCE(SUM(prompt_tokens), 0) AS INTEGER) AS prompt_tokens,
+    CAST(COALESCE(SUM(completion_tokens), 0) AS INTEGER) AS completion_tokens,
+    CAST(COALESCE(SUM(total_tokens), 0) AS INTEGER) AS total_tokens
+FROM chat_token_usage
+WHERE user_id = ? AND created_at >= ?
+GROUP BY model
+ORDER BY model ASC
+`
+
+type SumTokenUsageSinceByUserParams struct {
+	UserID    string
+	CreatedAt int64
+}
+
+type SumTokenUsageSinceByUserRow struct {
+	Model            string
+	Turns            int64
+	PromptTokens     int64
+	CompletionTokens int64
+	TotalTokens      int64
+}
+
+func (q *Queries) SumTokenUsageSinceByUser(ctx context.Context, arg SumTokenUsageSinceByUserParams) ([]SumTokenUsageSinceByUserRow, error) {
+	rows, err := q.db.QueryContext(ctx, sumTokenUsageSinceByUser, arg.UserID, arg.CreatedAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []SumTokenUsageSinceByUserRow
+	for rows.Next() {
+		var i SumTokenUsageSinceByUserRow
 		if err := rows.Scan(
 			&i.Model,
 			&i.Turns,

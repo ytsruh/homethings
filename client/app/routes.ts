@@ -30,6 +30,7 @@ export default [
 			route("recipes/:recipeId/edit", "routes/app/recipes/edit.tsx"),
 			route("recipes/:recipeId/delete", "routes/app/recipes/delete.tsx"),
 			route("profile", "routes/app/profile.tsx"),
+			route("usage", "routes/app/usage.tsx"),
 			route("feedback", "routes/app/feedback.tsx"),
 		]),
 	]),

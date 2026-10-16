@@ -51,6 +51,7 @@ function getPageTitle(pathname: string): string {
 		notes: "Notes",
 		recipes: "Recipes",
 		profile: "Profile",
+		usage: "Usage",
 		feedback: "Feedback",
 	};
 
@@ -113,6 +114,11 @@ export function Navbar({ user }: NavbarProps) {
 							<Link to="/app/profile">
 								<DropdownMenuItem className="hover:cursor-pointer">
 									Profile
+								</DropdownMenuItem>
+							</Link>
+							<Link to="/app/usage">
+								<DropdownMenuItem className="hover:cursor-pointer">
+									Usage
 								</DropdownMenuItem>
 							</Link>
 							<Link to="/app/feedback">

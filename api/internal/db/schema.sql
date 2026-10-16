@@ -89,3 +89,5 @@ CREATE TABLE IF NOT EXISTS chat_token_usage (
     created_at INTEGER NOT NULL,
     FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
 );
+
+CREATE INDEX IF NOT EXISTS idx_chat_token_usage_user_created ON chat_token_usage(user_id, created_at);

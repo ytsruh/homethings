@@ -10,6 +10,23 @@ import (
 	"database/sql"
 )
 
+const countNotesByCompletion = `-- name: CountNotesByCompletion :one
+SELECT COUNT(*) FROM notes
+WHERE completed = ? AND created_by = ?
+`
+
+type CountNotesByCompletionParams struct {
+	Completed int64
+	CreatedBy string
+}
+
+func (q *Queries) CountNotesByCompletion(ctx context.Context, arg CountNotesByCompletionParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countNotesByCompletion, arg.Completed, arg.CreatedBy)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createNote = `-- name: CreateNote :one
 INSERT INTO notes (id, title, body, priority, completed, created_by, created_at, updated_at)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?)

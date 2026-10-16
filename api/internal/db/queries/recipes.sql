@@ -1,6 +1,9 @@
 -- name: ListRecipes :many
 SELECT * FROM recipes WHERE 1=1 ORDER BY created_at DESC;
 
+-- name: CountRecipes :one
+SELECT COUNT(*) FROM recipes;
+
 -- name: ListRecipesByTag :many
 SELECT * FROM recipes WHERE tags LIKE '%' || ? || '%' ORDER BY created_at DESC;
 

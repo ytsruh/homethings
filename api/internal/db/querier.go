@@ -10,6 +10,8 @@ import (
 )
 
 type Querier interface {
+	CountNotesByCompletion(ctx context.Context, arg CountNotesByCompletionParams) (int64, error)
+	CountRecipes(ctx context.Context) (int64, error)
 	CreateChatMessage(ctx context.Context, arg CreateChatMessageParams) (ChatMessage, error)
 	CreateChatSession(ctx context.Context, arg CreateChatSessionParams) (ChatSession, error)
 	CreateChatTokenUsage(ctx context.Context, arg CreateChatTokenUsageParams) (ChatTokenUsage, error)
@@ -17,6 +19,7 @@ type Querier interface {
 	CreateNote(ctx context.Context, arg CreateNoteParams) (Note, error)
 	CreateRecipe(ctx context.Context, arg CreateRecipeParams) (Recipe, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DailyTokenUsageByUser(ctx context.Context, arg DailyTokenUsageByUserParams) ([]DailyTokenUsageByUserRow, error)
 	DeleteComment(ctx context.Context, arg DeleteCommentParams) (NotesComment, error)
 	DeleteNote(ctx context.Context, arg DeleteNoteParams) (Note, error)
 	DeleteRecipe(ctx context.Context, id string) (Recipe, error)
@@ -34,6 +37,7 @@ type Querier interface {
 	ListRecipesByTag(ctx context.Context, dollar_1 sql.NullString) ([]Recipe, error)
 	SoftDeleteChatSession(ctx context.Context, arg SoftDeleteChatSessionParams) (ChatSession, error)
 	SumTokenUsageByUser(ctx context.Context, userID string) ([]SumTokenUsageByUserRow, error)
+	SumTokenUsageSinceByUser(ctx context.Context, arg SumTokenUsageSinceByUserParams) ([]SumTokenUsageSinceByUserRow, error)
 	TouchChatSession(ctx context.Context, arg TouchChatSessionParams) (ChatSession, error)
 	UpdateChatSessionTitle(ctx context.Context, arg UpdateChatSessionTitleParams) (ChatSession, error)
 	UpdateNote(ctx context.Context, arg UpdateNoteParams) (Note, error)

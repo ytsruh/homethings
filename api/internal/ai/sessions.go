@@ -300,8 +300,7 @@ func (h *Handler) DeleteSession(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{"message": "Chat session deleted"})
 }
 
-// UsageSummary aggregates token usage per model for the caller (backend-only,
-// no client UI yet; exposed for verification and future surfaces).
+// UsageSummary aggregates lifetime token usage per model for the caller.
 func (h *Handler) UsageSummary(c echo.Context) error {
 	user, err := currentUser(c)
 	if err != nil {
@@ -322,4 +321,99 @@ func (h *Handler) UsageSummary(c echo.Context) error {
 		})
 	}
 	return c.JSON(http.StatusOK, map[string]any{"models": out})
+}
+
+// DailyUsage returns rolling-window token usage for the caller: per-model
+// totals over the window plus a per-model per-day breakdown (UTC days).
+// GET /api/chat/usage/daily?days=30 (default 30, clamped 1-90).
+func (h *Handler) DailyUsage(c echo.Context) error {
+	user, err := currentUser(c)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"message": "Unauthorized"})
+	}
+	days := 30
+	if raw := strings.TrimSpace(c.QueryParam("days")); raw != "" {
+		n, ok := parseDaysParam(raw)
+		if !ok {
+			return c.JSON(http.StatusBadRequest, map[string]string{"message": "Invalid days parameter (1-90)"})
+		}
+		days = n
+	}
+	since := time.Now().Unix() - int64(days)*86400
+	ctx := context.Background()
+	q := h.db.Queries()
+
+	totals, err := q.SumTokenUsageSinceByUser(ctx, db.SumTokenUsageSinceByUserParams{
+		UserID:    user.UserID,
+		CreatedAt: since,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to load token usage"})
+	}
+	rows, err := q.DailyTokenUsageByUser(ctx, db.DailyTokenUsageByUserParams{
+		UserID:    user.UserID,
+		CreatedAt: since,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Failed to load daily token usage"})
+	}
+	totalsOut := make([]map[string]any, 0, len(totals))
+	for _, r := range totals {
+		totalsOut = append(totalsOut, map[string]any{
+			"model":            r.Model,
+			"turns":            r.Turns,
+			"promptTokens":     r.PromptTokens,
+			"completionTokens": r.CompletionTokens,
+			"totalTokens":      r.TotalTokens,
+		})
+	}
+	dailyOut := make([]map[string]any, 0, len(rows))
+	for _, r := range rows {
+		dailyOut = append(dailyOut, map[string]any{
+			"date":             dayString(r.Day),
+			"model":            r.Model,
+			"turns":            r.Turns,
+			"promptTokens":     r.PromptTokens,
+			"completionTokens": r.CompletionTokens,
+			"totalTokens":      r.TotalTokens,
+		})
+	}
+	return c.JSON(http.StatusOK, map[string]any{
+		"days":   days,
+		"since":  since,
+		"totals": totalsOut,
+		"daily":  dailyOut,
+	})
+}
+
+// parseDaysParam validates the ?days= query value (1-90).
+func parseDaysParam(raw string) (int, bool) {
+	n := 0
+	for _, r := range raw {
+		if r < '0' || r > '9' {
+			return 0, false
+		}
+		n = n*10 + int(r-'0')
+		if n > 90 {
+			return 0, false
+		}
+	}
+	if n < 1 || n > 90 {
+		return 0, false
+	}
+	return n, true
+}
+
+// dayString normalizes the SQLite date() value (string or []byte) to YYYY-MM-DD.
+func dayString(v any) string {
+	switch t := v.(type) {
+	case string:
+		return t
+	case []byte:
+		return string(t)
+	case sql.NullString:
+		return t.String
+	default:
+		return ""
+	}
 }

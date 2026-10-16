@@ -3,6 +3,10 @@ SELECT * FROM notes
 WHERE completed = ? AND created_by = ?
 ORDER BY created_at DESC;
 
+-- name: CountNotesByCompletion :one
+SELECT COUNT(*) FROM notes
+WHERE completed = ? AND created_by = ?;
+
 -- name: GetNoteByID :one
 SELECT * FROM notes
 WHERE id = ? AND created_by = ?;

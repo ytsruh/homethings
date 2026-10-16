@@ -55,3 +55,26 @@ FROM chat_token_usage
 WHERE user_id = ?
 GROUP BY model
 ORDER BY model ASC;
+
+-- name: SumTokenUsageSinceByUser :many
+SELECT model,
+    COUNT(*) AS turns,
+    CAST(COALESCE(SUM(prompt_tokens), 0) AS INTEGER) AS prompt_tokens,
+    CAST(COALESCE(SUM(completion_tokens), 0) AS INTEGER) AS completion_tokens,
+    CAST(COALESCE(SUM(total_tokens), 0) AS INTEGER) AS total_tokens
+FROM chat_token_usage
+WHERE user_id = ? AND created_at >= ?
+GROUP BY model
+ORDER BY model ASC;
+
+-- name: DailyTokenUsageByUser :many
+SELECT date(created_at, 'unixepoch') AS day,
+    model,
+    COUNT(*) AS turns,
+    CAST(COALESCE(SUM(prompt_tokens), 0) AS INTEGER) AS prompt_tokens,
+    CAST(COALESCE(SUM(completion_tokens), 0) AS INTEGER) AS completion_tokens,
+    CAST(COALESCE(SUM(total_tokens), 0) AS INTEGER) AS total_tokens
+FROM chat_token_usage
+WHERE user_id = ? AND created_at >= ?
+GROUP BY day, model
+ORDER BY day ASC, model ASC;

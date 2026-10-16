@@ -10,6 +10,17 @@ import (
 	"database/sql"
 )
 
+const countRecipes = `-- name: CountRecipes :one
+SELECT COUNT(*) FROM recipes
+`
+
+func (q *Queries) CountRecipes(ctx context.Context) (int64, error) {
+	row := q.db.QueryRowContext(ctx, countRecipes)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const createRecipe = `-- name: CreateRecipe :one
 INSERT INTO recipes (id, title, description, tags, ingredients, steps, image_key, created_at, updated_at)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
