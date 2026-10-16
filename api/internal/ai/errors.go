@@ -17,6 +17,10 @@ type chatError struct {
 
 func (e *chatError) Error() string { return e.Message }
 
+// LogDetail exposes the raw provider detail for server-side logging only.
+// Never send this to the client.
+func (e *chatError) LogDetail() string { return e.detail }
+
 // Error codes returned to the client in {code, message} JSON bodies.
 const (
 	codeModelUnavailable = "model_unavailable"
@@ -62,4 +66,30 @@ func isModelGone(detail string) bool {
 		}
 	}
 	return false
+}
+
+// MapRecipeError converts a recipe extraction failure into an HTTP status
+// and a user-safe JSON body. Image validation failures are 400s; upstream or
+// config failures keep their chatError status/code; anything else is a 502.
+// Shared helper so the recipes controller stays thin and never leaks provider
+// detail to the client.
+func MapRecipeError(err error) (int, map[string]string) {
+	if imgErr, ok := err.(*imageValidationError); ok {
+		msg := imgErr.Message
+		if msg == "" {
+			msg = "Invalid image data."
+		}
+		return http.StatusBadRequest, map[string]string{"message": msg}
+	}
+	if chatErr, ok := err.(*chatError); ok {
+		status := chatErr.StatusCode
+		if status == 0 {
+			status = http.StatusBadGateway
+		}
+		return status, map[string]string{"code": chatErr.Code, "message": chatErr.Message}
+	}
+	return http.StatusBadGateway, map[string]string{
+		"code":    codeProviderError,
+		"message": "The AI service failed. Please try again.",
+	}
 }

@@ -154,10 +154,20 @@ func messageText(m openAIMessage) string {
 }
 
 // openAIChatRequest is the body POSTed to Cloudflare's OpenAI-compatible endpoint.
+// Temperature/MaxTokens/ResponseFormat are omitempty so the streaming chat
+// path (which sets none of them) is unaffected.
 type openAIChatRequest struct {
-	Model    string          `json:"model"`
-	Messages []openAIMessage `json:"messages"`
-	Stream   bool            `json:"stream"`
+	Model          string                `json:"model"`
+	Messages       []openAIMessage       `json:"messages"`
+	Stream         bool                  `json:"stream"`
+	Temperature    *float64              `json:"temperature,omitempty"`
+	MaxTokens      *int                  `json:"max_tokens,omitempty"`
+	ResponseFormat *openAIResponseFormat `json:"response_format,omitempty"`
+}
+
+// openAIResponseFormat requests structured output (e.g. {"type":"json_object"}).
+type openAIResponseFormat struct {
+	Type string `json:"type"`
 }
 
 // openAIUsage carries token counts reported by the provider. All fields are
