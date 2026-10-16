@@ -1,22 +1,33 @@
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type FileUIPart } from "ai";
 import {
+	ArrowUp,
 	Check,
+	ChevronDown,
 	History,
 	ImagePlus,
 	Pencil,
-	RotateCcw,
-	SendHorizontal,
+	Plus,
 	Square,
 	Trash2,
 	X,
 } from "lucide-react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Remark } from "react-remark";
 import { useNavigate, useParams } from "react-router";
 import { LoadingSpinner } from "~/components/LoadingSpinner";
 import PageHeader from "~/components/PageHeader";
 import { toast } from "~/components/Toaster";
+import {
+	Attachment,
+	AttachmentAction,
+	AttachmentActions,
+	AttachmentContent,
+	AttachmentDescription,
+	AttachmentMedia,
+	AttachmentTitle,
+} from "~/components/ui/attachment";
+import { Bubble, BubbleContent } from "~/components/ui/bubble";
 import { Button } from "~/components/ui/button";
 import {
 	Dialog,
@@ -26,17 +37,36 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
-import { ScrollArea } from "~/components/ui/scroll-area";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "~/components/ui/select";
-import { Textarea } from "~/components/ui/textarea";
+	Drawer,
+	DrawerContent,
+	DrawerDescription,
+	DrawerHeader,
+	DrawerTitle,
+} from "~/components/ui/drawer";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
+import { Input } from "~/components/ui/input";
+import {
+	InputGroup,
+	InputGroupAddon,
+	InputGroupButton,
+	InputGroupTextarea,
+} from "~/components/ui/input-group";
+import { Message, MessageContent } from "~/components/ui/message";
+import {
+	MessageScroller,
+	MessageScrollerButton,
+	MessageScrollerContent,
+	MessageScrollerItem,
+	MessageScrollerProvider,
+	MessageScrollerViewport,
+} from "~/components/ui/message-scroller";
 import {
 	type ChatHistoryMessage,
 	type ChatModel,
@@ -64,10 +94,11 @@ const ACCEPTED_IMAGE_TYPES = [
 	"image/gif",
 ];
 
-interface Attachment {
+interface PendingAttachment {
 	dataUrl: string;
 	mediaType: string;
 	filename: string;
+	size: number;
 }
 
 type ChatPart = {
@@ -93,6 +124,12 @@ function imagesOf(message: { parts: unknown }): ChatPart[] {
 	);
 }
 
+function formatBytes(bytes: number): string {
+	if (bytes < 1024) return `${bytes} B`;
+	if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+	return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function readFileAsDataURL(file: File): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
@@ -109,14 +146,13 @@ export default function Chat() {
 	const [models, setModels] = useState<ChatModel[]>([]);
 	const [selectedModel, setSelectedModel] = useState<string>("");
 	const [sessions, setSessions] = useState<ChatSession[]>([]);
-	const [showHistory, setShowHistory] = useState(false);
-	const [attachments, setAttachments] = useState<Attachment[]>([]);
+	const [historyOpen, setHistoryOpen] = useState(false);
+	const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
+	const [isDragging, setIsDragging] = useState(false);
 	const [renamingId, setRenamingId] = useState<string | null>(null);
 	const [renameValue, setRenameValue] = useState("");
 	const [deleteId, setDeleteId] = useState<string | null>(null);
-	const modelInputId = useId();
-	const messagesRef = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLTextAreaElement>(null);
+	const formRef = useRef<HTMLFormElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	// Session created server-side during a stream on /app/chat (no id yet).
 	// Navigated to once the stream finishes.
@@ -185,6 +221,8 @@ export default function Chat() {
 	const isGenerating = status === "submitted" || status === "streaming";
 	const selectedModelEntry = models.find((m) => m.id === selectedModel);
 	const supportsImages = selectedModelEntry?.supportsImages ?? false;
+	const canSend =
+		(Boolean(input.trim()) || attachments.length > 0) && !isGenerating;
 
 	function requestBody() {
 		return {
@@ -263,26 +301,8 @@ export default function Chat() {
 		setInput("");
 		setAttachments([]);
 		pendingSessionRef.current = null;
+		setHistoryOpen(false);
 		navigate("/app/chat");
-	}
-
-	useEffect(() => {
-		if (messages.length === 0 && status === "ready") return;
-		const viewport = messagesRef.current?.querySelector(
-			'[data-slot="scroll-area-viewport"]',
-		);
-		if (viewport) viewport.scrollTop = viewport.scrollHeight;
-	}, [messages, status]);
-
-	function autoresizeTextarea(el: HTMLTextAreaElement | null) {
-		if (!el) return;
-		el.style.height = "auto";
-		el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
-	}
-
-	function handleInputChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-		setInput(event.target.value);
-		autoresizeTextarea(event.target);
 	}
 
 	async function handleFiles(files: FileList | File[]) {
@@ -295,7 +315,7 @@ export default function Chat() {
 			});
 			return;
 		}
-		const next: Attachment[] = [];
+		const next: PendingAttachment[] = [];
 		for (const file of incoming) {
 			if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
 				toast({
@@ -318,6 +338,7 @@ export default function Chat() {
 					dataUrl: await readFileAsDataURL(file),
 					mediaType: file.type,
 					filename: file.name || "image",
+					size: file.size,
 				});
 			} catch {
 				toast({
@@ -355,14 +376,14 @@ export default function Chat() {
 		}
 		clearError();
 		setInput("");
-		if (inputRef.current) inputRef.current.style.height = "auto";
+		setAttachments([]);
+		setIsDragging(false);
 		const files: FileUIPart[] = attachments.map((a) => ({
 			type: "file",
 			mediaType: a.mediaType,
 			filename: a.filename,
 			url: a.dataUrl,
 		}));
-		setAttachments([]);
 		const body = requestBody();
 		if (text) {
 			await sendMessage(
@@ -393,8 +414,17 @@ export default function Chat() {
 			!event.nativeEvent.isComposing
 		) {
 			event.preventDefault();
-			sendCurrent();
+			formRef.current?.requestSubmit();
 		}
+	}
+
+	function handlePaste(event: React.ClipboardEvent<HTMLTextAreaElement>) {
+		const files = Array.from(event.clipboardData?.files ?? []).filter((f) =>
+			f.type.startsWith("image/"),
+		);
+		if (files.length === 0) return;
+		event.preventDefault();
+		handleFiles(files);
 	}
 
 	async function handleRename(id: string) {
@@ -439,27 +469,295 @@ export default function Chat() {
 		<>
 			<title>Chat | Homethings</title>
 			<meta name="description" content="Chat with Homethings assistant" />
-			<div className="flex w-full max-w-5xl mx-auto gap-4 h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-8rem)]">
-				<aside
-					className={cn(
-						"shrink-0 w-64 border-r pr-3 flex-col gap-2 overflow-hidden",
-						showHistory ? "flex" : "hidden lg:flex",
-					)}
+			<div className="flex w-full max-w-5xl mx-auto flex-col h-[calc(100dvh-3.5rem)] md:h-[calc(100dvh-8rem)]">
+				<PageHeader
+					title="Chat"
+					subtitle="Ask the Homethings assistant anything"
+				/>
+
+				<div className="flex items-center justify-end gap-2 py-2 shrink-0">
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={handleNewChat}
+						disabled={messages.length === 0 && !error}
+						title="Clear conversation and start over"
+						className="shrink-0"
+					>
+						<Plus className="size-4" />
+						<span className="hidden sm:inline">New chat</span>
+					</Button>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setHistoryOpen(true)}
+						title="Open chat history"
+						className="shrink-0"
+					>
+						<History className="size-4" />
+						<span className="hidden sm:inline">History</span>
+					</Button>
+				</div>
+
+				<div className="flex-1 min-h-0">
+					<MessageScrollerProvider
+						autoScroll
+						defaultScrollPosition="last-anchor"
+					>
+						<MessageScroller>
+							<MessageScrollerViewport>
+								<MessageScrollerContent>
+									{messages.length === 0 && (
+										<MessageScrollerItem messageId="empty-state">
+											<p className="text-sm text-muted-foreground text-center py-8">
+												Start a conversation below. Chats are saved to your
+												history.
+											</p>
+										</MessageScrollerItem>
+									)}
+									{messages.map((message) => {
+										const isUser = message.role === "user";
+										const imgs = imagesOf(message);
+										return (
+											<MessageScrollerItem
+												key={message.id}
+												messageId={message.id}
+												scrollAnchor={isUser}
+											>
+												<Message align={isUser ? "end" : "start"}>
+													<MessageContent>
+														{isUser ? (
+															<Bubble align="end" variant="muted">
+																<BubbleContent>
+																	{imgs.length > 0 && (
+																		<span className="flex flex-wrap gap-2 pb-2">
+																			{imgs.map((img) => (
+																				<img
+																					key={img.url}
+																					src={img.url}
+																					alt={img.filename || "Uploaded image"}
+																					className="max-h-40 max-w-full rounded-md object-cover"
+																				/>
+																			))}
+																		</span>
+																	)}
+																	<span className="whitespace-pre-wrap">
+																		{textOf(message)}
+																	</span>
+																</BubbleContent>
+															</Bubble>
+														) : (
+															<div className="prose prose-sm dark:prose-invert max-w-none break-words text-foreground prose-p:my-1 prose-headings:my-2 prose-pre:my-2 [&_pre]:overflow-x-auto">
+																<Remark>
+																	{textOf(message) || (isGenerating ? "…" : "")}
+																</Remark>
+															</div>
+														)}
+													</MessageContent>
+												</Message>
+											</MessageScrollerItem>
+										);
+									})}
+									{status === "submitted" &&
+										messages.at(-1)?.role === "user" && (
+											<MessageScrollerItem messageId="typing-indicator">
+												<Message>
+													<MessageContent>
+														<div className="bg-muted rounded-lg px-4 py-2 w-fit">
+															<LoadingSpinner className="size-5" />
+														</div>
+													</MessageContent>
+												</Message>
+											</MessageScrollerItem>
+										)}
+								</MessageScrollerContent>
+							</MessageScrollerViewport>
+							<MessageScrollerButton />
+						</MessageScroller>
+					</MessageScrollerProvider>
+				</div>
+
+				<form
+					ref={formRef}
+					onSubmit={handleSubmit}
+					className="bg-background py-3 shrink-0"
 				>
-					<div className="flex items-center justify-between pt-1">
-						<span className="text-sm font-medium">History</span>
-						<Button
-							type="button"
-							variant="ghost"
-							size="sm"
-							onClick={handleNewChat}
-							title="Start a new chat"
-						>
-							<RotateCcw className="size-4" />
-						</Button>
-					</div>
-					<ScrollArea className="flex-1 min-h-0">
-						<div className="flex flex-col gap-1 py-1">
+					<input
+						ref={fileInputRef}
+						type="file"
+						accept={ACCEPTED_IMAGE_TYPES.join(",")}
+						multiple
+						className="hidden"
+						onChange={(e) => {
+							if (e.target.files) handleFiles(e.target.files);
+						}}
+					/>
+					<InputGroup
+						onDragOver={(e) => {
+							e.preventDefault();
+							if (supportsImages && !isGenerating) setIsDragging(true);
+						}}
+						onDragLeave={() => setIsDragging(false)}
+						onDrop={(e) => {
+							e.preventDefault();
+							setIsDragging(false);
+							if (supportsImages && !isGenerating && e.dataTransfer.files) {
+								handleFiles(e.dataTransfer.files);
+							}
+						}}
+						className={cn(
+							isDragging && "border-primary ring-2 ring-primary/30",
+						)}
+					>
+						{attachments.length > 0 && (
+							<InputGroupAddon align="block-start">
+								<div className="flex flex-wrap gap-2">
+									{attachments.map((a) => (
+										<Attachment key={a.dataUrl} size="sm">
+											<AttachmentMedia variant="image">
+												<img src={a.dataUrl} alt={a.filename} />
+											</AttachmentMedia>
+											<AttachmentContent>
+												<AttachmentTitle>{a.filename}</AttachmentTitle>
+												<AttachmentDescription>
+													{a.mediaType.split("/")[1]?.toUpperCase()} ·{" "}
+													{formatBytes(a.size)}
+												</AttachmentDescription>
+											</AttachmentContent>
+											<AttachmentActions>
+												<AttachmentAction
+													aria-label={`Remove ${a.filename}`}
+													onClick={() => removeAttachment(a.dataUrl)}
+												>
+													<X />
+												</AttachmentAction>
+											</AttachmentActions>
+										</Attachment>
+									))}
+								</div>
+							</InputGroupAddon>
+						)}
+						<InputGroupTextarea
+							rows={1}
+							value={input}
+							onChange={(e) => setInput(e.target.value)}
+							onKeyDown={handleInputKeyDown}
+							onPaste={handlePaste}
+							placeholder={
+								isDragging
+									? "Drop images to attach…"
+									: "Type a message... (Enter to send, Shift+Enter for a new line)"
+							}
+							disabled={isGenerating}
+							aria-label="Chat message"
+							className="max-h-40 overflow-y-auto"
+						/>
+						<InputGroupAddon align="block-end">
+							<InputGroupButton
+								size="icon-sm"
+								variant="outline"
+								className="rounded-full"
+								aria-label={
+									supportsImages
+										? "Attach images (max 5, 5MB each)"
+										: "Images need a vision-capable model"
+								}
+								title={
+									supportsImages
+										? "Attach images (max 5, 5MB each)"
+										: "Pick a vision-capable model to attach images"
+								}
+								onClick={() => fileInputRef.current?.click()}
+								disabled={
+									!supportsImages ||
+									isGenerating ||
+									attachments.length >= MAX_IMAGES
+								}
+							>
+								<ImagePlus />
+							</InputGroupButton>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<InputGroupButton
+										size="sm"
+										disabled={models.length === 0 || isGenerating}
+										aria-label="Pick a model"
+										className="ml-auto"
+									>
+										{selectedModelEntry?.label ?? "Loading models..."}
+										<ChevronDown />
+									</InputGroupButton>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start">
+									<DropdownMenuRadioGroup
+										value={selectedModel}
+										onValueChange={handleModelChange}
+									>
+										{models.map((model) => (
+											<DropdownMenuRadioItem key={model.id} value={model.id}>
+												<span className="flex items-center gap-2">
+													{model.label}
+													{model.supportsImages && (
+														<ImagePlus className="size-3.5 text-muted-foreground" />
+													)}
+												</span>
+											</DropdownMenuRadioItem>
+										))}
+									</DropdownMenuRadioGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+							{isGenerating ? (
+								<InputGroupButton
+									size="icon-sm"
+									variant="default"
+									className="rounded-full"
+									aria-label="Stop generating"
+									onClick={stop}
+								>
+									<Square />
+								</InputGroupButton>
+							) : (
+								<InputGroupButton
+									type="submit"
+									size="icon-sm"
+									variant="default"
+									className="rounded-full"
+									disabled={!canSend}
+									aria-label="Send"
+								>
+									<ArrowUp />
+								</InputGroupButton>
+							)}
+						</InputGroupAddon>
+					</InputGroup>
+				</form>
+			</div>
+
+			<Drawer
+				direction="right"
+				open={historyOpen}
+				onOpenChange={setHistoryOpen}
+			>
+				<DrawerContent>
+					<DrawerHeader>
+						<div className="flex items-center justify-between">
+							<DrawerTitle>History</DrawerTitle>
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								onClick={handleNewChat}
+								title="Start a new chat"
+							>
+								<Plus className="size-4" />
+							</Button>
+						</div>
+						<DrawerDescription>Your saved chats.</DrawerDescription>
+					</DrawerHeader>
+					<div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
+						<div className="flex flex-col gap-1">
 							{sessions.length === 0 && (
 								<p className="text-xs text-muted-foreground px-1 py-2">
 									No saved chats yet.
@@ -500,7 +798,10 @@ export default function Chat() {
 											<button
 												type="button"
 												className="flex-1 min-w-0 text-left truncate"
-												onClick={() => navigate(`/app/chat/${s.id}`)}
+												onClick={() => {
+													setHistoryOpen(false);
+													navigate(`/app/chat/${s.id}`);
+												}}
 												title={s.title}
 											>
 												{s.title}
@@ -533,205 +834,9 @@ export default function Chat() {
 								</div>
 							))}
 						</div>
-					</ScrollArea>
-				</aside>
-
-				<div className="flex flex-col flex-1 min-w-0">
-					<PageHeader
-						title="Chat"
-						subtitle="Ask the Homethings assistant anything"
-					/>
-
-					<div className="flex items-center gap-2 py-2 shrink-0">
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							className="lg:hidden shrink-0"
-							onClick={() => setShowHistory((v) => !v)}
-							title="Toggle chat history"
-						>
-							<History className="size-4" />
-						</Button>
-						<Label htmlFor={modelInputId} className="text-sm shrink-0">
-							Model
-						</Label>
-						<Select
-							value={selectedModel}
-							onValueChange={handleModelChange}
-							disabled={models.length === 0 || isGenerating}
-						>
-							<SelectTrigger id={modelInputId} className="w-full max-w-xs">
-								<SelectValue placeholder="Loading models..." />
-							</SelectTrigger>
-							<SelectContent>
-								{models.map((model) => (
-									<SelectItem key={model.id} value={model.id}>
-										{model.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-						{selectedModelEntry?.blurb && (
-							<span className="text-xs text-muted-foreground hidden sm:inline">
-								{selectedModelEntry.blurb}
-							</span>
-						)}
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={handleNewChat}
-							disabled={messages.length === 0 && !error}
-							title="Clear conversation and start over"
-							className="ml-auto shrink-0"
-						>
-							<RotateCcw className="size-4" />
-							<span className="hidden sm:inline">New chat</span>
-						</Button>
 					</div>
-
-					<div ref={messagesRef} className="flex-1 min-h-0">
-						<ScrollArea className="h-full">
-							<div className="flex flex-col gap-4 py-2 pr-3" aria-live="polite">
-								{messages.length === 0 && (
-									<p className="text-sm text-muted-foreground text-center py-8">
-										Start a conversation below. Chats are saved to your history.
-									</p>
-								)}
-								{messages.map((message) => {
-									const isUser = message.role === "user";
-									const imgs = imagesOf(message);
-									return (
-										<div
-											key={message.id}
-											className={cn(
-												"flex w-full",
-												isUser ? "justify-end" : "justify-start",
-											)}
-										>
-											<div
-												className={cn(
-													"max-w-[85%] rounded-lg px-4 py-2 text-sm",
-													isUser
-														? "bg-primary text-primary-foreground"
-														: "bg-muted text-foreground",
-												)}
-											>
-												{imgs.length > 0 && (
-													<div className="flex flex-wrap gap-2 pb-2">
-														{imgs.map((img) => (
-															<img
-																key={img.url}
-																src={img.url}
-																alt={img.filename || "Uploaded image"}
-																className="max-h-40 max-w-full rounded-md object-cover"
-															/>
-														))}
-													</div>
-												)}
-												{isUser ? (
-													<span className="whitespace-pre-wrap">
-														{textOf(message)}
-													</span>
-												) : (
-													<div className="prose prose-sm dark:prose-invert max-w-none break-words text-foreground prose-p:my-1 prose-headings:my-2 prose-pre:my-2 [&_pre]:overflow-x-auto">
-														<Remark>
-															{textOf(message) || (isGenerating ? "…" : "")}
-														</Remark>
-													</div>
-												)}
-											</div>
-										</div>
-									);
-								})}
-								{status === "submitted" && messages.at(-1)?.role === "user" && (
-									<div className="flex justify-start">
-										<div className="bg-muted rounded-lg px-4 py-2">
-											<LoadingSpinner className="size-5" />
-										</div>
-									</div>
-								)}
-							</div>
-						</ScrollArea>
-					</div>
-
-					{attachments.length > 0 && (
-						<div className="flex flex-wrap gap-2 py-2 shrink-0">
-							{attachments.map((a) => (
-								<div key={a.dataUrl} className="relative">
-									<img
-										src={a.dataUrl}
-										alt={a.filename}
-										className="h-16 w-16 rounded-md object-cover border"
-									/>
-									<button
-										type="button"
-										onClick={() => removeAttachment(a.dataUrl)}
-										className="absolute -top-2 -right-2 rounded-full bg-background border p-0.5"
-										title="Remove image"
-									>
-										<X className="size-3.5" />
-									</button>
-								</div>
-							))}
-						</div>
-					)}
-
-					<form
-						onSubmit={handleSubmit}
-						className="flex items-end gap-2 bg-background py-3 shrink-0"
-					>
-						<input
-							ref={fileInputRef}
-							type="file"
-							accept={ACCEPTED_IMAGE_TYPES.join(",")}
-							multiple
-							className="hidden"
-							onChange={(e) => {
-								if (e.target.files) handleFiles(e.target.files);
-							}}
-						/>
-						{supportsImages && !isGenerating && (
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => fileInputRef.current?.click()}
-								title="Attach images (max 5, 5MB each)"
-								disabled={attachments.length >= MAX_IMAGES}
-							>
-								<ImagePlus className="size-4" />
-								<span className="sr-only">Attach images</span>
-							</Button>
-						)}
-						<Textarea
-							ref={inputRef}
-							rows={1}
-							value={input}
-							onChange={handleInputChange}
-							onKeyDown={handleInputKeyDown}
-							placeholder="Type a message... (Enter to send, Shift+Enter for a new line)"
-							disabled={isGenerating}
-							aria-label="Chat message"
-							className="max-h-40 overflow-y-auto resize-none"
-						/>
-						{isGenerating ? (
-							<Button type="button" variant="outline" onClick={stop}>
-								<Square className="size-4" />
-								<span className="sr-only">Stop generating</span>
-							</Button>
-						) : (
-							<Button
-								type="submit"
-								disabled={!input.trim() && attachments.length === 0}
-							>
-								<SendHorizontal className="size-4" />
-								<span className="sr-only">Send message</span>
-							</Button>
-						)}
-					</form>
-				</div>
-			</div>
+				</DrawerContent>
+			</Drawer>
 
 			<Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
 				<DialogContent>
