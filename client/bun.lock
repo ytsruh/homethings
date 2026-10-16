@@ -13,7 +13,7 @@
         "ai": "^7.0.141",
         "class-variance-authority": "^0.7.1",
         "cn": "^0.4.0",
-        "isbot": "^5.1.29",
+        "isbot": "^5",
         "lucide-react": "^0.483.0",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
