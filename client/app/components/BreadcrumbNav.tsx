@@ -20,9 +20,7 @@ export function BreadcrumbNav() {
 		<Breadcrumb className="hidden md:flex">
 			<BreadcrumbList className="my-3 ml-3">
 				<BreadcrumbItem>
-					<BreadcrumbLink asChild>
-						<Link to="/app">Home</Link>
-					</BreadcrumbLink>
+					<BreadcrumbLink render={<Link to="/app" />}>Home</BreadcrumbLink>
 				</BreadcrumbItem>
 				{pathSegments.map((segment, index) => {
 					const path = `/${pathSegments.slice(0, index + 1).join("/")}`;
@@ -37,10 +35,8 @@ export function BreadcrumbNav() {
 										{segment.charAt(0).toUpperCase() + segment.slice(1)}
 									</BreadcrumbPage>
 								) : (
-									<BreadcrumbLink asChild>
-										<Link to={"/app" + path}>
-											{segment.charAt(0).toUpperCase() + segment.slice(1)}
-										</Link>
+									<BreadcrumbLink render={<Link to={`/app${path}`} />}>
+										{segment.charAt(0).toUpperCase() + segment.slice(1)}
 									</BreadcrumbLink>
 								)}
 							</BreadcrumbItem>

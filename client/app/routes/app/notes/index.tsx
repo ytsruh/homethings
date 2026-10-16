@@ -116,10 +116,13 @@ export default function NotesPage({ loaderData }: Route.ComponentProps) {
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 					<PageHeader title="Notes" subtitle="Manage your notes and tasks" />
 					<Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-						<DialogTrigger asChild>
-							<div className="py-2 flex items-center justify-end gap-2">
-								<Button>New Note</Button>
-							</div>
+						<DialogTrigger
+							render={
+								<div className="py-2 flex items-center justify-end gap-2" />
+							}
+							nativeButton={false}
+						>
+							<Button>New Note</Button>
 						</DialogTrigger>
 						<DialogContent>
 							<DialogHeader>

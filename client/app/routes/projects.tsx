@@ -46,15 +46,21 @@ export default function Projects() {
 										</div>
 										<div className="flex flex-wrap gap-3">
 											{project.link && (
-												<Button asChild variant="secondary">
-													<Link to={project.link.url}>{project.link.text}</Link>
+												<Button
+													variant="secondary"
+													render={<Link to={project.link.url} />}
+													nativeButton={false}
+												>
+													{project.link.text}
 												</Button>
 											)}
 											{project.github && (
-												<Button asChild variant="default">
-													<Link to={project.github.url}>
-														{project.github.text}
-													</Link>
+												<Button
+													variant="default"
+													render={<Link to={project.github.url} />}
+													nativeButton={false}
+												>
+													{project.github.text}
 												</Button>
 											)}
 										</div>

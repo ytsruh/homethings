@@ -194,8 +194,13 @@ export default function NoteDetailPage({ loaderData }: Route.ComponentProps) {
 			<meta name="description" content="View and edit note" />
 			<div className="space-y-6">
 				<div className="flex items-center justify-between">
-					<Button variant="ghost" size="sm" asChild>
-						<Link to="/app/notes">← Back</Link>
+					<Button
+						variant="ghost"
+						size="sm"
+						render={<Link to="/app/notes" />}
+						nativeButton={false}
+					>
+						← Back
 					</Button>
 					<Button
 						variant="destructive"

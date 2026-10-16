@@ -136,5 +136,7 @@ body {
 	}
 	body {
 		@apply bg-background text-foreground;
+		/* Required by Base UI drawer: overlay is absolutely positioned on iOS Safari. */
+		position: relative;
 	}
 }

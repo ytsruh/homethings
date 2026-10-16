@@ -55,14 +55,22 @@ export default function RecipeDetailPage({ loaderData }: Route.ComponentProps) {
 			<title>{`${recipe.title} | Homethings`}</title>
 			<div className="space-y-6">
 				<div className="flex items-center justify-between">
-					<Button variant="ghost" size="sm" asChild>
-						<Link to="/app/recipes">&#8592; Back</Link>
+					<Button
+						variant="ghost"
+						size="sm"
+						render={<Link to="/app/recipes" />}
+						nativeButton={false}
+					>
+						&#8592; Back
 					</Button>
 					<div className="flex gap-2">
-						<Button variant="ghost" size="sm" asChild>
-							<Link to={`/app/recipes/${recipe.id}/edit`}>
-								<Pencil className="h-4 w-4 mr-1" />
-							</Link>
+						<Button
+							variant="ghost"
+							size="sm"
+							render={<Link to={`/app/recipes/${recipe.id}/edit`} />}
+							nativeButton={false}
+						>
+							<Pencil className="h-4 w-4 mr-1" />
 						</Button>
 						<DeleteRecipeModal
 							recipeId={recipe.id}
@@ -171,10 +179,8 @@ function DeleteRecipeModal({ recipeId, recipeTitle }: DeleteRecipeModalProps) {
 
 	return (
 		<Dialog>
-			<DialogTrigger asChild>
-				<Button variant="destructive" size="sm">
-					<Trash2 className="h-4 w-4" />
-				</Button>
+			<DialogTrigger render={<Button variant="destructive" size="sm" />}>
+				<Trash2 className="h-4 w-4" />
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
@@ -185,8 +191,8 @@ function DeleteRecipeModal({ recipeId, recipeTitle }: DeleteRecipeModalProps) {
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
-					<DialogClose asChild>
-						<Button variant="outline">Cancel</Button>
+					<DialogClose render={<Button variant="outline" />}>
+						Cancel
 					</DialogClose>
 					<fetcher.Form
 						method="post"
@@ -253,8 +259,8 @@ function RemoveImageModal({
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
-					<DialogClose asChild>
-						<Button variant="outline">Cancel</Button>
+					<DialogClose render={<Button variant="outline" />}>
+						Cancel
 					</DialogClose>
 					<Button
 						variant="destructive"

@@ -679,16 +679,18 @@ export default function Chat() {
 								<ImagePlus />
 							</InputGroupButton>
 							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<InputGroupButton
-										size="sm"
-										disabled={models.length === 0 || isGenerating}
-										aria-label="Pick a model"
-										className="ml-auto"
-									>
-										{selectedModelEntry?.label ?? "Loading models..."}
-										<ChevronDown />
-									</InputGroupButton>
+								<DropdownMenuTrigger
+									render={
+										<InputGroupButton
+											size="sm"
+											disabled={models.length === 0 || isGenerating}
+											aria-label="Pick a model"
+											className="ml-auto"
+										/>
+									}
+								>
+									{selectedModelEntry?.label ?? "Loading models..."}
+									<ChevronDown />
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start">
 									<DropdownMenuRadioGroup
@@ -736,7 +738,7 @@ export default function Chat() {
 			</div>
 
 			<Drawer
-				direction="right"
+				swipeDirection="right"
 				open={historyOpen}
 				onOpenChange={setHistoryOpen}
 			>

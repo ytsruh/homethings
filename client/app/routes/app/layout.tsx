@@ -159,11 +159,11 @@ export default function AppLayout() {
 														{menuItems.map((item) => {
 															return (
 																<SidebarMenuItem key={item.title}>
-																	<SidebarMenuButton asChild>
-																		<Link to={item.url}>
-																			<item.icon />
-																			<span>{item.title}</span>
-																		</Link>
+																	<SidebarMenuButton
+																		render={<Link to={item.url} />}
+																	>
+																		<item.icon />
+																		<span>{item.title}</span>
 																	</SidebarMenuButton>
 																</SidebarMenuItem>
 															);
