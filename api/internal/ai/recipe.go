@@ -17,7 +17,7 @@ import (
 // RecipeVisionModelID is the vision-capable model used for extraction.
 // It must stay in the SupportedChatModels catalog (models.go) with
 // SupportsImages=true; GetChatModel enforces this at call time.
-const RecipeVisionModelID = "@cf/mistralai/mistral-small-3.1-24b-instruct"
+const RecipeVisionModelID = "@cf/zai-org/glm-5.3-flash"
 
 // RecipeIngredient is one extracted ingredient.
 type RecipeIngredient struct {

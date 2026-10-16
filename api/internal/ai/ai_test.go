@@ -270,19 +270,19 @@ func TestModelCatalogCapabilities(t *testing.T) {
 	if visionModels == 0 {
 		t.Fatal("expected at least one vision-capable model")
 	}
-	vision, err := GetChatModel("@cf/mistralai/mistral-small-3.1-24b-instruct")
+	vision, err := GetChatModel("@cf/zai-org/glm-5.3-flash")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if !vision.SupportsImages {
-		t.Fatal("expected Mistral Small 3.1 to support images")
+		t.Fatal("expected GLM 5.3 Flash to support images")
 	}
-	plain, err := GetChatModel("@cf/meta/llama-3.3-70b-instruct-fp8-fast")
+	plain, err := GetChatModel("google/gemini-3.8-flash")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	if plain.SupportsImages {
-		t.Fatal("expected Llama 3.3 to be text-only")
+		t.Fatal("expected Gemini 3.8 Flash to be text-only")
 	}
 }
 

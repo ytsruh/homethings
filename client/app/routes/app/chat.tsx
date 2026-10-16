@@ -685,12 +685,14 @@ export default function Chat() {
 											size="sm"
 											disabled={models.length === 0 || isGenerating}
 											aria-label="Pick a model"
-											className="ml-auto"
+											className="ml-auto w-48 shrink-0"
 										/>
 									}
 								>
-									{selectedModelEntry?.label ?? "Loading models..."}
-									<ChevronDown />
+									<span className="truncate">
+										{selectedModelEntry?.label ?? "Loading models..."}
+									</span>
+									<ChevronDown className="shrink-0" />
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start">
 									<DropdownMenuRadioGroup

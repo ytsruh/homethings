@@ -18,53 +18,34 @@ type ChatModel struct {
 
 // SupportedChatModels is the allowlist of models the chat endpoint accepts.
 // The frontend fetches this list to render the model picker.
+// IDs are the exact Workers AI run IDs from
+// https://developers.cloudflare.com/ai/models/ .
 var SupportedChatModels = []ChatModel{
 	{
-		ID:             "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-		Label:          "Llama 3.3 70B",
-		Blurb:          "Most capable all-rounder, FP8 fast",
-		ContextWindow:  128000,
+		ID:             "google/gemini-3.8-flash",
+		Label:          "Gemini 3.8 Flash",
+		Blurb:          "Fast Flash model for agents and enterprise workflows",
+		ContextWindow:  1048576,
 		SupportsImages: false,
 	},
 	{
-		ID:             "@cf/openai/gpt-oss-120b",
-		Label:          "GPT-OSS 120B",
-		Blurb:          "OpenAI open-weight, strong reasoning",
-		ContextWindow:  128000,
+		ID:             "openai/gpt-6-luna",
+		Label:          "GPT-6 Luna",
+		Blurb:          "Efficient OpenAI model for focused high-volume tasks",
+		ContextWindow:  1050000,
 		SupportsImages: false,
 	},
 	{
-		ID:             "@cf/openai/gpt-oss-20b",
-		Label:          "GPT-OSS 20B",
-		Blurb:          "Smaller, lower-latency reasoning",
-		ContextWindow:  128000,
-		SupportsImages: false,
-	},
-	{
-		ID:             "@cf/mistralai/mistral-small-3.1-24b-instruct",
-		Label:          "Mistral Small 3.1 24B",
-		Blurb:          "Strong text and vision, 128k context",
-		ContextWindow:  128000,
+		ID:             "@cf/zai-org/glm-5.3-flash",
+		Label:          "GLM 5.3 Flash",
+		Blurb:          "Natively multimodal, strong coding and vision",
+		ContextWindow:  1048576,
 		SupportsImages: true,
-	},
-	{
-		ID:             "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-		Label:          "DeepSeek R1 Distill 32B",
-		Blurb:          "Reasoning-distilled problem solver",
-		ContextWindow:  128000,
-		SupportsImages: false,
-	},
-	{
-		ID:             "@cf/meta/llama-3.1-8b-instruct-fp8",
-		Label:          "Llama 3.1 8B",
-		Blurb:          "Fast and cheap for simple chats",
-		ContextWindow:  128000,
-		SupportsImages: false,
 	},
 }
 
 // DefaultChatModelID is used when the client does not request a model.
-const DefaultChatModelID = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+const DefaultChatModelID = "google/gemini-3.8-flash"
 
 // ResolveChatModel returns the requested model if it is supported,
 // the default if requested is empty, or an error naming the valid options.
