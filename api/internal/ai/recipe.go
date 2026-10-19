@@ -113,7 +113,7 @@ func ExtractRecipeFromImage(ctx context.Context, imageDataURI string) (*Extracte
 
 	temperature := 0.3
 	maxTokens := 2048
-	content, err := cfg.chatCompletion(ctx, modelEntry.ID, messages, &temperature, &maxTokens, true)
+	content, _, err := cfg.completeChat(ctx, modelEntry, messages, &temperature, &maxTokens, true)
 	if err != nil {
 		return nil, err
 	}

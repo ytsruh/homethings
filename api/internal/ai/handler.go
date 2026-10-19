@@ -79,20 +79,9 @@ func (h *Handler) Chat(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	upstream, err := cfg.chatCompletionsStream(ctx, model, modelMessages)
+	upstream, parseDeltas, err := cfg.streamChat(ctx, modelEntry, modelMessages)
 	if err != nil {
-		if chatErr, ok := err.(*chatError); ok {
-			c.Logger().Warnf("chat upstream failure: model=%s code=%s detail=%s", model, chatErr.Code, chatErr.detail)
-			return c.JSON(chatErr.StatusCode, map[string]string{
-				"code":    chatErr.Code,
-				"message": chatErr.Message,
-			})
-		}
-		c.Logger().Warnf("chat upstream failure: model=%s err=%v", model, err)
-		return c.JSON(http.StatusBadGateway, map[string]string{
-			"code":    codeProviderError,
-			"message": "The AI service failed. Please try again.",
-		})
+		return writeChatUpstreamError(c, model, err)
 	}
 	defer upstream.Body.Close()
 
@@ -154,7 +143,7 @@ func (h *Handler) Chat(c echo.Context) error {
 	safeWrite(map[string]string{"type": "text-start", "id": textID})
 
 	var assistantText strings.Builder
-	finishReason, usage, deltaErr := extractDeltas(upstream.Body, func(delta string) {
+	finishReason, usage, deltaErr := parseDeltas(upstream.Body, func(delta string) {
 		assistantText.WriteString(delta)
 		safeWrite(map[string]string{
 			"type":  "text-delta",
@@ -348,4 +337,57 @@ func (h *Handler) Models(c echo.Context) error {
 		"default": DefaultChatModelID,
 		"models":  SupportedChatModels,
 	})
+}
+
+// writeChatUpstreamError maps a transport failure to a user-safe JSON body.
+func writeChatUpstreamError(c echo.Context, model string, err error) error {
+	if chatErr, ok := err.(*chatError); ok {
+		c.Logger().Warnf("chat upstream failure: model=%s code=%s detail=%s", model, chatErr.Code, chatErr.detail)
+		return c.JSON(chatErr.StatusCode, map[string]string{
+			"code":    chatErr.Code,
+			"message": chatErr.Message,
+		})
+	}
+	c.Logger().Warnf("chat upstream failure: model=%s err=%v", model, err)
+	return c.JSON(http.StatusBadGateway, map[string]string{
+		"code":    codeProviderError,
+		"message": "The AI service failed. Please try again.",
+	})
+}
+
+// writeSingleDeltaChat serves non-streaming transports (Responses via /ai/v1/responses)
+// through the same Vercel AI SDK stream frames: one text-delta then finish.
+// Usage persists exactly like the streaming path.
+func writeSingleDeltaChat(c echo.Context, h *Handler, userID, model, sessionID, text string, usage *openAIUsage) error {
+	res := c.Response()
+	header := res.Header()
+	header.Set("Content-Type", "text/event-stream")
+	header.Set("Cache-Control", "no-cache")
+	header.Set("Connection", "keep-alive")
+	header.Set("X-Accel-Buffering", "no")
+	header.Set("x-vercel-ai-ui-message-stream", "v1")
+	header.Set("X-Chat-Session-Id", sessionID)
+
+	flusher, ok := res.Writer.(http.Flusher)
+	if !ok {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": "Streaming not supported"})
+	}
+	res.WriteHeader(http.StatusOK)
+
+	messageID := uuid.NewString()
+	textID := uuid.NewString()
+
+	_ = writePart(res, flusher, map[string]string{"type": "start", "messageId": messageID})
+	_ = writePart(res, flusher, map[string]string{"type": "start-step"})
+	_ = writePart(res, flusher, map[string]string{"type": "text-start", "id": textID})
+	if text != "" {
+		_ = writePart(res, flusher, map[string]string{"type": "text-delta", "id": textID, "delta": text})
+	}
+	c.Logger().Infof("chat complete: model=%s finish_reason=stop (non-streaming)", model)
+	h.persistAssistantTurn(context.Background(), userID, model, sessionID, text, usage)
+	_ = writePart(res, flusher, map[string]string{"type": "text-end", "id": textID})
+	_ = writePart(res, flusher, map[string]string{"type": "finish-step"})
+	_ = writePart(res, flusher, map[string]string{"type": "finish"})
+	writeDone(res, flusher)
+	return nil
 }

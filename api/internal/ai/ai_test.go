@@ -263,6 +263,11 @@ func TestModelCatalogCapabilities(t *testing.T) {
 		if m.ContextWindow <= 0 {
 			t.Fatalf("model %q missing context window", m.ID)
 		}
+		switch m.Transport {
+		case TransportChatCompletions, TransportAnthropicMessages, TransportResponses:
+		default:
+			t.Fatalf("model %q has unknown transport %q", m.ID, m.Transport)
+		}
 		if m.SupportsImages {
 			visionModels++
 		}
@@ -283,6 +288,153 @@ func TestModelCatalogCapabilities(t *testing.T) {
 	}
 	if plain.SupportsImages {
 		t.Fatal("expected Gemini 3.8 Flash to be text-only")
+	}
+	argon, err := GetChatModel("google/gemini-4-argon")
+	if err != nil {
+		t.Fatalf("expected Gemini 4 Argon in catalog: %v", err)
+	}
+	if argon.Transport != TransportChatCompletions {
+		t.Fatalf("expected Argon on chat_completions, got %q", argon.Transport)
+	}
+	for _, tc := range []struct {
+		id        string
+		transport ModelTransport
+	}{
+		{"meta/muse-spark-1.3", TransportResponses},
+		{"meta/muse-wonder-1.0", TransportResponses},
+		{"anthropic/claude-haiku-5.5", TransportAnthropicMessages},
+	} {
+		entry, err := GetChatModel(tc.id)
+		if err != nil {
+			t.Fatalf("expected %q in catalog: %v", tc.id, err)
+		}
+		if entry.Transport != tc.transport {
+			t.Fatalf("expected %q on %q, got %q", tc.id, tc.transport, entry.Transport)
+		}
+		if entry.SupportsImages {
+			t.Fatalf("expected %q to be text-only until vision is verified", tc.id)
+		}
+	}
+}
+
+func TestOpenAIMessagesToAnthropic(t *testing.T) {
+	msgs := []openAIMessage{
+		{Role: "system", Content: "Be brief."},
+		{Role: "user", Content: "Hello"},
+		{Role: "assistant", Content: "Hi"},
+	}
+	system, converted := openAIMessagesToAnthropic(msgs)
+	if system != "Be brief." {
+		t.Fatalf("expected system extracted, got %q", system)
+	}
+	if len(converted) != 2 {
+		t.Fatalf("expected 2 messages, got %d", len(converted))
+	}
+	if converted[0].Role != "user" {
+		t.Fatalf("unexpected role %q", converted[0].Role)
+	}
+	if text, ok := converted[0].Content.(string); !ok || text != "Hello" {
+		t.Fatalf("unexpected content %+v", converted[0].Content)
+	}
+}
+
+func TestOpenAIMessagesToAnthropicImages(t *testing.T) {
+	imgURL := "data:image/png;base64," + strings.Repeat("a", 20)
+	msgs := []openAIMessage{{
+		Role: "user",
+		Content: []openAIContentPart{
+			{Type: "text", Text: "What is this?"},
+			{Type: "image_url", ImageURL: &struct {
+				URL string `json:"url"`
+			}{URL: imgURL}},
+		},
+	}}
+	_, converted := openAIMessagesToAnthropic(msgs)
+	if len(converted) != 1 {
+		t.Fatalf("expected 1 message, got %d", len(converted))
+	}
+	blocks, ok := converted[0].Content.([]anthropicContentBlock)
+	if !ok {
+		t.Fatalf("expected blocks, got %T", converted[0].Content)
+	}
+	if len(blocks) != 2 || blocks[0].Type != "text" || blocks[1].Type != "image" {
+		t.Fatalf("unexpected blocks %+v", blocks)
+	}
+	if blocks[1].Source == nil || blocks[1].Source.MediaType != "image/png" {
+		t.Fatalf("bad image source %+v", blocks[1].Source)
+	}
+}
+
+func TestExtractAnthropicDeltas(t *testing.T) {
+	upstream := "event: message_start\n" +
+		"data: {\"type\":\"message_start\",\"message\":{\"usage\":{\"input_tokens\":12}}}\n\n" +
+		"event: content_block_delta\n" +
+		"data: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\"Hello\"}}\n\n" +
+		"data: {\"type\":\"content_block_delta\",\"delta\":{\"type\":\"text_delta\",\"text\":\" world\"}}\n\n" +
+		"event: message_delta\n" +
+		"data: {\"type\":\"message_delta\",\"delta\":{\"stop_reason\":\"end_turn\"},\"usage\":{\"output_tokens\":5}}\n\n" +
+		"data: [DONE]\n\n"
+	var deltas []string
+	finish, usage, err := extractAnthropicDeltas(strings.NewReader(upstream), func(s string) {
+		deltas = append(deltas, s)
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := strings.Join(deltas, ""); got != "Hello world" {
+		t.Fatalf("unexpected deltas %q", got)
+	}
+	if finish != "stop" {
+		t.Fatalf("expected stop, got %q", finish)
+	}
+	if usage == nil || usage.PromptTokens == nil || *usage.PromptTokens != 12 {
+		t.Fatalf("bad prompt usage %+v", usage)
+	}
+	if usage.CompletionTokens == nil || *usage.CompletionTokens != 5 {
+		t.Fatalf("bad completion usage %+v", usage)
+	}
+	if usage.TotalTokens == nil || *usage.TotalTokens != 17 {
+		t.Fatalf("bad total usage %+v", usage)
+	}
+}
+
+func TestMapAnthropicStopReason(t *testing.T) {
+	if got := mapAnthropicStopReason("end_turn"); got != "stop" {
+		t.Fatalf("expected stop, got %q", got)
+	}
+	if got := mapAnthropicStopReason("max_tokens"); got != "length" {
+		t.Fatalf("expected length, got %q", got)
+	}
+}
+
+func TestExtractResponsesDeltas(t *testing.T) {
+	upstream := "event: response.output_text.delta\n" +
+		"data: {\"type\":\"response.output_text.delta\",\"delta\":\"Hello\"}\n\n" +
+		"data: {\"type\":\"response.output_text.delta\",\"delta\":\" world\"}\n\n" +
+		"event: response.completed\n" +
+		"data: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"usage\":{\"input_tokens\":8,\"output_tokens\":4,\"total_tokens\":12}}}\n\n" +
+		"data: [DONE]\n\n"
+	var deltas []string
+	finish, usage, err := extractResponsesDeltas(strings.NewReader(upstream), func(s string) {
+		deltas = append(deltas, s)
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if got := strings.Join(deltas, ""); got != "Hello world" {
+		t.Fatalf("unexpected deltas %q", got)
+	}
+	if finish != "stop" {
+		t.Fatalf("expected stop, got %q", finish)
+	}
+	if usage == nil || usage.PromptTokens == nil || *usage.PromptTokens != 8 {
+		t.Fatalf("bad prompt usage %+v", usage)
+	}
+	if usage.CompletionTokens == nil || *usage.CompletionTokens != 4 {
+		t.Fatalf("bad completion usage %+v", usage)
+	}
+	if usage.TotalTokens == nil || *usage.TotalTokens != 12 {
+		t.Fatalf("bad total usage %+v", usage)
 	}
 }
 

@@ -60,7 +60,7 @@ func (c Config) chatCompletionsStream(ctx context.Context, model string, message
 // endpoint without streaming and returns the assistant message content.
 // Shared transport for non-chat features (e.g. recipe extraction) so they
 // reuse the same credentials, error mapping, and message types as chat.
-func (c Config) chatCompletion(ctx context.Context, model string, messages []openAIMessage, temperature *float64, maxTokens *int, jsonMode bool) (string, error) {
+func (c Config) chatCompletion(ctx context.Context, model string, messages []openAIMessage, temperature *float64, maxTokens *int, jsonMode bool) (string, *openAIUsage, error) {
 	url := fmt.Sprintf(
 		"https://api.cloudflare.com/client/v4/accounts/%s/ai/v1/chat/completions",
 		c.AccountID,
@@ -79,12 +79,12 @@ func (c Config) chatCompletion(ctx context.Context, model string, messages []ope
 
 	body, err := json.Marshal(payload)
 	if err != nil {
-		return "", fmt.Errorf("failed to encode chat request: %w", err)
+		return "", nil, fmt.Errorf("failed to encode chat request: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
 	if err != nil {
-		return "", fmt.Errorf("failed to create chat request: %w", err)
+		return "", nil, fmt.Errorf("failed to create chat request: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.APIToken)
@@ -92,7 +92,7 @@ func (c Config) chatCompletion(ctx context.Context, model string, messages []ope
 	client := &http.Client{Timeout: 120 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", &chatError{
+		return "", nil, &chatError{
 			Code:       codeProviderError,
 			Message:    "The AI service failed. Please try again.",
 			StatusCode: http.StatusBadGateway,
@@ -103,13 +103,13 @@ func (c Config) chatCompletion(ctx context.Context, model string, messages []ope
 
 	if resp.StatusCode != http.StatusOK {
 		detail, _ := io.ReadAll(io.LimitReader(resp.Body, 4<<10))
-		return "", mapUpstreamError(resp.StatusCode, strings.TrimSpace(string(detail)))
+		return "", nil, mapUpstreamError(resp.StatusCode, strings.TrimSpace(string(detail)))
 	}
 
 	var decoded openAICompletionResponse
 	raw, err := io.ReadAll(io.LimitReader(resp.Body, 4<<20))
 	if err != nil {
-		return "", &chatError{
+		return "", nil, &chatError{
 			Code:       codeProviderError,
 			Message:    "The AI service failed. Please try again.",
 			StatusCode: http.StatusBadGateway,
@@ -117,7 +117,7 @@ func (c Config) chatCompletion(ctx context.Context, model string, messages []ope
 		}
 	}
 	if err := json.Unmarshal(raw, &decoded); err != nil {
-		return "", &chatError{
+		return "", nil, &chatError{
 			Code:       codeProviderError,
 			Message:    "The AI service failed. Please try again.",
 			StatusCode: http.StatusBadGateway,
@@ -125,12 +125,12 @@ func (c Config) chatCompletion(ctx context.Context, model string, messages []ope
 		}
 	}
 	if len(decoded.Choices) == 0 {
-		return "", &chatError{
+		return "", nil, &chatError{
 			Code:       codeProviderError,
 			Message:    "The AI service failed. Please try again.",
 			StatusCode: http.StatusBadGateway,
 			detail:     "no choices in upstream response",
 		}
 	}
-	return decoded.Choices[0].Message.Content, nil
+	return decoded.Choices[0].Message.Content, decoded.Usage, nil
 }
